@@ -1,3 +1,13 @@
+# TODO lists
+
+>after implement posting
+
+1. Navigation.astro: `.extra-info` actual implementation
+2. 
+3. 
+
+blah blah..
+
 # Astro Starter Kit: Minimal
 
 ```sh
