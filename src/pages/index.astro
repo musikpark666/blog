@@ -1,17 +1,20 @@
 ---
-
+import Navigation from '../components/Navigation.astro';
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Test</title>
-	</head>
-	<body>
-		<h1>Deploy Test</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>blog</title>
+  </head>
+  <body>
+    <a href="/">Home</a>
+    <Navigation />
+    <h1>blog</h1>
+    <p>contents...</p>
+  </body>
 </html>
