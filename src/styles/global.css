@@ -1,0 +1,22 @@
+:root {
+  --dc-color-1: #1d2761;
+  --dc-color-2: #29367c;
+  --dc-color-3: #3b4890;
+
+  --layout-max-width: 1200px;
+  --layout-min-width: 320px;
+}
+
+*,*::before,*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  font-size: 1rem;
+  min-width: var(--layout-min-width);
+}
