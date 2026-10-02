@@ -5,6 +5,14 @@
 1. Navigation.astro: `.extra-info` actual implementation
 2. Header.astro: **search** implementation
 3. Header.astro: **menu, night mode** implementation
+4. Footer.astro: **btns** implementation
+5. Footer.astro: `.footer-top` wide view
+6. **About Page** implementation
+
+>bug?
+
+1. Header logo image flicking
+2. Page navigation latency (Dev Server error?)
 
 blah blah..
 
