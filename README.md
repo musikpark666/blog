@@ -3,8 +3,8 @@
 >after implement posting
 
 1. Navigation.astro: `.extra-info` actual implementation
-2. 
-3. 
+2. Header.astro: **search** implementation
+3. Header.astro: **menu, night mode** implementation
 
 blah blah..
 
