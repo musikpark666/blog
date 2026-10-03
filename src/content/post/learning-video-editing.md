@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/PostLayout.astro
 title: "映像編集を学ぼう"
 description: ""
 image: ""

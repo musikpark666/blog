@@ -1,13 +1,19 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-const { frontmatter } = Astro.props;
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'post'>;
+}
+
+const { post } = Astro.props;
 ---
 
-<BaseLayout title={`${frontmatter.title} | musik.gallery`}>
-  <h1>{frontmatter.title}</h1>
-  <p>{frontmatter.pubDate.toString().slice(0,10)}</p>
-  <p><em>{frontmatter.description}</em></p>
-  <p>{frontmatter.categories} ギャラリー</p>
-  <img src={frontmatter.image} width="300" alt="thumbnail image" />
+<BaseLayout title={`${post.data.title} | musik.gallery`}>
+  <h1>{post.data.title}</h1>
+  <p>{post.data.pubDate.toString().slice(0,10)}</p>
+  <p><em>{post.data.description}</em></p>
+  <p>{post.data.categories} ギャラリー</p>
+  <img src={post.data.image} width="300" alt="thumbnail image" />
   <slot />
 </BaseLayout>
