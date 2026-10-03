@@ -14,7 +14,9 @@
 1. Header logo image flicking
 2. Page navigation latency (Dev Server error?)
 
-blah blah..
+>will be soon
+
+1. mini gallery - fediverse microblog integrate
 
 # Astro Starter Kit: Minimal
 
