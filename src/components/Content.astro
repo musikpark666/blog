@@ -1,3 +1,80 @@
+---
+import Sidebar from './Sidebar.astro';
+---
+
 <div class="content-wrapper">
-  <slot />
+  <div class="left-ad">
+    <a href="/" target="_blank" rel="sponsored noopener">
+      <img src="/left-ad.png" alt="temp ad" loading="lazy" />
+    </a>
+  </div>
+  <article>
+    <slot />
+  </article>
+  <aside>
+    <Sidebar />
+  </aside>
 </div>
+
+<style>
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: var(--layout-max-width);
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+  }
+
+  .left-ad {
+    display: none;
+  }
+  aside {
+    display: none;
+  }
+
+  article {
+    padding: 10px 0 10px 10px;
+    margin: 0 10px 0 0 ;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .content-wrapper {
+      grid-template-columns: 1fr calc(200px + 10px);
+    }
+
+    aside {
+      display: block;
+      padding: 10px 10px 10px 0;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .content-wrapper {
+      grid-template-columns: 1fr calc(250px + 10px);
+    }
+  }
+
+  @media (min-width: 1700px) {
+    .content-wrapper {
+      grid-template-columns: auto 1fr calc(250px + 10px);
+    }
+
+    .left-ad {
+      display: block;
+      align-self: start;
+      width: 160px;
+      height: 600px;
+      margin: 10px 0 0 -160px !important;
+      position: sticky;
+      top: 10px;
+      transform: translateX(-10px);
+    }
+    .left-ad img {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+</style>
