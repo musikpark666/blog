@@ -1,5 +1,9 @@
+---
+import Social from './Social.astro';
+---
+
 <div class="sidebar-about">
-  <div class="info">
+  <div class="my-info">
     <a class="info-name" href="/about/">
       <span><strong>ムシク</strong>ちゃん</span>
       <img src="/galler-con.gif" alt="" width="12" height="11" />
@@ -8,13 +12,123 @@
     <a class="info-btn" href="/about/">紹介</a>
   </div>
   <div class="social">
-    socials
+    <Social />
   </div>
 </div>
 
+<section class="sidebar-item sidebar-recent" >
+  <div class="sidebar-item-header">
+    <h2><a href="/all/">最近の投稿</a></h2>
+  </div>
+  <div class="sidebar-item-recent">
+    - 投稿 3
+    - 投稿 2
+    - 投稿 1
+  </div>
+</section>
+
+<section class="sidebar-item sidebar-galleries">
+  <div class="sidebar-item-header">
+    <h2><a href="/g/">ギャラリーリスト</a></h2>
+  </div>
+  <div class="sidebar-item-list">
+    - ギャラリー 1
+    - ギャラリー 2
+    - ギャラリー 3
+    - ギャラリー 4
+  </div>
+</section>
+
+<section class="sidebar-item">
+  <div class="sidebar-item-header">
+    <h2>名言</h2>
+  </div>
+  <div class="sidebar-item-">
+    blah blah...
+  </div>
+</section>
+
+<section class="sidebar-item">
+  <div class="sidebar-item-header">
+    <h2>ニュース</h2>
+  </div>
+  <div class="sidebar-item-">
+    blah blah...
+  </div>
+</section>
+
 <style>
+  /* about widget */
   .sidebar-about {
-    margin-bottom: .75rem;
     border: 1px solid var(--dc-color-2);
+    margin-bottom: 15px;
+  }
+  .my-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 42px;
+  }
+  .info-name {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: var(--dc-color-2);
+    text-decoration: none;
+  }
+  .info-name img {
+    margin-left: 2px;
+    margin-bottom: 5px;
+    align-self: flex-end;
+  }
+  .info-btn {
+    padding: 0 6px;
+    border: 1px solid var(--dc-color-2);
+    background-color: var(--dc-color-3);
+    color: #fff;
+    text-shadow: 0px 1px var(--dc-color-1);
+    text-decoration: none;
+  }
+  .info-name:hover {
+    color: var(--dc-color-1);
+  }
+  .info-btn:hover {
+    background-color: var(--dc-color-2);
+    color: #ffed44;
+  }
+  .social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    height: 36px;
+    background-color: #f3f3f3;
+  }
+
+  /* batch styles */
+  .sidebar-item {
+    padding: 0 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+  }
+  .sidebar-item-header {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding-left: 2px;
+    border-bottom: 1px dashed #aaa;
+  }
+  .sidebar-item-header h2 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .sidebar-item-header a {
+    color: #333;
+    text-decoration: none;
+  }
+  .sidebar-item-header a:hover {
+    color: var(--dc-color-2);
   }
 </style>

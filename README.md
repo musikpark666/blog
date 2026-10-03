@@ -10,10 +10,11 @@
 6. Sidebar.astro: implement several **widgets**
 7. **About Page** implementation
 
->bug?
+>issue?
 
 1. Header logo image flicking
 2. Page navigation latency (Dev Server error?)
+3. Sidebar UI broken
 
 >will be soon
 
@@ -23,8 +24,10 @@
 >someday
 
 1. remake favicon
+4. add socials (GitHub, fix links...)
 2. setting **AD** (Content.astro - left area)
 3. focus-visible styling
+4. aria-labeling
 n. refer to other sites (blog, news, ...)
 
 # Astro Starter Kit: Minimal
