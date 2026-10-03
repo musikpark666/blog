@@ -7,7 +7,8 @@
 3. Header.astro: **menu, night mode** implementation
 4. Footer.astro: **btns** implementation
 5. Footer.astro: `.footer-top` wide view
-6. **About Page** implementation
+6. Sidebar.astro: implement several **widgets**
+7. **About Page** implementation
 
 >bug?
 
@@ -16,7 +17,15 @@
 
 >will be soon
 
-1. mini gallery - fediverse microblog integrate
+1. improve deploy script (don't copy all)
+2. mini gallery - fediverse microblog integrate
+
+>someday
+
+1. remake favicon
+2. setting **AD** (Content.astro - left area)
+3. focus-visible styling
+n. refer to other sites (blog, news, ...)
 
 # Astro Starter Kit: Minimal
 
