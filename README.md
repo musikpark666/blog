@@ -2,6 +2,7 @@
 
 >after implement posting
 
+0. **image optimization** (`content.config.ts`, ...)
 1. Navigation.astro: `.extra-info` actual implementation
 2. Header.astro: **search** implementation
 3. Header.astro: **menu, night mode** implementation
