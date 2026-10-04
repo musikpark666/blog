@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import GalleryHeader from '../../../components/GalleryHeader.astro';
+
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+type BlogPost = CollectionEntry<'post'>;
+
+export const getStaticPaths = (async () => {
+  const postsPerPage = 20; // changeable
+  const [galleries, posts] = await Promise.all([
+    getCollection('gallery'),
+    getCollection('post'),
+  ]);
+  const postsByGallery = new Map<string, BlogPost[]>();
+
+  for (const post of posts) {
+    for (const category of post.data.categories) {
+      const galleryPosts = postsByGallery.get(category.id) ?? [];
+      galleryPosts.push(post);
+      postsByGallery.set(category.id, galleryPosts);
+    }
+  }
+
+  for (const galleryPosts of postsByGallery.values()) {
+    galleryPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  }
+
+  return galleries.flatMap((gallery) => {
+    const galleryPosts = postsByGallery.get(gallery.id) ?? [];
+    const totalPages = Math.max(1, Math.ceil(galleryPosts.length / postsPerPage));
+
+    return Array.from({ length: totalPages }, (_, pageIndex) => {
+      const currentPage = pageIndex + 1;
+      const pageStart = pageIndex * postsPerPage;
+      const props = {
+        gallery,
+        pagePosts: galleryPosts.slice(pageStart, pageStart + postsPerPage),
+        postCount: galleryPosts.length,
+        currentPage,
+        totalPages,
+      };
+
+      return currentPage === 1
+        ? [
+            { params: { category: gallery.id, page: undefined }, props },
+            { params: { category: gallery.id, page: '1' }, props },
+          ]
+        : [{ params: { category: gallery.id, page: String(currentPage) }, props }];
+    }).flat();
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  gallery: CollectionEntry<'gallery'>;
+  pagePosts: BlogPost[];
+  postCount: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+const { gallery, pagePosts, postCount, currentPage, totalPages } = Astro.props;
+
+if (Astro.params.page === '1') {
+  return Astro.redirect(`/g/${gallery.id}/`);
+}
+
+const { title, description, thumbnail } = gallery.data;
+const pageTitle = currentPage === 1
+  ? `${title} ギャラリー | musik.gallery`
+  : `${title} ギャラリー - ${currentPage}ページ | musik.gallery`;
+---
+
+<BaseLayout title={pageTitle} description={description}>
+  <GalleryHeader gallery={gallery} postCount={postCount} />
+  <Image src={thumbnail} alt="" width={120} height={90} fit="cover" />
+  <p>{description}</p>
+
+  {pagePosts.length > 0 ? (
+    <ul>
+      {pagePosts.map((post) => (
+        <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>
+      ))}
+    </ul>
+  ) : (
+    <p>投稿はまだありません。</p>
+  )}
+
+  {totalPages > 1 && (
+    <nav aria-label="ページ切り替え">
+      {currentPage > 1 && (
+        <a href={currentPage === 2 ? `/g/${gallery.id}/` : `/g/${gallery.id}/${currentPage - 1}/`}>
+          前のページ
+        </a>
+      )}
+      <span> {currentPage} / {totalPages} </span>
+      {currentPage < totalPages && (
+        <a href={`/g/${gallery.id}/${currentPage + 1}/`}>次のページ</a>
+      )}
+    </nav>
+  )}
+</BaseLayout>

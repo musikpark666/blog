@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  gallery: CollectionEntry<'gallery'>;
+  postCount: number;
+}
+
+const { gallery, postCount } = Astro.props;
+const { title, relatedSites } = gallery.data;
+const dialogId = `related-sites-dialog-${gallery.id}`;
+---
+
+<div class="gallery-header" data-gallery-header-root>
+  <header class="gallery-header">
+    <h1>
+      <a href={`/g/${gallery.id}/`}>{title}<span> ギャラリー</span></a>
+      <small>({postCount}件)</small>
+    </h1>
+    <div class="gallery-header-action">
+      <button type="button" aria-labe="ギャラリー情報">
+        <span class="action-label-short">ⓘ</span>
+        <span class="action-label-long">ギャラリー情報</span>
+      </button>
+    </div>
+  </header>
+</div>
