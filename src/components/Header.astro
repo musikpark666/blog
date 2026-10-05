@@ -1,12 +1,25 @@
 ---
+import { Image } from 'astro:assets';
 import Navigation from '../components/Navigation.astro';
 import TitleSVG from '../../public/brand-title.svg';
+import brandLogo from '../assets/imgs/brand-logo-foiled.png';
 ---
 
 <header>
   <div class="header-container">
     <a class="header-brand" href="/" title="朴武識のブログ">
-      <img class="header-brand-logo" src="/brand-logo-foiled.png" alt="blog logo" />
+      <Image
+        class="header-brand-logo"
+        src={brandLogo}
+        alt="blog logo"
+        width={48}
+        height={48}
+        widths={[36, 48, 72, 96, 108, 144]}
+        sizes="(min-width: 768px) 48px, 36px"
+        format="avif"
+        quality={70}
+        loading="eager"
+      />
       <TitleSVG class="header-brand-title" fill="currentColor" />
     </a>
     <div class="header-search">
@@ -65,6 +78,7 @@ import TitleSVG from '../../public/brand-title.svg';
   }
   .header-brand-logo {
     height: 100%;
+    width: auto;
   }
   .header-brand-title {
     display: none;

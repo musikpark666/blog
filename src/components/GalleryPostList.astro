@@ -93,8 +93,8 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
 
   <nav class="post-list-pagination" aria-label="ページ切り替え">
     {currentPage > 1
-      ? <a class="pagination-link" href={getGalleryPageHref(1)} aria-label="最初のページ" title="最初のページ">«</a>
-      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最初のページ" title="最初のページ">«</span>}
+      ? <a class="pagination-link" href={getGalleryPageHref(1)} aria-label="最初のページ" title="最初のページ">≪</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最初のページ" title="最初のページ">≪</span>}
 
     {currentPage > 1 
       ? <a class="pagination-direction pagination-link" href={getGalleryPageHref(currentPage - 1)}>前へ</a>
@@ -118,8 +118,8 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
       : <span class="pagination-direction pagination-link is-disabled" aria-disabled="true">次へ</span>}
 
     {currentPage < totalPages
-      ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">»</a>
-      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">»</span>}
+      ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">≫</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">≫</span>}
   </nav>
 </section>
 
@@ -325,7 +325,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
   }
 
   /* media queries */
-  @media (min-width: 430px) {
+  @media (min-width: 380px) {
     .pagination-numbers {
       display: none;
     }
@@ -334,7 +334,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     }
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 540px) {
     .post-list-pagination {
       gap: 6px;
     }

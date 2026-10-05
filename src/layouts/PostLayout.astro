@@ -14,21 +14,20 @@ interface Props {
 const { post, galleryContexts } = Astro.props;
 const { pubDate, updDate } = post.data;
 const defaultContext = galleryContexts[0];
-const postDateFormatter = new Intl.DateTimeFormat('ja-JP', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  timeZone: 'Asia/Tokyo',
-});
-const postTimeFormatter = new Intl.DateTimeFormat('ja-JP', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-  timeZone: 'Asia/Tokyo',
-});
-const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
-const formatPostDateTime = (date: Date) => `${formatPostDate(date)} ${postTimeFormatter.format(date)}`;
-const formattedPubDate = updDate ? formatPostDate(pubDate) : formatPostDateTime(pubDate);
+
+function formatPostDate(date: Date, showTime = true) {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: showTime ? '2-digit' : undefined,
+    minute: showTime ? '2-digit' : undefined,
+    hourCycle: 'h23',
+    timeZone: 'Asia/Tokyo',
+  }).format(date).replaceAll('/', '.');
+}
+
+const formattedPubDate = formatPostDate(pubDate, !updDate);
 ---
 
 <BaseLayout title={`${post.data.title} | musik.gallery`} description={post.data.description}>
@@ -46,7 +45,7 @@ const formattedPubDate = updDate ? formatPostDate(pubDate) : formatPostDateTime(
       <p class="post-description">{post.data.description}</p>
       <p class="post-dates">
         <time datetime={pubDate.toISOString()}>{formattedPubDate}</time>
-        {updDate && <span>（更新：<time datetime={updDate.toISOString()}>{formatPostDateTime(updDate)}</time>）</span>}
+        {updDate && <span>（更新：<time datetime={updDate.toISOString()}>{formatPostDate(updDate)}</time>）</span>}
       </p>
     </header>
     <div class="post-content">
