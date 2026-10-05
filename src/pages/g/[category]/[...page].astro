@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import GalleryHeader from '../../../components/GalleryHeader.astro';
+import GalleryPostList from '../../../components/GalleryPostList.astro';
 
 import { Image } from 'astro:assets';
 import type { GetStaticPaths } from 'astro';
@@ -81,32 +82,12 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
     <p>{description}</p>
   </div>
 
-  <Image src={thumbnail} alt="" width={120} height={90} fit="cover" />
-  <p>{description}</p>
-
-  {pagePosts.length > 0 ? (
-    <ul>
-      {pagePosts.map((post) => (
-        <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>
-      ))}
-    </ul>
-  ) : (
-    <p>投稿はまだありません。</p>
-  )}
-
-  {totalPages > 1 && (
-    <nav aria-label="ページ切り替え">
-      {currentPage > 1 && (
-        <a href={currentPage === 2 ? `/g/${gallery.id}/` : `/g/${gallery.id}/${currentPage - 1}/`}>
-          前のページ
-        </a>
-      )}
-      <span> {currentPage} / {totalPages} </span>
-      {currentPage < totalPages && (
-        <a href={`/g/${gallery.id}/${currentPage + 1}/`}>次のページ</a>
-      )}
-    </nav>
-  )}
+  <GalleryPostList 
+    gallery={gallery}
+    posts={pagePosts}
+    currentPage={currentPage}
+    totalPages={totalPages}
+  />
 </BaseLayout>
 
 <style>
