@@ -7,21 +7,116 @@ interface Props {
 }
 
 const { gallery, postCount } = Astro.props;
-const { title, relatedSites } = gallery.data;
-const dialogId = `related-sites-dialog-${gallery.id}`;
+const { title } = gallery.data;
 ---
 
-<div class="gallery-header" data-gallery-header-root>
-  <header class="gallery-header">
-    <h1>
-      <a href={`/g/${gallery.id}/`}>{title}<span> ギャラリー</span></a>
-      <small>({postCount}件)</small>
-    </h1>
-    <div class="gallery-header-action">
-      <button type="button" aria-labe="ギャラリー情報">
-        <span class="action-label-short">ⓘ</span>
-        <span class="action-label-long">ギャラリー情報</span>
-      </button>
-    </div>
-  </header>
-</div>
+<header class="gallery-header" data-gallery-header-root>
+  <h1>
+    <a href={`/g/${gallery.id}/`}>{title}<span> ギャラリー</span></a>
+    <small>({postCount}件)</small>
+  </h1>
+  <div class="gallery-header-action">
+    <button type="button" aria-label="ギャラリー情報">
+      <span class="action-label-short">ⓘ</span>
+      <span class="action-label-long">ギャラリー情報</span>
+    </button>
+    <button type="button">案内</button>
+  </div>
+</header>
+
+<style>
+  .gallery-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--dc-color-2);
+    gap: 2px;
+    min-width: 0;
+  }
+
+  /* title */
+  .gallery-header h1 {
+    display: flex;
+    align-items: baseline;
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.35;
+    min-width: 0;
+  }
+  .gallery-header  h1 a {
+    color: var(--dc-color-2);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .gallery-header h1 small {
+    color: #667085; /* previously #98a2b3 */
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .gallery-header h1 span {
+    display: none;
+  }
+  .gallery-header h1 a:hover,
+  .gallery-header h1 a:focus-visible {
+    color: var(--dc-color-3);
+    outline: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* actions */
+  .gallery-header-action {
+    display: flex;
+  }
+  .gallery-header-action button {
+    border: 0;
+    background-color: transparent;
+    color: #475467;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .gallery-header-action button + button {
+    position: relative;
+    margin-left: 5px;
+  }
+  .gallery-header-action button + button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -3px;
+    width: 1px;
+    height: 10px;
+    background-color: #ccc;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .gallery-header-action button:hover,
+  .gallery-header-action button:focus-visible {
+    background: #f1f4ff;
+    color: var(--dc-color-2);
+    outline: none;
+  }
+  .action-label-long {
+    display: none;
+  }
+
+  /* media */
+  @media (min-width: 430px) {
+    .gallery-header h1 span {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .action-label-long {
+      display: inline;
+    }
+    .action-label-short {
+      display: none;
+    }
+  }
+</style>

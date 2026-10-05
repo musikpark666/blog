@@ -10,7 +10,7 @@ import { getCollection } from 'astro:content';
 type BlogPost = CollectionEntry<'post'>;
 
 export const getStaticPaths = (async () => {
-  const postsPerPage = 20; // changeable
+  const postsPerPage = 2; // changeable
   const [galleries, posts] = await Promise.all([
     getCollection('gallery'),
     getCollection('post'),
@@ -69,13 +69,18 @@ if (Astro.params.page === '1') {
 }
 
 const { title, description, thumbnail } = gallery.data;
-const pageTitle = currentPage === 1
-  ? `${title} ギャラリー | musik.gallery`
-  : `${title} ギャラリー - ${currentPage}ページ | musik.gallery`;
+const pageTitle = `${title} ギャラリー | musik.gallery`;
+// const pageTitle = currentPage === 1 ? `${title} ギャラリー | musik.gallery` : `${title} ギャラリー - ${currentPage}ページ | musik.gallery`;
 ---
 
 <BaseLayout title={pageTitle} description={description}>
   <GalleryHeader gallery={gallery} postCount={postCount} />
+
+  <div class="gallery-intro">
+    <Image src={thumbnail} alt="" width="120" height="90" fit="cover" />
+    <p>{description}</p>
+  </div>
+
   <Image src={thumbnail} alt="" width={120} height={90} fit="cover" />
   <p>{description}</p>
 
@@ -103,3 +108,28 @@ const pageTitle = currentPage === 1
     </nav>
   )}
 </BaseLayout>
+
+<style>
+  /* Gallery Intro */
+  .gallery-intro {
+    padding: 10px 0;
+    border-bottom: 1px solid #d5d5d5;
+    display: flex;
+    gap: 12px;
+  }
+  .gallery-intro :global(img) {
+  }
+  .gallery-intro p {
+    margin: 0;
+    color: #475467;
+    font-size: 14px;
+  }
+  
+  /* Media Queries */
+  @media (min-width: 430px) {
+    .gallery-intro :global(img) {
+      object-fit: cover;
+      width: 160px;
+    }
+  }
+</style>
