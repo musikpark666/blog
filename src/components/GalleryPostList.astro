@@ -30,13 +30,15 @@ const postDateFormatter = new Intl.DateTimeFormat('ja-JP',
 const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
 
 const getGalleryPageHref = (page: number) => ( page === 1 ? `/g/${gallery.id}/` : `/g/${gallery.id}/${page}/` );
-const PAGE_GROUP_SIZE= 10;
-const pageGroupStart = Math.floor((currentPage - 1) / PAGE_GROUP_SIZE) * PAGE_GROUP_SIZE + 1;
-const pageGroupEnd = Math.min(pageGroupStart + PAGE_GROUP_SIZE - 1, totalPages);
-const pageNumbers = Array.from(
-  { length: pageGroupEnd - pageGroupStart + 1 },
-  (_, index) => pageGroupStart + index,
-);
+const pageGroups = [5, 7, 10].map((groupSize) => {
+  const start = Math.floor((currentPage - 1) / groupSize) * groupSize + 1;
+  const end = Math.min(start + groupSize - 1, totalPages);
+
+  return {
+    groupSize,
+    pages: Array.from({ length: end - start + 1 }, (_, index) => start + index),
+  };
+});
 ---
 
 <section class="gallery-posts">
@@ -90,21 +92,34 @@ const pageNumbers = Array.from(
   </div>
 
   <nav class="post-list-pagination" aria-label="ページ切り替え">
+    {currentPage > 1
+      ? <a class="pagination-link" href={getGalleryPageHref(1)} aria-label="最初のページ" title="最初のページ">«</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最初のページ" title="最初のページ">«</span>}
+
     {currentPage > 1 
       ? <a class="pagination-direction pagination-link" href={getGalleryPageHref(currentPage - 1)}>前へ</a>
       : <span class="pagination-direction pagination-link is-disabled" aria-disabled="true">前へ</span>}
 
-    <div class="pagination-numbers">
-      {pageNumbers.map((page) => (
-        page === currentPage 
-          ? <span class="pagination-link is-current">{page}</span>
-          : <a class="pagination-link" href={getGalleryPageHref(page)}>{page}</a>
-      ))}
-    </div>
+    {pageGroups.map(({ groupSize, pages }) => (
+      <div class:list={['pagination-numbers', {
+        'pagination-numbers-medium': groupSize === 7,
+        'pagination-numbers-wide': groupSize === 10,
+      }]}>
+        {pages.map((page) => (
+          page === currentPage
+            ? <span class="pagination-link is-current">{page}</span>
+            : <a class="pagination-link" href={getGalleryPageHref(page)}>{page}</a>
+        ))}
+      </div>
+    ))}
 
     {currentPage < totalPages
       ? <a class="pagination-direction pagination-link" href={getGalleryPageHref(currentPage + 1)}>次へ</a>
       : <span class="pagination-direction pagination-link is-disabled" aria-disabled="true">次へ</span>}
+
+    {currentPage < totalPages
+      ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">»</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">»</span>}
   </nav>
 </section>
 
@@ -264,23 +279,28 @@ const pageNumbers = Array.from(
   .post-list-pagination {
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 2px;
     margin-top: 18px;
   }
   .pagination-numbers {
     display: flex;
-    gap: 4px;
+    gap: 2px;
+  }
+  .pagination-numbers-medium,
+  .pagination-numbers-wide {
+    display: none;
   }
   .pagination-direction {
-    min-width: 46px;
+    min-width: 40px;
   }
   .pagination-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
+    flex: 0 0 auto;
+    width: 28px;
     height: 30px;
-    padding: 0 8px;
+    padding: 0 4px;
     border: 1px solid #d5dbea;
     background-color: #fff;
     color: #475467;
@@ -305,7 +325,32 @@ const pageNumbers = Array.from(
   }
 
   /* media queries */
+  @media (min-width: 430px) {
+    .pagination-numbers {
+      display: none;
+    }
+    .pagination-numbers-medium {
+      display: flex;
+    }
+  }
+
   @media (min-width: 640px) {
-    
+    .post-list-pagination {
+      gap: 6px;
+    }
+    .pagination-numbers {
+      display: none;
+      gap: 4px;
+    }
+    .pagination-numbers-wide {
+      display: flex;
+    }
+    .pagination-direction {
+      min-width: 46px;
+    }
+    .pagination-link {
+      width: 30px;
+      padding: 0 8px;
+    }
   }
 </style>

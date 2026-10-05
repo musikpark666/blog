@@ -12,10 +12,26 @@ interface Props {
 }
 
 const { post, galleryContexts } = Astro.props;
+const { pubDate, updDate } = post.data;
 const defaultContext = galleryContexts[0];
+const postDateFormatter = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: 'Asia/Tokyo',
+});
+const postTimeFormatter = new Intl.DateTimeFormat('ja-JP', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  timeZone: 'Asia/Tokyo',
+});
+const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
+const formatPostDateTime = (date: Date) => `${formatPostDate(date)} ${postTimeFormatter.format(date)}`;
+const formattedPubDate = updDate ? formatPostDate(pubDate) : formatPostDateTime(pubDate);
 ---
 
-<BaseLayout title={`${post.data.title} | musik.gallery`}>
+<BaseLayout title={`${post.data.title} | musik.gallery`} description={post.data.description}>
   <div
     data-post-gallery-context
     data-gallery-id={defaultContext?.gallery.id}
@@ -28,7 +44,10 @@ const defaultContext = galleryContexts[0];
     <header class="post-header">
       <h1>{post.data.title}</h1>
       <p class="post-description">{post.data.description}</p>
-      <p>{post.data.pubDate.toString().slice(0,10)}</p>
+      <p class="post-dates">
+        <time datetime={pubDate.toISOString()}>{formattedPubDate}</time>
+        {updDate && <span>（更新：<time datetime={updDate.toISOString()}>{formatPostDateTime(updDate)}</time>）</span>}
+      </p>
     </header>
     <div class="post-content">
       <slot />
@@ -45,8 +64,8 @@ const defaultContext = galleryContexts[0];
       )}
     </div>
 
-    <!-- Static pages cannot read request queries; prepare only this post's galleries. -->
-    {galleryContexts.map((context) => (
+    <!-- Prepare gallery variants only when this post belongs to multiple galleries. -->
+    {galleryContexts.length > 1 && galleryContexts.map((context) => (
       <template data-gallery-variant={context.gallery.id}>
         <div data-context-header>
           <GalleryHeader gallery={context.gallery} postCount={context.postCount} />
