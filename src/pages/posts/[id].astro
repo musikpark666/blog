@@ -3,24 +3,32 @@ import PostLayout from '../../layouts/PostLayout.astro';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import  { getCollection, render } from 'astro:content';
+import { getPostGalleryContexts, groupPostsByGallery } from '../../lib/gallery';
+import type { GalleryPostContext } from '../../lib/gallery';
 
 export const getStaticPaths = (async () => {
-  const posts = await getCollection('post');
+  const [posts, galleries] = await Promise.all([
+    getCollection('post'),
+    getCollection('gallery'),
+  ]);
+  const galleriesById = new Map(galleries.map((gallery) => [gallery.id, gallery]));
+  const postsByGallery = groupPostsByGallery(posts);
 
   return posts.map((post) => ({
     params: { id: post.id },
-    props: { post },
+    props: { post, galleryContexts: getPostGalleryContexts(post, galleriesById, postsByGallery) },
   }));
 }) satisfies GetStaticPaths;
 
 interface Props {
   post: CollectionEntry<'post'>;
+  galleryContexts: GalleryPostContext[];
 }
 
-const { post } = Astro.props;
+const { post, galleryContexts } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<PostLayout post={post}>
+<PostLayout post={post} galleryContexts={galleryContexts}>
   <Content />
 </PostLayout>

@@ -1,19 +1,109 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import GalleryHeader from '../components/GalleryHeader.astro';
+import GalleryPostList from '../components/GalleryPostList.astro';
+
 import type { CollectionEntry } from 'astro:content';
+import type { GalleryPostContext } from '../lib/gallery';
 
 interface Props {
   post: CollectionEntry<'post'>;
+  galleryContexts: GalleryPostContext[];
 }
 
-const { post } = Astro.props;
+const { post, galleryContexts } = Astro.props;
+const defaultContext = galleryContexts[0];
 ---
 
 <BaseLayout title={`${post.data.title} | musik.gallery`}>
-  <h1>{post.data.title}</h1>
-  <p>{post.data.pubDate.toString().slice(0,10)}</p>
-  <p><em>{post.data.description}</em></p>
-  <p>{post.data.categories} ギャラリー</p>
-  <img src={post.data.image} width="300" alt="thumbnail image" />
-  <slot />
+  <div
+    data-post-gallery-context
+    data-gallery-id={defaultContext?.gallery.id}
+  >
+    <div data-post-gallery-header>
+      {defaultContext && (
+        <GalleryHeader gallery={defaultContext.gallery} postCount={defaultContext.postCount} />
+      )}
+    </div>
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      <p class="post-description">{post.data.description}</p>
+      <p>{post.data.pubDate.toString().slice(0,10)}</p>
+    </header>
+    <div class="post-content">
+      <slot />
+    </div>
+    <div data-post-gallery-list>
+      {defaultContext && (
+        <GalleryPostList
+          gallery={defaultContext.gallery}
+          posts={defaultContext.pagePosts}
+          currentPage={defaultContext.currentPage}
+          totalPages={defaultContext.totalPages}
+          currentPostId={post.id}
+        />
+      )}
+    </div>
+
+    <!-- Static pages cannot read request queries; prepare only this post's galleries. -->
+    {galleryContexts.map((context) => (
+      <template data-gallery-variant={context.gallery.id}>
+        <div data-context-header>
+          <GalleryHeader gallery={context.gallery} postCount={context.postCount} />
+        </div>
+        <div data-context-list>
+          <GalleryPostList
+            gallery={context.gallery}
+            posts={context.pagePosts}
+            currentPage={context.currentPage}
+            totalPages={context.totalPages}
+            currentPostId={post.id}
+          />
+        </div>
+      </template>
+    ))}
+  </div>
 </BaseLayout>
+
+<script>
+  function selectPostGallery() {
+    const root = document.querySelector<HTMLElement>('[data-post-gallery-context]');
+    if (!root) return;
+
+    const templates = Array.from(root.querySelectorAll<HTMLTemplateElement>('template[data-gallery-variant]'));
+    const requestedGallery = new URLSearchParams(window.location.search).get('g');
+    const selected = templates.find((template) => template.dataset.galleryVariant === requestedGallery) ?? templates[0];
+    if (!selected || root.dataset.galleryId === selected.dataset.galleryVariant) return;
+
+    const fragment = selected.content.cloneNode(true) as DocumentFragment;
+    const header = fragment.querySelector('[data-context-header]');
+    const list = fragment.querySelector('[data-context-list]');
+    const headerTarget = root.querySelector('[data-post-gallery-header]');
+    const listTarget = root.querySelector('[data-post-gallery-list]');
+    if (!header || !list || !headerTarget || !listTarget) return;
+
+    headerTarget.replaceChildren(...header.childNodes);
+    listTarget.replaceChildren(...list.childNodes);
+    root.dataset.galleryId = selected.dataset.galleryVariant;
+  }
+
+  selectPostGallery();
+  document.addEventListener('astro:page-load', selectPostGallery);
+  window.addEventListener('popstate', selectPostGallery);
+</script>
+
+<style>
+  /* Post Header */
+  .post-header {
+    border-bottom: 1px solid #dfe2ee;
+  }
+  .post-header h1 {
+    margin: 0;
+    color: #171b30;
+    font-size: 20px;
+  }
+  .post-description {
+  }
+  .post-dates {
+  }
+</style>

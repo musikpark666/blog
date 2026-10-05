@@ -66,7 +66,7 @@ const pageNumbers = Array.from(
 
       return (
         <article class:list={['post-list-item', {'is-current': isCurrentPost}]}>
-          <a href={postHref}>
+          <a href={postHref} aria-current={isCurrentPost ? 'page' : undefined}>
             <span class="post-list-thumbnail" aria-hidden="true">
               <Image src={postImage} alt="" loading="lazy" decoding="async" width="96" height="72" />
             </span>
@@ -181,10 +181,10 @@ const pageNumbers = Array.from(
   .post-list-item {
     border-bottom: 1px solid #e1e4ea;
   }
-  /* .post-list-item.is-current {
+  .post-list-item.is-current {
     background: #f4f6ff;
     box-shadow: inset 3px 0 0 var(--dc-color-2);
-  } */
+  }
   
   .post-list a {
     display: grid;

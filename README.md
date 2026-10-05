@@ -14,7 +14,8 @@ This is  my personal blog.
 5. Footer.astro: `.footer-top` wide view
 6. Sidebar.astro: implement several **widgets**
 7. **About Page** implementation
-8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation, thumnail image styling
+8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation, **thumnail image styling**, currentPage tracking  
+9. GalleryPostList.astro: currentPage tracking, media query styling(+overflow), several scripting, 
 
 >issue?
 
@@ -32,9 +33,11 @@ This is  my personal blog.
 1. remake favicon
 4. add socials (GitHub, fix links...)
 2. setting **AD** (Content.astro - left area)
+3. **ellipses** improve (by characters)
 3. focus-visible styling
 4. aria-labeling
 5. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
+6. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
 n. refer to other sites (blog, news, ...)
 
 ## 🧞 Commands

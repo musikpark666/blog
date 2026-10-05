@@ -7,28 +7,17 @@ import { Image } from 'astro:assets';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
+import { GALLERY_POSTS_PER_PAGE, groupPostsByGallery } from '../../../lib/gallery';
 
 type BlogPost = CollectionEntry<'post'>;
 
 export const getStaticPaths = (async () => {
-  const postsPerPage = 2; // changeable
+  const postsPerPage = GALLERY_POSTS_PER_PAGE;
   const [galleries, posts] = await Promise.all([
     getCollection('gallery'),
     getCollection('post'),
   ]);
-  const postsByGallery = new Map<string, BlogPost[]>();
-
-  for (const post of posts) {
-    for (const category of post.data.categories) {
-      const galleryPosts = postsByGallery.get(category.id) ?? [];
-      galleryPosts.push(post);
-      postsByGallery.set(category.id, galleryPosts);
-    }
-  }
-
-  for (const galleryPosts of postsByGallery.values()) {
-    galleryPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-  }
+  const postsByGallery = groupPostsByGallery(posts);
 
   return galleries.flatMap((gallery) => {
     const galleryPosts = postsByGallery.get(gallery.id) ?? [];
