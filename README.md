@@ -9,7 +9,7 @@ This is  my personal blog.
 0. **image optimization** (`content.config.ts`, ...)
 1. Navigation.astro: `.extra-info` actual implementation
 2. Header.astro: **search** implementation
-3. Header.astro: **menu, night mode** implementation
+3. Header.astro: **menu, night mode** implementation (++**Theme**)
 4. Footer.astro: **btns** implementation
 5. Footer.astro: `.footer-top` wide view
 6. Sidebar.astro: implement several **widgets**
@@ -25,21 +25,22 @@ This is  my personal blog.
 
 >will be soon
 
-1. improve deploy script (don't copy all)
-2. mini gallery - fediverse microblog integrate
-
->someday
-
 1. remake favicon
 4. add socials (GitHub, fix links...)
 2. setting **AD** (Content.astro - left area)
 3. **ellipses** improve (by characters)
 3. focus-visible styling
-4. aria-labeling
 5. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
+5. Views (view count) & Comment
 6. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
-9. i18n 
+4. aria-labeling
 n. refer to other sites (blog, news, ...)
+
+>someday
+
+1. improve deploy script (don't copy all)
+2. mini gallery - fediverse microblog integrate
+3. i18n
 
 ## 🧞 Commands
 
@@ -51,6 +52,6 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run deploy`         | build and deployment to server     |
+| `npm run deploy`          | Build and deployment to server                   |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
