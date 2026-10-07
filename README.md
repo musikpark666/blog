@@ -25,7 +25,7 @@ This is  my personal blog.
 
 >will be soon
 
-1. remove **AD** (Content.astro - left area)
+1. 
 2. remake favicon
 3. add socials (GitHub, fix links...)
 4. **ellipses** improve (by characters)
