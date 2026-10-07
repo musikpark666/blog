@@ -25,22 +25,21 @@ This is  my personal blog.
 
 >will be soon
 
-1. remake favicon
-4. add socials (GitHub, fix links...)
-2. setting **AD** (Content.astro - left area)
-3. **ellipses** improve (by characters)
-3. focus-visible styling
-5. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
-5. Views (view count) & Comment
-6. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
-4. aria-labeling
+1. remove **AD** (Content.astro - left area)
+2. remake favicon
+3. add socials (GitHub, fix links...)
+4. **ellipses** improve (by characters)
+5. focus-visible styling
+6. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
+7. Views (view count) & Comment
+8. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
+9. aria-labeling
 n. refer to other sites (blog, news, ...)
 
 >someday
 
 1. improve deploy script (don't copy all)
 2. mini gallery - fediverse microblog integrate
-3. i18n
 
 ## 🧞 Commands
 
