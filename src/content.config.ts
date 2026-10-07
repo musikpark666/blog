@@ -2,11 +2,10 @@ import { glob } from "astro/loaders";
 import { defineCollection, reference } from "astro:content";
 import { z } from "astro/zod";
 
-// Post timestamps use YYYY-MM-DDTHH:mm and always represent Japan time.
-const postDateSchema = z.string()
-  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, '日時は YYYY-MM-DDTHH:mm 形式で入力してください。')
-  .transform((date) => `${date}+09:00`)
-  .pipe(z.coerce.date());
+// Write unquoted YYYY-MM-DDTHH:mm:ss values without a timezone; they represent Japan time.
+// YAML parses these as UTC dates, so subtract nine hours to recover the intended JST instant.
+const postDateSchema = z.date()
+  .transform((date) => new Date(date.getTime() - 9 * 60 * 60 * 1000));
 
 const relatedSiteSchema = z.object({
   title: z.string(),
