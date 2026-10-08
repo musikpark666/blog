@@ -6,6 +6,9 @@
   --layout-max-width: 1200px;
   --layout-min-width: 320px;
   --layout-left-width: clamp(0px, calc(100vw - 1020px), 180px);
+
+  --font-body: var(--font-noto-sans-jp);
+  --font-code: ui-monospace, Consola, monospace;
 }
 
 *,*::before,*::after {
@@ -23,8 +26,25 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0;
-  font-size: 1rem;
   min-width: var(--layout-min-width);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: var(--font-code);
 }
 
 .visually-hidden {

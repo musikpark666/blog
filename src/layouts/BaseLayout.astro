@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Content from '../components/Content.astro';
@@ -24,6 +25,7 @@ const {
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <Font cssVariable="--font-noto-sans-jp" />
   </head>
   <body>
     <Header />

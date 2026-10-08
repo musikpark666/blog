@@ -16,6 +16,8 @@ This is  my personal blog.
 7. **About Page** implementation
 8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation, **thumnail image styling**, currentPage tracking, info button simplify(only ⓘ)
 9. GalleryPostList.astro: currentPage tracking, media query styling(+overflow), several scripting, 
+10. additional `astro.config.mjs` settings
+11. additional **Page Header** settings
 
 >issue?
 
