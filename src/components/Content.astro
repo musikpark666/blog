@@ -3,6 +3,9 @@ import Sidebar from './Sidebar.astro';
 ---
 
 <div class="content-wrapper">
+  <div class="content-left">
+    Left Side
+  </div>
   <article>
     <slot />
   </article>
@@ -26,25 +29,34 @@ import Sidebar from './Sidebar.astro';
   }
 
   article {
-    padding: 10px 0 10px 10px;
-    margin: 0 10px 0 0 ;
+    padding: 12px 0 12px 12px;
+    margin: 0 12px 0 0 ;
     overflow: hidden;
+  }
+
+  .content-left {
+    display: none;
   }
 
   @media (min-width: 768px) {
     .content-wrapper {
-      grid-template-columns: 1fr calc(200px + 10px);
+      grid-template-columns: var(--layout-left-width) 1fr calc(260px + 12px);
+    }
+
+    .content-left {
+      display: block;  
+      overflow: hidden;
     }
 
     aside {
       display: block;
-      padding: 10px 10px 10px 0;
+      padding: 12px 12px 12px 0;
     }
   }
 
-  @media (min-width: 992px) {
+  @media (min-width: 992px) { 
     .content-wrapper {
-      grid-template-columns: 1fr calc(250px + 10px);
+      grid-template-columns: var(--layout-left-width) 1fr calc(300px + 12px);
     }
   }
 </style>

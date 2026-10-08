@@ -5,6 +5,7 @@
 
   --layout-max-width: 1200px;
   --layout-min-width: 320px;
+  --layout-left-width: clamp(0px, calc(100vw - 1020px), 180px);
 }
 
 *,*::before,*::after {
