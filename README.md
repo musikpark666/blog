@@ -36,6 +36,7 @@ This is  my personal blog.
 7. Views (view count) & Comment
 8. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
 9. aria-labeling
+10. testing additional fonts 
 n. refer to other sites (blog, news, ...)
 
 >someday

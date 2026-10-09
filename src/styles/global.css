@@ -8,7 +8,12 @@
   --layout-left-width: clamp(0px, calc(100vw - 1020px), 180px);
 
   --font-body: var(--font-noto-sans-jp);
-  --font-code: ui-monospace, Consola, monospace;
+  --font-code: ui-monospace, Consolas, monospace;
+
+  --text-body: 1.0625rem;   /* 17px */
+  --text-ui: 0.875rem;      /* 14px */
+  --text-small: 0.8125rem;  /* 13px */
+  --text-heading: 1.5rem;   /* 24px */
 }
 
 *,*::before,*::after {
