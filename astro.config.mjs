@@ -2,11 +2,18 @@
 import { defineConfig, fontProviders } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
-
 import expressiveCode from 'astro-expressive-code';
+import { unified } from '@astrojs/markdown-remark';
+import remarkCjkFriendly from 'remark-cjk-friendly';
+import remarkBreaks from 'remark-breaks';
 
 // https://astro.build/config
 export default defineConfig({
+  markdown: {
+    processor: unified({
+      remarkPlugins: [remarkCjkFriendly, remarkBreaks],
+    }),
+  },
   integrations: [
     expressiveCode({
       themes: ['github-dark'],
