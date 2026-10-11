@@ -37,6 +37,7 @@ This is  my personal blog.
 8. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
 9. aria-labeling
 10. testing additional fonts 
+11. more styling code block
 n. refer to other sites (blog, news, ...)
 
 >someday

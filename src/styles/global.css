@@ -15,13 +15,14 @@
   --text-ui: 0.875rem;      /* 14px */
   --text-small: 0.8125rem;  /* 13px */
   --text-list-title: 1rem;  /* 16px */
-  --text-subheading: 1.25rem; /* 20px */
-  --text-heading: 1.5rem;   /* 24px */
-  --text-title: 1.75rem;    /* 28px */
+  --text-subheading: 1.1rem; /* */
+  --text-heading: 1.25rem;   /* 20px */
+  --text-title: 1.5rem;      /* 24px */
+  --text-title-legacy: 1.75rem;    /* 28px */
 
   --leading-ui: 1.5;
   --leading-body: 1.7;
-  --leading-heading: 1.4;
+  --leading-heading: 1.3;
   --leading-code: 1.6;
 }
 
