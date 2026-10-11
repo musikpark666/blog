@@ -68,7 +68,7 @@ import Social from './Social.astro';
     align-items: center;
     justify-content: space-between;
     padding: 0 12px;
-    height: 42px;
+    min-height: 2.625rem;
   }
   .info-name {
     display: flex;
@@ -83,7 +83,8 @@ import Social from './Social.astro';
     align-self: flex-end;
   }
   .info-btn {
-    padding: 0 6px;
+    padding: 0.125em 0.5em;
+    font-size: var(--text-ui);
     border: 1px solid var(--dc-color-2);
     background-color: var(--dc-color-3);
     color: #fff;
@@ -102,7 +103,7 @@ import Social from './Social.astro';
     align-items: center;
     justify-content: center;
     padding: 0 12px;
-    height: 36px;
+    min-height: 2.25rem;
     background-color: #f3f3f3;
   }
 
@@ -111,16 +112,19 @@ import Social from './Social.astro';
     padding: 12px 12px;
     margin-bottom: 12px;
     border: 1px solid #ccc;
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
   }
   .sidebar-item-header {
     display: flex;
     align-items: center;
-    height: 44px;
+    min-height: 2.75rem;
     padding-left: 2px;
     border-bottom: 1px dashed #aaa;
   }
   .sidebar-item-header h2 {
-    font-size: 14px;
+    font-size: var(--text-ui);
+    line-height: var(--leading-heading);
     margin: 0;
     font-weight: 700;
   }

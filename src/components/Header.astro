@@ -64,7 +64,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 52px;
+    min-height: 3.25rem;
     max-width: var(--layout-max-width);
     margin: 0 auto;
   }
@@ -88,8 +88,9 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
   .header-search {
     display: flex;
     align-items: center;
-    height: 36px;
+    height: 2.25rem;
     width: 100%;
+    min-width: 0;
     margin: 8px 8px 8px 0;
     background-color: #fff;
     border: 1px solid var(--dc-color-1);
@@ -104,6 +105,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
   .header-search search {
     height: 100%;
     width: 100%;
+    min-width: 0;
   }
   .header-search form {
     display: flex;
@@ -111,11 +113,12 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
   }
   .header-search form input {
     width: 100%;
+    min-width: 0;
     padding: 0 6px;
     border: none;
     outline: none;
-    font-size: 13px;
-    letter-spacing: -1px;
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
   }
   .header-search form button {
     display: flex;
@@ -143,9 +146,10 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     padding: 0 6px !important;
     height: 100%;
     color: #555;
-    font-weight: bold;
-    font-size: 13px;
-    letter-spacing: -1px;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
     white-space: nowrap;
     position: relative;
   }
@@ -198,8 +202,8 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     }
     .header-container {
       display: grid;
-      grid-template-columns: 1fr minmax(280px, 420px) 1fr;
-      height: 76px;
+      grid-template-columns: minmax(max-content, 1fr) minmax(0, 420px) minmax(max-content, 1fr);
+      min-height: 4.75rem;
     }
 
     .header-brand {
@@ -223,7 +227,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     }
 
     .header-search {
-      height: 46px;
+      height: 2.875rem;
       margin: auto 0;
       border: 4px solid var(--dc-color-3);
     }
@@ -258,13 +262,15 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       align-self: center;
       align-items: center;
       display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 0;
       margin: 0 4px;
       padding: 0;
       gap: 8px;
       color: #4d5266;
-      font-size: 12px;
-      line-height: 1;
-      white-space: nowrap;
+      font-size: var(--text-small);
+      line-height: var(--leading-ui);
       list-style: none;
     }
     .header-menu li {

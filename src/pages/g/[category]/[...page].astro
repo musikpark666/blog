@@ -86,13 +86,19 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
     border-bottom: 1px solid #d5d5d5;
     display: flex;
     gap: 12px;
+    align-items: flex-start;
   }
   .gallery-intro :global(img) {
+    flex-shrink: 0;
+    max-width: 100%;
   }
   .gallery-intro p {
     margin: 0;
     color: #475467;
-    font-size: 14px;
+    min-width: 0;
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
+    overflow-wrap: anywhere;
   }
   
   /* Media Queries */

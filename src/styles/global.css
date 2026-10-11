@@ -10,10 +10,19 @@
   --font-body: var(--font-noto-sans-jp);
   --font-code: ui-monospace, Consolas, monospace;
 
+  /* Pixel equivalents assume the browser's default font size is 16px. */
   --text-body: 1.0625rem;   /* 17px */
   --text-ui: 0.875rem;      /* 14px */
   --text-small: 0.8125rem;  /* 13px */
+  --text-list-title: 1rem;  /* 16px */
+  --text-subheading: 1.25rem; /* 20px */
   --text-heading: 1.5rem;   /* 24px */
+  --text-title: 1.75rem;    /* 28px */
+
+  --leading-ui: 1.5;
+  --leading-body: 1.7;
+  --leading-heading: 1.4;
+  --leading-code: 1.6;
 }
 
 *,*::before,*::after {
@@ -35,7 +44,7 @@ body {
   font-size: 1rem;
   font-family: var(--font-body);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: var(--leading-ui);
 }
 
 button,

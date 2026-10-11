@@ -114,24 +114,91 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   /* Post Header */
   .post-header {
     border-bottom: 1px solid #dfe2ee;
+    padding-block: 1rem;
   }
   .post-header h1 {
     margin: 0;
     color: #171b30;
-    font-size: 20px;
+    font-size: var(--text-title);
+    line-height: var(--leading-heading);
+    overflow-wrap: anywhere;
   }
   .post-description {
+    margin: 0.5em 0;
+    color: #475467;
+    font-size: var(--text-ui);
   }
   .post-dates {
+    margin: 0;
+    color: #667085;
+    font-size: var(--text-small);
   }
 
   .post-content {
     font-size: var(--text-body);
-    line-height: 1.7;
+    line-height: var(--leading-body);
+    overflow-wrap: anywhere;
+  }
+
+  .post-content :global(h1),
+  .post-content :global(h2),
+  .post-content :global(h3),
+  .post-content :global(h4),
+  .post-content :global(h5),
+  .post-content :global(h6) {
+    margin-block: 1.5em 0.5em;
+    font-weight: 700;
+    line-height: var(--leading-heading);
+  }
+
+  .post-content :global(h1),
+  .post-content :global(h2) {
+    font-size: var(--text-heading);
+  }
+
+  .post-content :global(h3) {
+    font-size: var(--text-subheading);
+  }
+
+  .post-content :global(h4),
+  .post-content :global(h5),
+  .post-content :global(h6) {
+    font-size: var(--text-body);
+  }
+
+  .post-content :global(p),
+  .post-content :global(ul),
+  .post-content :global(ol),
+  .post-content :global(blockquote) {
+    margin-block: 1em;
+  }
+
+  .post-content :global(code) {
+    font-size: 0.875em;
   }
 
   .post-content :global(pre) {
+    max-width: 100%;
+    overflow-x: auto;
     font-size: var(--text-ui);
-    line-height: 1.6;
+    line-height: var(--leading-code);
+    padding: 1em;
+  }
+
+  .post-content :global(pre code) {
+    font-size: inherit;
+  }
+
+  .post-content :global(img),
+  .post-content :global(video) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .post-content :global(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: var(--text-ui);
   }
 </style>

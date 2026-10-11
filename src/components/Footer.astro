@@ -36,12 +36,12 @@
 
   /* Footer navigation */
   .footer-top nav {
-    height: 32px;
+    min-height: 2rem;
   }
   .footer-top nav ul {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    height: 100%;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -49,18 +49,17 @@
   .footer-top nav ul li {
     display: flex;
     align-items: center;
-    height: 100%;
   }
   .footer-top nav ul li a {
     display: flex;
     align-items: center;
-    height: 100%;
-    padding: 0 8px;
-    font-size: 12px;
+    min-height: 2rem;
+    padding: 0.375em 0.5em;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
     color: #ebecf0;
     text-decoration: none;
     white-space: nowrap;
-    letter-spacing: -1px;
   }
   .footer-top nav ul li a:hover,
   .footer-top nav ul li a:focus {
@@ -78,6 +77,7 @@
   /* Footer bottom (copyright etc.) */
   .footer-btm ul {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -88,8 +88,10 @@
   .footer-btm ul button {
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    font-size: 12px;
+    min-height: 1.75rem;
+    padding: 0.25em 1em;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
     color: #c4cae9;
     border: 1px solid var(--dc-color-1);
     border-radius: 10px;
@@ -105,12 +107,15 @@
 
   .copyright {
     text-align: center;
-    font-size: 11px;
-    color: rgba(255, 255, 255, .5);
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
+    color: #c4cae9;
+    padding: 0 12px;
+    overflow-wrap: anywhere;
     margin: 0;
   }
   .copyright a {
-    color: rgba(255, 255, 0, .5);
+    color: #ffed44;
   }
   .copyright span {
     white-space: nowrap;

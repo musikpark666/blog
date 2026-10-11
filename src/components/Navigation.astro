@@ -20,17 +20,17 @@
   }
   .nav-container {
     display: flex;
-    align-items: center;
-    height: 38px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    min-height: 2.375rem;
     max-width: var(--layout-max-width);
     margin: 0 auto;
-    overflow: hidden;
   }
 
   nav ul {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
@@ -39,12 +39,12 @@
   nav ul a {
     display: flex;
     align-items: center;
-    height: 100%;
-    padding: 0 9px;
+    min-height: 2.375rem;
+    padding: 0.375em 0.4em;
     color: #fff;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: -1px;
+    font-size: var(--text-ui);
+    font-weight: 700;
+    line-height: var(--leading-ui);
     white-space: nowrap;
     text-decoration: none;
   }
@@ -63,14 +63,15 @@
       justify-content: space-between;
     }
     nav ul {
-      max-width: 320px;
+      max-width: 20rem;
     }
 
     .extra-info {
       display: block;
-      padding: 0 10px;
+      align-self: center;
+      padding: 0.375em 0.625em;
       color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
+      font-size: var(--text-small);
       white-space: nowrap;
     }
     .extra-info .em1 {
@@ -80,8 +81,11 @@
 
   @media (min-width: 768px) {
     .nav-container {
-      height: 42px;
+      min-height: 2.625rem;
       padding-inline-start: var(--layout-left-width);
+    }
+    nav ul a {
+      min-height: 2.625rem;
     }
   }
 </style>

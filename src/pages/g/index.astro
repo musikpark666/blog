@@ -98,7 +98,7 @@ for (const post of posts) {
   .page-header p {
     margin: 0;
     color: #333;
-    font-size: 14px;
+    font-size: var(--text-ui);
     font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -117,7 +117,7 @@ for (const post of posts) {
   /* galleries */
   .gallery-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
 
@@ -171,23 +171,25 @@ for (const post of posts) {
   }
   .gallery-card-meta h2 {
     color: var(--dc-color-2);
-    font-size: 1.1rem;
+    font-size: var(--text-list-title);
+    line-height: var(--leading-heading);
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
   }
   .gallery-card-count {
     color: #667085;
-    font-size: 12px;
+    font-size: var(--text-small);
     white-space: nowrap;
   }
   .count-full {
+    display: none;
   }
 
   .gallery-card-body p {
     margin-top: 2px;
     color: #475467;
-    font-size: 14px;
+    font-size: var(--text-ui);
   }
   .gallery-card-description {
     display: -webkit-box;
@@ -221,7 +223,7 @@ for (const post of posts) {
       display: block;
       margin-top: auto;
       color: #1f2937;
-      font-size: 13px;
+      font-size: var(--text-small);
       font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
