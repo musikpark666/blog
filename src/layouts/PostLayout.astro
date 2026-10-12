@@ -199,6 +199,9 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     color: var(--dc-color-2);
     text-underline-offset: 0.15em;
   }
+  .post-content :global(a:visited) {
+    color: #6b46a3;
+  }
   .post-content :global(a:hover) {
     color: var(--dc-color-1);
   }
@@ -257,6 +260,11 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   .post-content :global(ul),
   .post-content :global(ol) {
     padding-inline-start: 1.5em;
+  }
+
+  .post-content :global(li > ul),
+  .post-content :global(li > ol) {
+    margin-block: 0.25em;
   }
 
   .post-content :global(blockquote[data-greentext]) {
