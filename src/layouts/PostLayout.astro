@@ -195,6 +195,18 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     overflow-wrap: anywhere;
   }
 
+  .post-content :global(a) {
+    color: var(--dc-color-2);
+    text-underline-offset: 0.15em;
+  }
+  .post-content :global(a:hover) {
+    color: var(--dc-color-1);
+  }
+  .post-content :global(a:focus-visible) {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+
   .post-content :global(h1),
   .post-content :global(h2),
   .post-content :global(h3),
@@ -242,15 +254,21 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     margin-block: 1em;
   }
 
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    padding-inline-start: 1.5em;
+  }
+
   .post-content :global(blockquote[data-greentext]) {
     margin-inline: 0;
     color: #4c6b23;
   }
-  .post-content :global(blockquote[data-greentext] > p) {
+  .post-content :global(.greentext-line) {
+    display: block;
     position: relative;
     padding-inline-start: 1.1em;
   }
-  .post-content :global(blockquote[data-greentext] > p::before) {
+  .post-content :global(.greentext-line::before) {
     position: absolute;
     inset-inline-start: 0;
     content: '>';
@@ -395,6 +413,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     box-decoration-break: clone;
   }
   .post-content :global(code:not(pre code)) {
+    vertical-align: 0.05em;
     border-color: #e1e4e8;
     background-color: #f3f4f6;
     color: #b8324a;

@@ -6,7 +6,9 @@ import expressiveCode from 'astro-expressive-code';
 import { unified } from '@astrojs/markdown-remark';
 import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkBreaks from 'remark-breaks';
-import remarkGreentext from './src/lib/remark-greentext.mjs';
+import remarkWikiLink from 'remark-wiki-link';
+import rehypeExternalLinks from 'rehype-external-links';
+import remarkGreentext, { rehypeGreentextLines } from './src/lib/remark-greentext.mjs';
 import rehypeCallouts from './src/lib/rehype-callouts.mjs';
 import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
 
@@ -14,8 +16,34 @@ import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
 export default defineConfig({
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkCjkFriendly, remarkBreaks, remarkGreentext],
-      rehypePlugins: [rehypeCallouts, rehypeFootnotes],
+      remarkPlugins: [
+        remarkCjkFriendly,
+        remarkBreaks,
+        remarkGreentext,
+        [remarkWikiLink, {
+          aliasDivider: '|',
+          pageResolver: (name) => [name.trim()],
+          hrefTemplate: (slug) => `/posts/${encodeURIComponent(slug)}/`,
+        }],
+      ],
+      rehypePlugins: [
+        rehypeCallouts,
+        rehypeGreentextLines,
+        rehypeFootnotes,
+        [rehypeExternalLinks, {
+          target: '_blank',
+          rel: ['noopener', 'noreferrer'],
+          test: (node) => {
+            try {
+              return new URL(String(node.properties.href), 'https://musik.gallery').hostname !== 'musik.gallery';
+            } catch {
+              return false;
+            }
+          },
+          content: { type: 'text', value: '（新しいタブで開く）' },
+          contentProperties: { className: ['visually-hidden'] },
+        }],
+      ],
       remarkRehype: {
         footnoteLabel: '参考',
         // Keep the heading visible in the collapsible section and the TOC.
