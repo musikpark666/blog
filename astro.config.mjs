@@ -6,12 +6,15 @@ import expressiveCode from 'astro-expressive-code';
 import { unified } from '@astrojs/markdown-remark';
 import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkBreaks from 'remark-breaks';
+import remarkGreentext from './src/lib/remark-greentext.mjs';
+import rehypeCallouts from './src/lib/rehype-callouts.mjs';
 
 // https://astro.build/config
 export default defineConfig({
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkCjkFriendly, remarkBreaks],
+      remarkPlugins: [remarkCjkFriendly, remarkBreaks, remarkGreentext],
+      rehypePlugins: [rehypeCallouts],
     }),
   },
   integrations: [
