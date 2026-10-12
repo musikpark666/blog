@@ -4,7 +4,7 @@ import Sidebar from './Sidebar.astro';
 
 <div class="content-wrapper">
   <div class="content-left">
-    Left Side
+    <slot name="left" />
   </div>
   <article>
     <slot />
@@ -44,8 +44,8 @@ import Sidebar from './Sidebar.astro';
     }
 
     .content-left {
-      display: block;  
-      overflow: hidden;
+      display: block;
+      min-width: 0;
     }
 
     aside {
@@ -57,6 +57,14 @@ import Sidebar from './Sidebar.astro';
   @media (min-width: 992px) { 
     .content-wrapper {
       grid-template-columns: var(--layout-left-width) minmax(0, 1fr) calc(300px + 12px);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .content-left {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
     }
   }
 </style>

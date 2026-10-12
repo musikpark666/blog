@@ -2,16 +2,23 @@
 import BaseLayout from './BaseLayout.astro';
 import GalleryHeader from '../components/GalleryHeader.astro';
 import GalleryPostList from '../components/GalleryPostList.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import type { GalleryPostContext } from '../lib/gallery';
 
 interface Props {
   post: CollectionEntry<'post'>;
   galleryContexts: GalleryPostContext[];
+  headings: MarkdownHeading[];
 }
 
-const { post, galleryContexts } = Astro.props;
+const { post, galleryContexts, headings } = Astro.props;
+// GFM's hidden footnote label is not an article section.
+const tocHeadings = headings.filter(
+  ({ depth, slug }) => (depth === 2 || depth === 3) && slug !== 'footnote-label'
+);
 const { pubDate, updDate } = post.data;
 const defaultContext = galleryContexts[0];
 
@@ -31,6 +38,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 ---
 
 <BaseLayout title={`${post.data.title} | musik.gallery`} description={post.data.description}>
+  <TableOfContents slot="left" title={post.data.title} headings={tocHeadings} />
   <div
     data-post-gallery-context
     data-gallery-id={defaultContext?.gallery.id}
@@ -41,13 +49,18 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
       )}
     </div>
     <header class="post-header">
-      <h1>{post.data.title}</h1>
+      <h1 id="post-title">{post.data.title}</h1>
       <p class="post-description">{post.data.description}</p>
       <p class="post-dates">
         <time datetime={pubDate.toISOString()}>{formattedPubDate}</time>
         {updDate && <span>（更新：<time datetime={updDate.toISOString()}>{formatPostDate(updDate)}</time>）</span>}
       </p>
     </header>
+    {tocHeadings.length > 0 && (
+      <div class="post-toc">
+        <TableOfContents title={post.data.title} headings={tocHeadings} compact />
+      </div>
+    )}
     <div class="post-content">
       <slot />
     </div>
@@ -111,6 +124,19 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 </script>
 
 <style>
+  .post-toc {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin-block: 0.75rem;
+  }
+
+  @media (min-width: 1200px) {
+    .post-toc {
+      display: none;
+    }
+  }
+
   /* Post Header */
   .post-header {
     border-bottom: 1px solid #dfe2ee;
@@ -123,6 +149,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     line-height: var(--leading-heading);
     font-weight: 600;
     overflow-wrap: anywhere;
+    scroll-margin-top: 4rem;
   }
   .post-description {
     margin: 0.25em 0;
@@ -151,6 +178,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     margin-block: 1.5em 0.5em;
     font-weight: 600;
     line-height: var(--leading-heading);
+    scroll-margin-top: 4rem;
   }
 
   .post-content :global(h2) {

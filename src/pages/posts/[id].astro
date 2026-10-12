@@ -26,9 +26,9 @@ interface Props {
 }
 
 const { post, galleryContexts } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
-<PostLayout post={post} galleryContexts={galleryContexts}>
+<PostLayout post={post} galleryContexts={galleryContexts} headings={headings}>
   <Content />
 </PostLayout>
