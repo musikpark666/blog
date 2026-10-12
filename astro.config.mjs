@@ -8,13 +8,19 @@ import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkBreaks from 'remark-breaks';
 import remarkGreentext from './src/lib/remark-greentext.mjs';
 import rehypeCallouts from './src/lib/rehype-callouts.mjs';
+import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
 
 // https://astro.build/config
 export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkCjkFriendly, remarkBreaks, remarkGreentext],
-      rehypePlugins: [rehypeCallouts],
+      rehypePlugins: [rehypeCallouts, rehypeFootnotes],
+      remarkRehype: {
+        footnoteLabel: '参考',
+        // Keep the heading visible in the collapsible section and the TOC.
+        footnoteLabelProperties: {},
+      },
     }),
   },
   integrations: [

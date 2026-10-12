@@ -16,9 +16,8 @@ interface Props {
 }
 
 const { post, galleryContexts, headings } = Astro.props;
-// GFM's hidden footnote label is not an article section.
 const tocHeadings = headings.filter(
-  ({ depth, slug }) => (depth === 2 || depth === 3) && slug !== 'footnote-label'
+  ({ depth }) => depth === 2 || depth === 3
 );
 const { pubDate, updDate } = post.data;
 const defaultContext = galleryContexts[0];
@@ -122,6 +121,32 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   selectPostGallery();
   document.addEventListener('astro:page-load', selectPostGallery);
   window.addEventListener('popstate', selectPostGallery);
+
+  function revealFootnotes(hash: string, scroll = false) {
+    let id: string;
+    try {
+      id = decodeURIComponent(hash.slice(1));
+    } catch {
+      return;
+    }
+    const target = document.getElementById(id);
+    const panel = target?.closest<HTMLDetailsElement>('.footnotes details');
+    if (!panel) return;
+    panel.open = true;
+    if (scroll) target!.scrollIntoView();
+  }
+
+  // Open before native anchor navigation, including repeated clicks on the same hash.
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || event.button !== 0 ||
+      event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest<HTMLAnchorElement>('a[href^="#"]');
+    if (link) revealFootnotes(link.hash);
+  });
+  const revealLinkedFootnote = () => revealFootnotes(window.location.hash, true);
+  revealLinkedFootnote();
+  window.addEventListener('hashchange', revealLinkedFootnote);
+  document.addEventListener('astro:page-load', revealLinkedFootnote);
 </script>
 
 <style>
@@ -278,6 +303,82 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
     margin-block-start: 0.5em;
   }
   .post-content :global(.callout-content > :last-child) {
+    margin-block-end: 0;
+  }
+
+  .post-content :global(a[data-footnote-ref]),
+  .post-content :global(a[data-footnote-backref]) {
+    color: var(--dc-color-2);
+    text-decoration: none;
+    white-space: nowrap;
+    scroll-margin-top: 4rem;
+  }
+  .post-content :global(a[data-footnote-ref]:hover),
+  .post-content :global(a[data-footnote-backref]:hover) {
+    text-decoration: underline;
+  }
+  .post-content :global(a[data-footnote-ref]:focus-visible),
+  .post-content :global(a[data-footnote-backref]:focus-visible) {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+  .post-content :global(.footnotes) {
+    margin-block: 1.5em 0.5em;
+  }
+  .post-content :global(.footnotes summary) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+    padding-block-end: 0.35em;
+    border-bottom: 1px solid #cfd4e4;
+    cursor: pointer;
+    list-style: none;
+  }
+  .post-content :global(.footnotes summary::-webkit-details-marker) {
+    display: none;
+  }
+  .post-content :global(.footnotes summary::after) {
+    content: '▸';
+    color: var(--dc-color-2);
+  }
+  .post-content :global(.footnotes details[open] > summary::after) {
+    content: '▾';
+  }
+  .post-content :global(.footnotes summary h2) {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .post-content :global(.footnotes summary:hover) {
+    color: var(--dc-color-2);
+  }
+  .post-content :global(.footnotes summary:focus-visible) {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 3px;
+  }
+  .post-content :global(.footnotes > details > ol) {
+    font-size: var(--text-ui);
+    list-style: none;
+    padding-inline-start: 0;
+  }
+  .post-content :global(.footnotes > details > ol > li) {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.6em;
+    margin-block: 0.75em;
+    scroll-margin-top: 4rem;
+  }
+  .post-content :global(.footnote-number) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-variant-numeric: tabular-nums;
+  }
+  .post-content :global(.footnote-content > :first-child) {
+    margin-block-start: 0;
+  }
+  .post-content :global(.footnote-content > :last-child) {
     margin-block-end: 0;
   }
 

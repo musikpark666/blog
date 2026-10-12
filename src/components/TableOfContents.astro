@@ -73,7 +73,10 @@ const hasSections = headings.some(({ depth }) => depth === 2);
         }
       }
 
-      const id = headings[Math.max(0, start - 1)].id;
+      // The final section may be too close to the page end to reach the reading line.
+      const atBottom = window.scrollY > 0 &&
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+      const id = headings[atBottom ? headings.length - 1 : Math.max(0, start - 1)].id;
       if (id === currentId) return;
       linksById.get(currentId)?.forEach((link) => link.removeAttribute('aria-current'));
       linksById.get(id)?.forEach((link) => link.setAttribute('aria-current', 'location'));
