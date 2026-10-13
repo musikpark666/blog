@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
 import expressiveCode from 'astro-expressive-code';
@@ -8,7 +8,7 @@ import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkBreaks from 'remark-breaks';
 import remarkWikiLink from 'remark-wiki-link';
 import rehypePostLinks from './src/lib/rehype-post-links.mjs';
-import sharedFontCss from './src/lib/shared-font-css.mjs';
+import sharedFontCss, { pretendardJp } from './src/lib/shared-font-css.mjs';
 import remarkGreentext, { rehypeGreentextLines } from './src/lib/remark-greentext.mjs';
 import rehypeCallouts from './src/lib/rehype-callouts.mjs';
 import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
@@ -74,21 +74,19 @@ export default defineConfig({
       },
     }),
     mdx(),
-    sharedFontCss('--font-noto-sans-jp'),
+    sharedFontCss('--font-pretendard-jp'),
   ],
   fonts: [
     {
-      provider: fontProviders.google(),
-      name: 'Noto Sans JP',
-      cssVariable: '--font-noto-sans-jp',
-      weights: ['400 700'],
+      provider: pretendardJp(),
+      name: 'Pretendard JP Variable',
+      cssVariable: '--font-pretendard-jp',
+      weights: ['45 920'],
       styles: ['normal'],
       display: 'swap',
       fallbacks: [
-        'Hiragino Sans',
-        'Yu Gothic',
-        'Meiryo',
-        'sans-serif',
+        'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Sans KR',
+        'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'sans-serif',
       ],
     },
   ],

@@ -3,7 +3,6 @@ import BaseLayout from './BaseLayout.astro';
 import GalleryHeader from '../components/GalleryHeader.astro';
 import GalleryPostList from '../components/GalleryPostList.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import 'rehype-callouts/theme/obsidian';
 
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
@@ -149,6 +148,10 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   document.addEventListener('astro:page-load', revealLinkedFootnote);
 </script>
 
+<style is:global>
+  @import 'rehype-callouts/theme/obsidian';
+</style>
+
 <style>
   .post-toc {
     position: sticky;
@@ -190,6 +193,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 
   /* Post Content */
   .post-content {
+    display: flow-root;
     margin-bottom: 3rem;
     font-size: var(--text-body);
     line-height: var(--leading-body);
@@ -217,6 +221,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   .post-content :global(h4),
   .post-content :global(h5),
   .post-content :global(h6) {
+    clear: both;
     margin-block: 1.5em 0.5em;
     font-weight: 600;
     line-height: var(--leading-heading);
@@ -473,7 +478,9 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   }
 
   .post-content :global(strong) {
-    font-weight: 600;
+    font-weight: 700;
+  }
+  .post-content :global(mark) {
     background: linear-gradient(transparent 60%, #ff6 60%);
   }
 </style>

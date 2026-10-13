@@ -7,7 +7,7 @@
   --layout-min-width: 320px;
   --layout-left-width: clamp(0px, calc(100vw - 1020px), 180px);
 
-  --font-body: var(--font-noto-sans-jp);
+  --font-body: var(--font-pretendard-jp);
   --font-code: ui-monospace, Consolas, monospace;
 
   /* Pixel equivalents assume the browser's default font size is 16px. */
