@@ -7,7 +7,8 @@ import { unified } from '@astrojs/markdown-remark';
 import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkBreaks from 'remark-breaks';
 import remarkWikiLink from 'remark-wiki-link';
-import rehypeExternalLinks from 'rehype-external-links';
+import rehypePostLinks from './src/lib/rehype-post-links.mjs';
+import sharedFontCss from './src/lib/shared-font-css.mjs';
 import remarkGreentext, { rehypeGreentextLines } from './src/lib/remark-greentext.mjs';
 import rehypeCallouts from './src/lib/rehype-callouts.mjs';
 import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
@@ -22,7 +23,8 @@ export default defineConfig({
         remarkGreentext,
         [remarkWikiLink, {
           aliasDivider: '|',
-          pageResolver: (name) => [name.trim()],
+          // GFM table aliases escape the divider: [[slug\|Alias]].
+          pageResolver: (name) => [name.trim().replace(/\\$/, '')],
           hrefTemplate: (slug) => `/posts/${encodeURIComponent(slug)}/`,
         }],
       ],
@@ -30,19 +32,7 @@ export default defineConfig({
         rehypeCallouts,
         rehypeGreentextLines,
         rehypeFootnotes,
-        [rehypeExternalLinks, {
-          target: '_blank',
-          rel: ['noopener', 'noreferrer'],
-          test: (node) => {
-            try {
-              return new URL(String(node.properties.href), 'https://musik.gallery').hostname !== 'musik.gallery';
-            } catch {
-              return false;
-            }
-          },
-          content: { type: 'text', value: '（新しいタブで開く）' },
-          contentProperties: { className: ['visually-hidden'] },
-        }],
+        rehypePostLinks,
       ],
       remarkRehype: {
         footnoteLabel: '参考',
@@ -84,6 +74,7 @@ export default defineConfig({
       },
     }),
     mdx(),
+    sharedFontCss('--font-noto-sans-jp'),
   ],
   fonts: [
     {

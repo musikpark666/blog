@@ -13,24 +13,21 @@ const hasSections = headings.some(({ depth }) => depth === 2);
 ---
 
 {headings.length > 0 && (
-  <Container class:list={['toc', { 'toc-compact': compact }]}>
-    {compact ? (
-      <summary>
-        <a href="#post-title" title={title}>{title}</a>
-      </summary>
-    ) : (
-      <p class="toc-title"><a href="#post-title">{title}</a></p>
-    )}
-    <nav aria-label="目次">
-      <ul>
-        {headings.map(({ depth, slug, text }) => (
-          <li class:list={{ 'toc-subheading': hasSections && depth === 3 }}>
-            <a href={`#${slug}`}>{text}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </Container>
+  <div class:list={['toc', { 'toc-compact': compact }]}>
+    <p class="toc-title"><a href="#post-title" title={title}>{title}</a></p>
+    <Container class:list={{ 'toc-panel': compact }}>
+      {compact && <summary aria-label="目次を開閉">目次</summary>}
+      <nav aria-label="目次">
+        <ul>
+          {headings.map(({ depth, slug, text }) => (
+            <li class:list={{ 'toc-subheading': hasSections && depth === 3 }}>
+              <a href={`#${slug}`}>{text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </Container>
+  </div>
 )}
 
 <script>
@@ -48,29 +45,33 @@ const hasSections = headings.some(({ depth }) => depth === 2);
       linksById.set(id, links);
     });
 
-    const headings = Array.from(document.querySelectorAll<HTMLElement>(
+    const allHeadings = Array.from(document.querySelectorAll<HTMLElement>(
       '#post-title, .post-content h2[id], .post-content h3[id]'
     )).filter((heading) => linksById.has(heading.id));
-    if (headings.length === 0) return;
+    if (allHeadings.length === 0) return;
 
     const events = new AbortController();
     let frame = 0;
-    let currentIndex = -1;
+    let currentId = '';
     const switchMargin = 12;
 
-    function setCurrentHeading(index: number) {
-      if (index < 0 || index === currentIndex) return;
-      if (currentIndex >= 0) {
-        linksById.get(headings[currentIndex].id)?.forEach((link) => link.removeAttribute('aria-current'));
-      }
-      linksById.get(headings[index].id)?.forEach((link) => link.setAttribute('aria-current', 'location'));
-      currentIndex = index;
+    function setCurrentHeading(id: string) {
+      if (!linksById.has(id) || id === currentId) return;
+      linksById.get(currentId)?.forEach((link) => link.removeAttribute('aria-current'));
+      linksById.get(id)?.forEach((link) => link.setAttribute('aria-current', 'location'));
+      currentId = id;
     }
 
     function selectLinkedHeading(hash: string) {
       try {
         const id = decodeURIComponent(hash.slice(1));
-        setCurrentHeading(headings.findIndex((heading) => heading.id === id));
+        const heading = allHeadings.find((heading) => heading.id === id);
+        if (!heading) return;
+        // Open all folded ancestors before native fragment navigation.
+        for (let parent = heading.parentElement; parent; parent = parent.parentElement) {
+          if (parent instanceof HTMLDetailsElement) parent.open = true;
+        }
+        setCurrentHeading(id);
       } catch {
         // Ignore malformed URL fragments and continue tracking scroll position.
       }
@@ -78,6 +79,11 @@ const hasSections = headings.some(({ depth }) => depth === 2);
 
     function updateCurrentHeading() {
       frame = 0;
+      // Closed details can still report heading rectangles. Their summary stays visible.
+      const headings = allHeadings.filter((heading) =>
+        !heading.closest('details:not([open]) > :not(summary)')
+      );
+      const currentIndex = headings.findIndex((heading) => heading.id === currentId);
       const readingLine = (parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 64) + 1;
 
       // Find the last heading above the reading line, even between long sections.
@@ -101,7 +107,7 @@ const hasSections = headings.some(({ depth }) => depth === 2);
         while (index > currentIndex && headings[index].getBoundingClientRect().top > readingLine - switchMargin) index--;
         while (index < currentIndex && headings[index + 1].getBoundingClientRect().top <= readingLine + switchMargin) index++;
       }
-      setCurrentHeading(index);
+      setCurrentHeading(headings[index].id);
     }
 
     function scheduleUpdate() {
@@ -110,6 +116,7 @@ const hasSections = headings.some(({ depth }) => depth === 2);
 
     window.addEventListener('scroll', scheduleUpdate, { passive: true, signal: events.signal });
     window.addEventListener('resize', scheduleUpdate, { signal: events.signal });
+    document.addEventListener('toggle', scheduleUpdate, { capture: true, signal: events.signal });
     window.addEventListener('hashchange', () => {
       selectLinkedHeading(window.location.hash);
       scheduleUpdate();
@@ -121,7 +128,7 @@ const hasSections = headings.some(({ depth }) => depth === 2);
       if (!link) return;
       selectLinkedHeading(link.hash);
       // Close before native anchor navigation, including clicks on the same hash.
-      const panel = link.closest<HTMLDetailsElement>('.toc-compact');
+      const panel = link.closest('.toc-compact')?.querySelector<HTMLDetailsElement>('.toc-panel');
       if (panel) panel.open = false;
       scheduleUpdate();
     }, { signal: events.signal });
@@ -205,7 +212,8 @@ const hasSections = headings.some(({ depth }) => depth === 2);
   }
 
   .toc-compact {
-    display: block;
+    display: flex;
+    align-items: center;
     position: relative;
     border: 1px solid #dfe2ee;
     background-color: #fff;
@@ -220,6 +228,14 @@ const hasSections = headings.some(({ depth }) => depth === 2);
     font-size: var(--text-ui);
     font-weight: 600;
     cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+    min-height: 44px;
+    border-inline-start: 1px solid #dfe2ee;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
   }
 
   summary::before {
@@ -227,17 +243,25 @@ const hasSections = headings.some(({ depth }) => depth === 2);
     flex-shrink: 0;
   }
 
-  .toc-compact[open] summary::before {
+  .toc-panel[open] summary::before {
     content: '▾';
   }
 
-  summary a {
+  .toc-compact .toc-title {
+    flex: 1;
     min-width: 0;
-    padding: 0;
-    border: 0;
+    margin: 0;
+  }
+
+  .toc-compact .toc-title a {
+    padding: 0.625rem 0.75rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .toc-panel {
+    flex-shrink: 0;
   }
 
   summary:hover,

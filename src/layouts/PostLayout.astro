@@ -190,6 +190,7 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 
   /* Post Content */
   .post-content {
+    margin-bottom: 3rem;
     font-size: var(--text-body);
     line-height: var(--leading-body);
     overflow-wrap: anywhere;
@@ -265,6 +266,14 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
   .post-content :global(li > ul),
   .post-content :global(li > ol) {
     margin-block: 0.25em;
+  }
+
+  .post-content :global(li > p) {
+    margin-block: 0.25em;
+  }
+
+  .post-content :global(li > p + p) {
+    margin-block-start: 0.5em;
   }
 
   .post-content :global(blockquote[data-greentext]) {
