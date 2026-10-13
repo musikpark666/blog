@@ -10,7 +10,7 @@ interface Props extends PostImage {
 }
 
 const { src, alt = '', caption, source, width, height, align = 'left', float,
-  sizes, loading = 'lazy' } = Astro.props;
+  sizes, loading = 'lazy', quality = 60 } = Astro.props;
 const image = await resolvePostImage(src);
 if (typeof image === 'string' && (!width || !height)) {
   throw new Error('<Img>: public/ and remote images require width and height to reserve their aspect ratio.');
@@ -18,6 +18,7 @@ if (typeof image === 'string' && (!width || !height)) {
 const intrinsicWidth = typeof image === 'string' ? width! : image.width;
 const intrinsicHeight = typeof image === 'string' ? height! : image.height;
 const displayWidth = Math.min(width ?? (float ? 320 : 640), intrinsicWidth);
+const displayHeight = Math.max(1, Math.round(displayWidth * intrinsicHeight / intrinsicWidth));
 const maxWidth = Math.min(intrinsicWidth, displayWidth * 2);
 const widths = [...new Set([320, 640, 960, displayWidth, maxWidth])]
   .filter((value) => value <= maxWidth).sort((a, b) => a - b);
@@ -34,9 +35,9 @@ const preserveOriginal = typeof image === 'string'
       <img src={typeof image === 'string' ? image : image.src} alt={alt}
         width={intrinsicWidth} height={intrinsicHeight} loading={loading} decoding="async" />
     ) : (
-      <Image src={image} alt={alt} width={displayWidth} height={height}
+      <Image src={image} alt={alt} width={displayWidth} height={displayHeight}
         widths={widths} sizes={sizes ?? `(min-width: ${displayWidth + 24}px) ${displayWidth}px, calc(100vw - 24px)`}
-        format="avif" quality={60} loading={loading} decoding="async" />
+        format="avif" quality={quality} loading={loading} decoding="async" />
     )}
     {sourceHtml && (
       <details class="post-image-source">

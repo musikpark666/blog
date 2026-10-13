@@ -1,0 +1,180 @@
+---
+import Img from './Img.astro';
+import { resolvePostImage, type PostImage } from '../../lib/post-images';
+
+interface Props {
+  images: PostImage[];
+  mode?: 'mosaic' | 'carousel';
+  columns?: 2 | 3;
+  label?: string;
+}
+const { images, mode = 'mosaic', columns = 2, label = '画像ギャラリー' } = Astro.props;
+if (!images.length) throw new Error('<ImgCollage>: images must contain at least one image.');
+const carousel = mode === 'carousel';
+const resolvedImages = await Promise.all(images.map(async (image) => ({
+  ...image, src: await resolvePostImage(image.src),
+})));
+const dimensions = resolvedImages.map((image) => {
+  const width = typeof image.src === 'string' ? image.width : image.src.width;
+  const height = typeof image.src === 'string' ? image.height : image.src.height;
+  if (!width || !height) throw new Error('<ImgCollage>: public/ and remote images require width and height.');
+  return { width, height, displayWidth: Math.min(image.width ?? 640, width) };
+});
+const collageWidth = Math.min(...dimensions.map((image) => image.displayWidth));
+const collageHeight = Math.min(...dimensions.map((image) => collageWidth * image.height / image.width));
+// Lazy images use their rendered width; the remaining sizes support older browsers.
+const imageSizes = carousel
+  ? `auto, min(${collageWidth}px, calc(100vw - 24px))`
+  : `auto, ${columns === 3 ? `(min-width: 640px) min(${collageWidth}px, calc((100vw - 48px) / 3)), ` : ''}min(${collageWidth}px, calc((100vw - 36px) / 2))`;
+---
+
+<img-collage class="post-image-collage" data-mode={mode} data-columns={columns}
+  style={`--collage-width: ${collageWidth}px; --collage-ratio: ${collageWidth} / ${collageHeight}`}>
+  <div class="collage-track" tabindex={carousel ? 0 : undefined}
+    role={carousel ? 'region' : 'group'} aria-label={label}
+    aria-description={carousel ? '左右の矢印キーで画像を切り替えられます。' : undefined}>
+    {resolvedImages.map((image, index) => (
+      <div class="collage-item" role={carousel ? 'group' : undefined}
+        aria-label={carousel ? `${index + 1} / ${images.length}` : undefined}>
+        <Img {...image} sizes={imageSizes} />
+      </div>
+    ))}
+  </div>
+  {carousel && images.length > 1 && (
+    <div class="collage-controls" hidden>
+      <button type="button" data-direction="-1" aria-label="前の画像">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 6-6 6 6 6" />
+        </svg>
+      </button>
+      <button type="button" data-direction="1" aria-label="次の画像">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 6 6 6-6 6" />
+        </svg>
+      </button>
+    </div>
+  )}
+</img-collage>
+
+<script>
+  class ImgCollage extends HTMLElement {
+    private cleanup?: () => void;
+
+    connectedCallback() {
+      const track = this.querySelector<HTMLElement>('.collage-track');
+      const controls = this.querySelector<HTMLElement>('.collage-controls');
+      if (!track || !controls || this.cleanup) return;
+      const items = Array.from(track.children) as HTMLElement[];
+      const buttons = Array.from(controls.querySelectorAll<HTMLButtonElement>('button'));
+      const visual = track.querySelector<HTMLElement>('.post-image-visual')!;
+      const controller = new AbortController();
+      let scrollTimer: ReturnType<typeof setTimeout> | undefined;
+      let current = 0;
+      const update = () => {
+        const left = track.getBoundingClientRect().left;
+        current = items.reduce((nearest, item, index) =>
+          Math.abs(item.getBoundingClientRect().left - left) <
+          Math.abs(items[nearest].getBoundingClientRect().left - left) ? index : nearest, 0);
+        this.style.setProperty('--controls-center', `${visual.getBoundingClientRect().height / 2}px`);
+        buttons[0].disabled = current === 0;
+        buttons[1].disabled = current === items.length - 1;
+      };
+      const moveTo = (index: number) => {
+        current = Math.max(0, Math.min(items.length - 1, index));
+        const target = items[current];
+        track.scrollBy({
+          left: target.getBoundingClientRect().left - track.getBoundingClientRect().left,
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+        });
+      };
+      controls.addEventListener('click', (event) => {
+        const button = (event.target as Element).closest<HTMLButtonElement>('button');
+        if (button) moveTo(current + Number(button.dataset.direction));
+      }, { signal: controller.signal });
+      track.addEventListener('keydown', (event) => {
+        if (event.target !== track || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        moveTo(event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 :
+          current + (event.key === 'ArrowRight' ? 1 : -1));
+      }, { signal: controller.signal });
+      if ('onscrollend' in track) {
+        track.addEventListener('scrollend', update, { signal: controller.signal });
+      } else {
+        track.addEventListener('scroll', () => {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(update, 120);
+        }, { signal: controller.signal });
+      }
+      const observer = new ResizeObserver(update);
+      observer.observe(track);
+      observer.observe(visual);
+      controls.hidden = false;
+      update();
+      this.cleanup = () => {
+        controller.abort();
+        clearTimeout(scrollTimer);
+        observer.disconnect();
+      };
+    }
+
+    disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
+  }
+  if (!customElements.get('img-collage')) customElements.define('img-collage', ImgCollage);
+</script>
+
+<style>
+  .post-image-collage { display: block; clear: both; min-width: 0; width: min(100%, var(--collage-width)); margin-block: 1.25em; }
+  .post-image-collage[data-mode='carousel'] { position: relative; }
+  .collage-track { display: grid; gap: 0.75rem; }
+  .collage-item { min-width: 0; }
+  .post-image-collage :global(.post-image) { width: 100%; margin-block: 0; }
+  .post-image-collage :global(.post-image-visual) { aspect-ratio: var(--collage-ratio); }
+  .post-image-collage :global(.post-image-visual img) { height: 100%; object-fit: contain; }
+  [data-mode='carousel'] .collage-track {
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  [data-mode='carousel'] .collage-track::-webkit-scrollbar { display: none; }
+  [data-mode='carousel'] .collage-item { scroll-snap-align: start; }
+  .collage-track:focus-visible { outline: 2px solid var(--dc-color-2); outline-offset: 3px; }
+  .collage-controls {
+    position: absolute;
+    inset-inline: 0.5rem;
+    top: var(--controls-center);
+    transform: translateY(-50%);
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .collage-controls[hidden] { display: none; }
+  .collage-controls button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid #cfd4df;
+    border-radius: 50%;
+    background: #fffffff0;
+    box-shadow: 0 1px 5px #171b3026;
+    color: var(--dc-color-2);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .collage-controls button:hover:enabled { background: #e9ecf8; }
+  .collage-controls button:focus-visible { outline: 2px solid var(--dc-color-2); outline-offset: 2px; }
+  .collage-controls button:disabled { opacity: 0.4; cursor: default; }
+  [data-mode='mosaic'] { width: min(100%, calc(var(--collage-width) * 2 + 0.75rem)); }
+  [data-mode='mosaic'] .collage-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 640px) {
+    [data-mode='mosaic'][data-columns='3'] { width: min(100%, calc(var(--collage-width) * 3 + 1.5rem)); }
+    [data-mode='mosaic'][data-columns='3'] .collage-track { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

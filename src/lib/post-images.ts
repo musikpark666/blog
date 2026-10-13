@@ -11,6 +11,7 @@ export interface PostImage {
   source?: string;
   width?: number;
   height?: number;
+  quality?: number;
 }
 
 const assets = import.meta.glob<ImageMetadata>(

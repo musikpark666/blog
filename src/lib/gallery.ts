@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-export const GALLERY_POSTS_PER_PAGE = 2;
+export const GALLERY_POSTS_PER_PAGE = 10;
 
 type BlogPost = CollectionEntry<'post'>;
 
