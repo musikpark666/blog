@@ -22,6 +22,15 @@ export const getStaticPaths = (async () => {
   return galleries.flatMap((gallery) => {
     const galleryPosts = postsByGallery.get(gallery.id) ?? [];
     const totalPages = Math.max(1, Math.ceil(galleryPosts.length / postsPerPage));
+    const randomCandidates = [...galleryPosts];
+    const randomPostCount = Math.min(4, randomCandidates.length);
+
+    for (let index = 0; index < randomPostCount; index++) {
+      const randomIndex = index + Math.floor(Math.random() * (randomCandidates.length - index));
+      [randomCandidates[index], randomCandidates[randomIndex]] = [randomCandidates[randomIndex], randomCandidates[index]];
+    }
+
+    const randomPosts = randomCandidates.slice(0, randomPostCount);
 
     return Array.from({ length: totalPages }, (_, pageIndex) => {
       const currentPage = pageIndex + 1;
@@ -29,6 +38,7 @@ export const getStaticPaths = (async () => {
       const props = {
         gallery,
         pagePosts: galleryPosts.slice(pageStart, pageStart + postsPerPage),
+        randomPosts,
         postCount: galleryPosts.length,
         currentPage,
         totalPages,
@@ -47,12 +57,13 @@ export const getStaticPaths = (async () => {
 interface Props {
   gallery: CollectionEntry<'gallery'>;
   pagePosts: BlogPost[];
+  randomPosts: BlogPost[];
   postCount: number;
   currentPage: number;
   totalPages: number;
 }
 
-const { gallery, pagePosts, postCount, currentPage, totalPages } = Astro.props;
+const { gallery, pagePosts, randomPosts, postCount, currentPage, totalPages } = Astro.props;
 
 if (Astro.params.page === '1') {
   return Astro.redirect(`/g/${gallery.id}/`);
@@ -67,8 +78,25 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
   <GalleryHeader gallery={gallery} postCount={postCount} />
 
   <div class="gallery-intro">
-    <Image src={thumbnail} alt="" width="120" height="90" fit="cover" />
-    <p>{description}</p>
+    <div class:list={['gallery-intro-layout', { 'has-random-posts': randomPosts.length > 0 }]}>
+      <div class="gallery-intro-info">
+        <Image src={thumbnail} alt="" width="150" height="100" fit="cover" />
+        <p>{description}</p>
+      </div>
+      {randomPosts.length > 0 && (
+        <section class="gallery-random-posts" aria-labelledby="gallery-random-posts-title">
+          <ul role="list">
+            {randomPosts.map((post) => (
+              <li>
+                <a href={`/posts/${post.id}/?g=${encodeURIComponent(gallery.id)}`}>
+                  {post.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
   </div>
 
   <GalleryPostList 
@@ -84,15 +112,24 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
   .gallery-intro {
     padding: 10px 0;
     border-bottom: 1px solid #d5d5d5;
+    container: gallery-intro / inline-size;
+  }
+  .gallery-intro-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .gallery-intro-info {
     display: flex;
     gap: 12px;
     align-items: flex-start;
+    min-width: 0;
   }
-  .gallery-intro :global(img) {
+  .gallery-intro-info :global(img) {
     flex-shrink: 0;
     max-width: 100%;
   }
-  .gallery-intro p {
+  .gallery-intro-info p {
     margin: 0;
     color: #475467;
     min-width: 0;
@@ -101,11 +138,59 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
     overflow-wrap: anywhere;
   }
   
-  /* Media Queries */
-  @media (min-width: 430px) {
-    .gallery-intro :global(img) {
-      object-fit: cover;
-      width: 160px;
+  .gallery-random-posts {
+    display: none;
+    min-width: 0;
+  }
+  .gallery-random-posts ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-small);
+  }
+  .gallery-random-posts li {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 4px;
+  }
+  .gallery-random-posts li::before {
+    content: '';
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background-color: #475467;
+  }
+  .gallery-random-posts a {
+    display: block;
+    min-width: 0;
+    padding: 2px 4px;
+    color: #475467;
+    line-height: var(--leading-ui);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .gallery-random-posts a:visited {
+    color: #75568b;
+  }
+  .gallery-random-posts a:hover,
+  .gallery-random-posts a:focus-visible {
+    background-color: #eef0f7;
+    text-decoration: underline;
+  }
+  .gallery-random-posts a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 1px;
+  }
+
+  @container gallery-intro (min-width: 600px) {
+    .gallery-intro-layout.has-random-posts {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+    .gallery-random-posts {
+      display: block;
     }
   }
 </style>

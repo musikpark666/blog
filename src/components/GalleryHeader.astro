@@ -16,10 +16,7 @@ const { title } = gallery.data;
     <small>({postCount}件)</small>
   </h1>
   <div class="gallery-header-action">
-    <button type="button" aria-label="ギャラリー情報">
-      <span class="action-label-short">ⓘ</span>
-      <span class="action-label-long">ギャラリー情報</span>
-    </button>
+    <button type="button" aria-label="ギャラリー情報">ⓘ</button>
     <button type="button">案内</button>
   </div>
 </header>
@@ -105,23 +102,11 @@ const { title } = gallery.data;
     color: var(--dc-color-2);
     outline: none;
   }
-  .action-label-long {
-    display: none;
-  }
 
   /* media */
   @media (min-width: 430px) {
     .gallery-header h1 span {
       display: inline;
-    }
-  }
-
-  @media (min-width: 640px) {
-    .action-label-long {
-      display: inline;
-    }
-    .action-label-short {
-      display: none;
     }
   }
 </style>

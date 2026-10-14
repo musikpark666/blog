@@ -61,8 +61,8 @@ for (const post of posts) {
                 src={gallery.data.thumbnail}
                 alt=""
                 loading={index === 0 ? 'eager' : 'lazy'}
-                widths={[90, 180, 350]}
-                sizes="(min-width: 425px) 175px, 90px"
+                widths={[90, 120, 150, 180, 240, 300]}
+                sizes="(min-width: 430px) 150px, 90px"
               />
             </div>
             <div class="gallery-card-body">
@@ -142,9 +142,9 @@ for (const post of posts) {
 
   .gallery-thumbnail {
     position: relative;
-    /* align-self: start; // is it require? */
+    align-self: stretch;
     overflow: hidden;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     background: linear-gradient(135deg, #eff3ff 0%, #f8fbff 100%);
   }
   .gallery-thumbnail :global(img) {
@@ -206,10 +206,7 @@ for (const post of posts) {
   /* Quaries */
   @media (min-width: 430px) {
     .gallery-card {
-      grid-template-columns: minmax(175px, 15%) minmax(0, 1fr);
-    }
-    .gallery-thumbnail {      
-      aspect-ratio: 16 / 9;
+      grid-template-columns: minmax(120px, 20%) minmax(0, 1fr);
     }
 
     .count-full {
