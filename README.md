@@ -6,7 +6,6 @@ This is  my personal blog.
 
 >after implement posting
 
-0. **image optimization** (`content.config.ts`, ...)
 1. Navigation.astro: `.extra-info` actual implementation
 2. Header.astro: **search** implementation
 3. Header.astro: **menu, night mode** implementation (++**Theme**)
@@ -14,23 +13,19 @@ This is  my personal blog.
 5. Footer.astro: `.footer-top` wide view
 6. Sidebar.astro: implement several **widgets**
 7. **About Page** implementation
-8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation, **thumnail image styling**, currentPage tracking, info button simplify(only ⓘ)
-9. GalleryPostList.astro: currentPage tracking, media query styling(+overflow), several scripting, 
+8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation
+9. GalleryPostList.astro: several btn scripting
 10. additional `astro.config.mjs` settings
-11. additional **Page Header** settings
 
 >issue?
 
 1. Header logo image flicking
 2. Page navigation latency (Dev Server error?)
-3. Sidebar UI broken
 
 >will be soon
 
 1. 
-2. remake favicon
 3. add socials (GitHub, fix links...)
-4. **ellipses** improve (by characters)
 5. focus-visible styling
 6. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
 7. Views (view count) & Comment
