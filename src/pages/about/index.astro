@@ -1,8 +1,331 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Social from '../../components/Social.astro';
+import GalleryHeader from '../../components/GalleryHeader.astro';
+import profileImage from '../../assets/imgs/profile cat foil.avif';
 ---
 
-<BaseLayout title="about | musik.gallery">
-  <h1>About</h1>
-  <p>私は人間の体に閉じ込められた猫ですにゃ。</p>
+<BaseLayout
+  title="ムシクについて | musik.gallery"
+  description="朴武識（ムシク）の自己紹介と、musik.gallery について。興味のあること、略歴・私の歩み、外部プロフィールをまとめています。"
+>
+  <div class="about-page">
+    <GalleryHeader title="朴武識" href="/about/" showInfo={false} />
+    <header class="about-header">
+      <img
+        class="about-avatar"
+        src={profileImage.src}
+        alt="ムシクのプロフィール画像"
+        width="96"
+        height="96"
+        decoding="async"
+      />
+      <div class="about-heading">
+        <p class="about-name"><ruby>朴<rt>パク</rt>武<rt>ム</rt>識<rt>シク</rt></ruby><span>ムシク / musik</span></p>
+        <p class="about-tagline">私はときどき、そして部分的には猫ですが、たいていはごく普通の人間のオスです。</p>
+      </div>
+    </header>
+
+    <nav class="about-nav" aria-label="紹介ページの目次">
+      <a href="#introduction">自己紹介</a>
+      <a href="#blog">このブログ</a>
+      <a href="#interests">興味のあること</a>
+      <a href="#history">略歴</a>
+      <a href="#contact">リンク</a>
+    </nav>
+
+    <section class="about-section" id="introduction" aria-labelledby="introduction-title">
+      <h2 id="introduction-title">自己紹介</h2>
+      <p>
+        こんにちは、ムシクです。
+      </p>
+      <p>
+        急に自分のことを紹介しようとすると、なんだかぎこちないですね。そうですね、思いつくままに書いてみましょうか。
+      </p>
+      <p>
+        実は、自己紹介の時間が嫌いでした。新しいクラスに入って、みんなの前で自分のことを話すあの瞬間は、私にとってこの上なく恐ろしいものでした。順番が進み、自分の番が近づくにつれて恐怖に震え、今すぐにでもどこかへ逃げ出したくなる、そんなアウトサイダーでした。
+      </p>
+      <p>
+        そうした気質も、きっと影響していたのでしょう。それに、いろいろなことがありました。2026年の今では、最後に人前に出て自己紹介をしたのがいつだったのかさえ、もう曖昧になっています。この10年近く、部屋に引きこもって過ごしてきたからです。
+      </p>
+      <p>
+        だから、私という人間を紹介しようとしても、「引きこもり」「ニート」といった気の滅入る言葉ばかりが浮かんで、とても書く気にはなれません。「○○で働いています、△△が一番好きです、趣味は◇◇です」といった、ごく普通の自己紹介が、いつの間にか遥か遠い風景のように感じられます。
+      </p>
+      <p>
+        それでも、いつかは私も「自己紹介」ができる人間になれると、信じています。
+      </p>
+      <p>
+        少しずつ、ここに書けることをつくって、書き足していきます。😿
+      </p>
+    </section>
+
+    <section class="about-section" id="blog" aria-labelledby="blog-title">
+      <h2 id="blog-title">このブログについて</h2>
+      <p>
+        musik.gallery は、私が自分で書いた記録をすべて収める個人ブログです。記事をテーマごとの「ギャラリー」に分けて、とりとめもなく書いています。
+      </p>
+      <p>
+        内容はどれもきわめて個人的で、専門的なものではなく、とにかく信用できるようなものではありません。脳を通さずに書いた内容は、きっと大半の人には不快に感じられることもあるでしょう。そもそも特定の読者に向けたものではなく、非商用の、きわめて個人的な記録のための場所です。
+      </p>
+      <p>
+        どうかあまり真に受けず、哀れんでいただければありがたいです。
+      </p>
+    </section>
+
+    <section class="about-section" id="interests" aria-labelledby="interests-title">
+      <h2 id="interests-title">興味のあること</h2>
+      <dl class="about-interests">
+        <div>
+          <dt>つくること</dt>
+          <dd>いつか漫画とゲームをつくりたいです。そのほかにも、曲をつくったり彫刻をしたり、いろいろなものをつくってみたいです。まだどれも漠然とした願いです。何かをこの世界に残すこと。</dd>
+        </div>
+        <div>
+          <dt>あそぶこと</dt>
+          <dd>生来の怠け者で、だらだら過ごすのが大好きです。部屋にいながらいろいろな作品に触れて、面白かったところや心に残ったことを記録すること。</dd>
+        </div>
+        <div>
+          <dt>記録すること</dt>
+          <dd>日々の出来事、ふと思ったこと、小さな発見。まとまっていなくても、まず残しておくこと。</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="about-section" id="history" aria-labelledby="history-title">
+      <h2 id="history-title">略歴・私の歩み</h2>
+      <p class="about-note">これから少しずつ追記していきます。</p>
+      <ol class="about-history" role="list">
+        <li>
+          <time datetime="2000-06-19">2000.06.19</time>
+          <div>
+            <h3>誕生</h3>
+            <p>猫の星で生まれました。</p>
+          </div>
+        </li>
+        <li>
+          <time datetime="2017-03-15">2017.03.15</time>
+          <div>
+            <h3>高校を中退</h3>
+            <p>苦痛しかなかった高校を離れ、安らぎという名の地獄を選びます。</p>
+          </div>
+        </li>
+        <li>
+          <time datetime="2026-09-30">2026.09.30</time>
+          <div>
+            <h3>ブログを始める</h3>
+            <p>最初の記事「<a href="/posts/hello-blog/?g=dev">Hello, Blog!</a>」を公開。自分だけの記録を残す場所づくりを始めました。</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="about-section" id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title">SNS・連絡先</h2>
+      <p>ブログの外では、こちらにもいます。</p>
+      <div class="about-social">
+        <span>SNS / CONTACT</span>
+        <Social />
+      </div>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .about-page {
+    container: about / inline-size;
+    color: #344054;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    overflow-wrap: anywhere;
+  }
+
+  .about-header {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .about-avatar {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .about-heading {
+    min-width: 0;
+  }
+  .about-name {
+    margin: 0;
+    color: #171b30;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: var(--leading-heading);
+  }
+  .about-name span {
+    display: block;
+    margin-top: 4px;
+    color: #667085;
+    font-size: var(--text-ui);
+    font-weight: 400;
+  }
+  .about-tagline {
+    margin: 10px 0 0;
+    font-size: var(--text-ui);
+  }
+
+  .about-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    padding: 8px 0;
+    border-top: 1px dashed #d5dbea;
+    border-bottom: 1px solid #d5dbea;
+    font-size: var(--text-ui);
+  }
+  .about-nav a {
+    padding: 4px 6px;
+    text-decoration: none;
+  }
+  .about-nav a:hover {
+    background-color: #eef0f7;
+  }
+  .about-section {
+    margin-top: 28px;
+    scroll-margin-top: 16px;
+  }
+  h2 {
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d5dbea;
+    color: #000;
+    font-size: var(--text-heading);
+    line-height: var(--leading-heading);
+  }
+  h2::before {
+    content: '#';
+    margin-inline-end: 0.4em;
+    color: var(--dc-color-2);
+    font-family: var(--font-code);
+  }
+  .about-section > p {
+    margin: 0 0 12px;
+  }
+  a {
+    color: var(--dc-color-2);
+    text-underline-offset: 0.2em;
+  }
+  a:visited {
+    color: #75568b;
+  }
+  a:hover {
+    color: var(--dc-color-1);
+  }
+  a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+  .about-text-link {
+    font-size: var(--text-ui);
+  }
+  .about-quote {
+    margin: 18px 0 0;
+    padding: 10px 14px;
+    border-left: 3px solid var(--dc-color-3);
+    background-color: #f7f8fb;
+    font-size: var(--text-ui);
+  }
+  .about-quote p {
+    margin: 0;
+  }
+  .about-interests {
+    margin: 0;
+  }
+  .about-interests > div {
+    padding: 12px 0;
+    border-bottom: 1px dashed #d5dbea;
+  }
+  .about-interests > div:first-child {
+    padding-top: 0;
+  }
+  .about-interests > div:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .about-interests dt {
+    margin-bottom: 4px;
+    color: #1f2937;
+    font-weight: 700;
+  }
+  .about-interests dd {
+    margin: 0;
+  }
+  .about-note {
+    color: #667085;
+    font-size: var(--text-ui);
+  }
+  .about-history {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .about-history li {
+    display: grid;
+    gap: 4px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e1e4ea;
+  }
+  .about-history li:last-child {
+    border-bottom: 0;
+  }
+  .about-history time {
+    color: #667085;
+    font-size: var(--text-ui);
+    font-variant-numeric: tabular-nums;
+  }
+  .about-history h3 {
+    margin: 0 0 6px;
+    color: #1f2937;
+    font-size: var(--text-list-title);
+    line-height: var(--leading-heading);
+  }
+  .about-history p {
+    margin: 0;
+    font-size: var(--text-ui);
+  }
+  .about-social {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 10px 12px;
+    border: 1px solid #d5dbea;
+    background-color: #f7f8fb;
+    font-size: var(--text-ui);
+  }
+
+  @container about (min-width: 480px) {
+    .about-header {
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 20px;
+    }
+    .about-avatar {
+      width: 96px;
+      height: 96px;
+    }
+    .about-interests > div {
+      display: grid;
+      grid-template-columns: 7rem minmax(0, 1fr);
+      gap: 16px;
+    }
+    .about-interests dt {
+      margin: 0;
+    }
+    .about-history li {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: 16px;
+    }
+  }
+</style>

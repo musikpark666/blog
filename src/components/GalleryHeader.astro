@@ -1,22 +1,26 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-interface Props {
-  gallery: CollectionEntry<'gallery'>;
-  postCount: number;
-}
+type Props = { showInfo?: boolean } & (
+  | { gallery: CollectionEntry<'gallery'>; postCount: number; title?: never; href?: never }
+  | { gallery?: never; postCount?: never; title: string; href: string }
+);
 
-const { gallery, postCount } = Astro.props;
-const { title } = gallery.data;
+const { gallery, postCount, title: customTitle, href: customHref, showInfo = true } = Astro.props;
+const title = gallery?.data.title ?? customTitle;
+const href = gallery ? `/g/${gallery.id}/` : customHref;
 ---
 
 <header class="gallery-header" data-gallery-header-root>
   <h1>
-    <a href={`/g/${gallery.id}/`}>{title}<span> ギャラリー</span></a>
-    <small>({postCount}件)</small>
+    <a href={href}>
+      <span class="gallery-title-name">{title}</span>
+      <span class="gallery-title-kind">ギャラリー</span>
+    </a>
+    {postCount !== undefined && <small>({postCount}件)</small>}
   </h1>
   <div class="gallery-header-action">
-    <button type="button" aria-label="ギャラリー情報">ⓘ</button>
+    {showInfo && <button type="button" aria-label="ギャラリー情報">ⓘ</button>}
     <button type="button">案内</button>
   </div>
 </header>
@@ -42,20 +46,33 @@ const { title } = gallery.data;
     min-width: 0;
   }
   .gallery-header  h1 a {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    height: 1lh;
+    min-width: 0;
     color: var(--dc-color-2);
     text-decoration: none;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .gallery-header h1 small {
     color: #667085; /* previously #98a2b3 */
     font-size: var(--text-small);
     font-weight: 400;
+    flex-shrink: 0;
     white-space: nowrap;
   }
-  .gallery-header h1 span {
-    display: none;
+  .gallery-title-name {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .gallery-title-kind {
+    flex-shrink: 0;
+    padding-left: 0.25em;
+    white-space: nowrap;
   }
   .gallery-header h1 a:hover,
   .gallery-header h1 a:focus-visible {
@@ -103,10 +120,4 @@ const { title } = gallery.data;
     outline: none;
   }
 
-  /* media */
-  @media (min-width: 430px) {
-    .gallery-header h1 span {
-      display: inline;
-    }
-  }
 </style>
