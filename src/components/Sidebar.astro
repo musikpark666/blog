@@ -1,6 +1,18 @@
 ---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import Social from './Social.astro';
 import profileImage from '../assets/imgs/profile cat foil.avif';
+import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
+
+const recentPostsPerPage = 6;
+const recentPosts = (await getCollection('post'))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime() || a.id.localeCompare(b.id))
+  .slice(0, recentPostsPerPage * 5);
+const recentPages = Array.from(
+  { length: Math.max(1, Math.ceil(recentPosts.length / recentPostsPerPage)) },
+  (_, index) => recentPosts.slice(index * recentPostsPerPage, (index + 1) * recentPostsPerPage),
+);
 ---
 
 <div class="sidebar-about">
@@ -28,16 +40,58 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   </div>
 </div>
 
-<section class="sidebar-item sidebar-recent" >
-  <div class="sidebar-item-header">
-    <h2><a href="/all/">最近の投稿</a></h2>
-  </div>
-  <div class="sidebar-item-recent">
-    - 投稿 3
-    - 投稿 2
-    - 投稿 1
-  </div>
-</section>
+<recent-posts>
+  <section class="sidebar-item sidebar-recent" aria-label="最近の投稿">
+    <div class="sidebar-item-header">
+      <h2><a href="/all/">最近の投稿</a></h2>
+      {recentPages.length > 1 && (
+        <div class="recent-pagination" data-recent-controls hidden>
+          <span data-recent-counter aria-live="polite" aria-atomic="true">1/{recentPages.length}</span>
+          <div class="recent-pagination-buttons">
+            <button type="button" data-recent-prev aria-label="最近の投稿の前のページ" disabled>
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M8 1 2 7l6 6Z" fill="currentColor" /></svg>
+            </button>
+            <button type="button" data-recent-next aria-label="最近の投稿の次のページ">
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="m2 1 6 6-6 6Z" fill="currentColor" /></svg>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+    {recentPages.map((posts, pageIndex) => (
+      <div class="recent-page" data-recent-page hidden={pageIndex !== 0}>
+        <ul class="recent-featured" role="list">
+          {posts.slice(0, 2).map((post) => (
+            <li>
+              <a href={`/posts/${post.id}/`} title={post.data.title}>
+                <Image
+                  src={post.data.image ?? missingPostImage}
+                  alt=""
+                  width={132}
+                  height={99}
+                  widths={[132, 264]}
+                  sizes="(min-width: 992px) 132px, 112px"
+                  fit="cover"
+                  format="avif"
+                  quality={60}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span>{post.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <ul class="recent-list" role="list">
+          {posts.slice(2).map((post) => (
+            <li><a href={`/posts/${post.id}/`} title={post.data.title}>{post.data.title}</a></li>
+          ))}
+        </ul>
+        {posts.length === 0 && <p class="recent-empty">投稿はまだありません。</p>}
+      </div>
+    ))}
+  </section>
+</recent-posts>
 
 <section class="sidebar-item sidebar-galleries">
   <div class="sidebar-item-header">
@@ -68,6 +122,44 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
     blah blah...
   </div>
 </section>
+
+<script>
+  class RecentPosts extends HTMLElement {
+    private controller?: AbortController;
+
+    connectedCallback() {
+      const pages = Array.from(this.querySelectorAll<HTMLElement>('[data-recent-page]'));
+      const controls = this.querySelector<HTMLElement>('[data-recent-controls]');
+      const counter = this.querySelector<HTMLElement>('[data-recent-counter]');
+      const previous = this.querySelector<HTMLButtonElement>('[data-recent-prev]');
+      const next = this.querySelector<HTMLButtonElement>('[data-recent-next]');
+      if (!controls || !counter || !previous || !next) return;
+
+      this.controller?.abort();
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      let currentPage = Math.max(0, pages.findIndex((page) => !page.hidden));
+      const showPage = (index: number) => {
+        currentPage = Math.max(0, Math.min(index, pages.length - 1));
+        pages.forEach((page, pageIndex) => { page.hidden = pageIndex !== currentPage; });
+        counter.textContent = `${currentPage + 1}/${pages.length}`;
+        previous.disabled = currentPage === 0;
+        next.disabled = currentPage === pages.length - 1;
+      };
+
+      previous.addEventListener('click', () => showPage(currentPage - 1), { signal });
+      next.addEventListener('click', () => showPage(currentPage + 1), { signal });
+      showPage(currentPage);
+      controls.hidden = false;
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+    }
+  }
+
+  if (!customElements.get('recent-posts')) customElements.define('recent-posts', RecentPosts);
+</script>
 
 <style>
   /* about widget */
@@ -147,7 +239,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   .sidebar-item-header {
     display: flex;
     align-items: center;
-    min-height: 2.75rem;
+    padding-bottom: 4px;
     padding-left: 2px;
     border-bottom: 1px dashed #aaa;
   }
@@ -163,5 +255,135 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   }
   .sidebar-item-header a:hover {
     color: var(--dc-color-2);
+  }
+
+  /* recent posts widget */
+  recent-posts {
+    display: block;
+  }
+  .sidebar-recent .sidebar-item-header {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .sidebar-recent h2 {
+    color: #333;
+    font-size: var(--text-list-title);
+  }
+  .recent-pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #333;
+    font-size: var(--text-ui);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .recent-pagination[hidden] {
+    display: none;
+  }
+  .recent-pagination-buttons {
+    display: flex;
+  }
+  .recent-pagination button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--dc-color-2);
+    background-color: var(--dc-color-3);
+    color: #fff;
+    cursor: pointer;
+  }
+  .recent-pagination button + button {
+    border-left: 0;
+  }
+  .recent-pagination button:hover:not(:disabled) {
+    background-color: var(--dc-color-1);
+  }
+  .recent-pagination button:focus-visible {
+    position: relative;
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+  .recent-pagination button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .recent-page {
+    padding-top: 10px;
+  }
+  .recent-featured,
+  .recent-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .recent-featured {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .recent-featured a {
+    display: block;
+  }
+  .recent-featured :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: 1px solid #d5dbea;
+  }
+  .recent-featured span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    margin-top: 6px;
+    font-weight: 600;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+  .recent-list li {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 4px;
+  }
+  .recent-list li::before {
+    content: '';
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background-color: #475467;
+  }
+  .recent-list a {
+    display: block;
+    min-width: 0;
+    padding: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sidebar-recent a {
+    color: #333;
+    text-decoration: none;
+  }
+  .recent-page a:visited {
+    color: #75568b;
+  }
+  .sidebar-recent a:hover,
+  .sidebar-recent a:focus-visible {
+    background-color: #eef0f7;
+    text-decoration: underline;
+  }
+  .sidebar-recent a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 1px;
+  }
+  .recent-empty {
+    margin: 0;
+    color: #667085;
   }
 </style>
