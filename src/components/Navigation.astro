@@ -1,3 +1,16 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('post');
+const characterCount = posts.reduce(
+  (total, post) => total + Array.from((post.body ?? '').replace(/\s/gu, '')).length,
+  0,
+);
+const numberFormatter = new Intl.NumberFormat('ja-JP');
+const formattedPostCount = numberFormatter.format(posts.length);
+const formattedCharacterCount = numberFormatter.format(characterCount);
+---
+
 <nav>
   <div class="nav-container">
     <ul>
@@ -8,11 +21,55 @@
       <li><a href="/cr/" title="何か作ったもの">作品</a></li>
       <li><a href="/pr/" title="私の一生">生</a></li>
     </ul>
-    <div class="extra-info">
-      <span class="ticker-item item-1">計<span class="em1">12件</span>の投稿を登録</span>
-    </div>
+    <site-stats class="extra-info" role="group" aria-label="ブログ全体の統計">
+      <span class="visually-hidden">計{formattedPostCount}件の投稿、計{formattedCharacterCount}文字（本文原文・空白を除く）。</span>
+      <span data-site-stat class="is-active" aria-hidden="true">計<span class="em1">{formattedPostCount}件</span>の投稿を公開</span>
+      <span data-site-stat aria-hidden="true">計<span class="em2">{formattedCharacterCount}文字</span>を執筆</span>
+    </site-stats>
   </div>
 </nav>
+
+<script>
+  const statsIntervalMs = 5000;
+
+  class SiteStats extends HTMLElement {
+    private timer?: number;
+    private controller?: AbortController;
+
+    connectedCallback() {
+      window.clearInterval(this.timer);
+      this.controller?.abort();
+      const stats = Array.from(this.querySelectorAll<HTMLElement>('[data-site-stat]'));
+      if (stats.length < 2) return;
+
+      const visibleWidth = window.matchMedia('(min-width: 576px)');
+      let currentStat = Math.max(0, stats.findIndex((stat) => stat.classList.contains('is-active')));
+      const updateTimer = () => {
+        window.clearInterval(this.timer);
+        this.timer = undefined;
+        if (document.hidden || !visibleWidth.matches) return;
+
+        this.timer = window.setInterval(() => {
+          currentStat = (currentStat + 1) % stats.length;
+          stats.forEach((stat, index) => stat.classList.toggle('is-active', index === currentStat));
+        }, statsIntervalMs);
+      };
+
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      visibleWidth.addEventListener('change', updateTimer, { signal });
+      document.addEventListener('visibilitychange', updateTimer, { signal });
+      updateTimer();
+    }
+
+    disconnectedCallback() {
+      window.clearInterval(this.timer);
+      this.controller?.abort();
+    }
+  }
+
+  if (!customElements.get('site-stats')) customElements.define('site-stats', SiteStats);
+</script>
 
 <style>
   nav {
@@ -55,7 +112,21 @@
   }
 
   .extra-info {
+    --stats-fade-duration: 180ms;
     display: none;
+  }
+  .extra-info > [data-site-stat] {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--stats-fade-duration) ease,
+      visibility 0s linear var(--stats-fade-duration);
+  }
+  .extra-info > .is-active {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: var(--stats-fade-duration), 0s;
   }
 
   @media (min-width: 576px) {
@@ -67,15 +138,19 @@
     }
 
     .extra-info {
-      display: block;
+      display: grid;
       align-self: center;
       padding: 0.375em 0.625em;
       color: rgba(255, 255, 255, 0.7);
       font-size: var(--text-small);
+      text-align: right;
       white-space: nowrap;
     }
     .extra-info .em1 {
       color: #ffbbee;
+    }
+    .extra-info .em2 {
+      color: #ffff99;
     }
   }
 
@@ -86,6 +161,12 @@
     }
     nav ul a {
       min-height: 2.625rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .extra-info > [data-site-stat] {
+      transition: none;
     }
   }
 </style>

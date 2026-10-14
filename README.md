@@ -6,7 +6,7 @@ This is  my personal blog.
 
 >after implement posting
 
-1. Navigation.astro: `.extra-info` actual implementation
+1. 
 2. Header.astro: **search** implementation
 3. Header.astro: **menu, night mode** implementation (++**Theme**)
 4. Footer.astro: **btns** implementation
