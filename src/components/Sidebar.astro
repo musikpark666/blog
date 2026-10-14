@@ -1,15 +1,27 @@
 ---
 import Social from './Social.astro';
+import profileImage from '../assets/imgs/profile cat foil.avif';
 ---
 
 <div class="sidebar-about">
   <div class="my-info">
-    <a class="info-name" href="/about/">
-      <span><strong>ムシク</strong>ちゃん</span>
-      <img src="/galler-con.gif" alt="" width="12" height="11" />
-      <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" stroke="currentColor" stroke-width="2" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" /></svg>
+    <a class="info-avatar-link" href="/about/" aria-label="ムシクの紹介">
+      <img
+        class="info-avatar"
+        src={profileImage.src}
+        alt="ムシクのプロフィール画像"
+        width="72"
+        height="72"
+        loading="lazy"
+        decoding="async"
+      />
     </a>
-    <a class="info-btn" href="/about/">紹介</a>
+    <div class="info-text">
+      <a class="info-name" href="/about/">
+        <span><strong>ムシク</strong>ちゃん</span>
+      </a>
+      <p class="info-description">猫は泣かないっていうけど、私は何なんだろう。</p>
+    </div>
   </div>
   <div class="social">
     <Social />
@@ -64,39 +76,56 @@ import Social from './Social.astro';
     margin-bottom: 12px;
   }
   .my-info {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 12px;
+  }
+  .info-text {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    min-height: 2.625rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+  }
+  .info-avatar-link {
+    display: block;
+    border-radius: 50%;
+  }
+  .info-avatar-link:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 3px;
+  }
+  .info-avatar {
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
   }
   .info-name {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    font-size: var(--text-list-title);
     color: var(--dc-color-2);
     text-decoration: none;
   }
-  .info-name img {
-    margin-left: 2px;
-    margin-bottom: 5px;
-    align-self: flex-end;
-  }
-  .info-btn {
-    padding: 0.125em 0.5em;
+  .info-description {
+    margin: 0;
+    min-width: 0;
+    color: #475467;
     font-size: var(--text-ui);
-    border: 1px solid var(--dc-color-2);
-    background-color: var(--dc-color-3);
-    color: #fff;
-    text-shadow: 0px 1px var(--dc-color-1);
-    text-decoration: none;
+    line-height: var(--leading-body);
+    overflow-wrap: anywhere;
   }
-  .info-name:hover {
+  .info-name:hover,
+  .info-name:focus-visible {
     color: var(--dc-color-1);
+    text-decoration: underline;
   }
-  .info-btn:hover {
-    background-color: var(--dc-color-2);
-    color: #ffed44;
+  .info-name:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
   .social {
     display: flex;
