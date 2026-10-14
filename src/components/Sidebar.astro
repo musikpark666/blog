@@ -5,13 +5,29 @@ import Social from './Social.astro';
 import profileImage from '../assets/imgs/profile cat foil.avif';
 import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
 
+const [postEntries, galleryEntries] = await Promise.all([
+  getCollection('post'),
+  getCollection('gallery'),
+]);
+
 const recentPostsPerPage = 6;
-const recentPosts = (await getCollection('post'))
+const recentPosts = postEntries
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime() || a.id.localeCompare(b.id))
   .slice(0, recentPostsPerPage * 5);
 const recentPages = Array.from(
   { length: Math.max(1, Math.ceil(recentPosts.length / recentPostsPerPage)) },
   (_, index) => recentPosts.slice(index * recentPostsPerPage, (index + 1) * recentPostsPerPage),
+);
+
+const galleries = galleryEntries.sort((a, b) => {
+  const yomiA = a.data.yomi || a.data.title;
+  const yomiB = b.data.yomi || b.data.title;
+  return yomiA.localeCompare(yomiB, 'ja');
+});
+const galleriesPerPage = 14;
+const galleryPages = Array.from(
+  { length: Math.max(1, Math.ceil(galleries.length / galleriesPerPage)) },
+  (_, index) => galleries.slice(index * galleriesPerPage, (index + 1) * galleriesPerPage),
 );
 ---
 
@@ -40,18 +56,18 @@ const recentPages = Array.from(
   </div>
 </div>
 
-<recent-posts>
+<sidebar-pager>
   <section class="sidebar-item sidebar-recent" aria-label="最近の投稿">
     <div class="sidebar-item-header">
       <h2><a href="/all/">最近の投稿</a></h2>
       {recentPages.length > 1 && (
-        <div class="recent-pagination" data-recent-controls hidden>
-          <span data-recent-counter aria-live="polite" aria-atomic="true">1/{recentPages.length}</span>
-          <div class="recent-pagination-buttons">
-            <button type="button" data-recent-prev aria-label="最近の投稿の前のページ" disabled>
+        <div class="sidebar-pagination" data-sidebar-controls hidden>
+          <span data-sidebar-counter aria-live="polite" aria-atomic="true">1/{recentPages.length}</span>
+          <div class="sidebar-pagination-buttons">
+            <button type="button" data-sidebar-prev aria-label="最近の投稿の前のページ" disabled>
               <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M8 1 2 7l6 6Z" fill="currentColor" /></svg>
             </button>
-            <button type="button" data-recent-next aria-label="最近の投稿の次のページ">
+            <button type="button" data-sidebar-next aria-label="最近の投稿の次のページ">
               <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="m2 1 6 6-6 6Z" fill="currentColor" /></svg>
             </button>
           </div>
@@ -59,7 +75,7 @@ const recentPages = Array.from(
       )}
     </div>
     {recentPages.map((posts, pageIndex) => (
-      <div class="recent-page" data-recent-page hidden={pageIndex !== 0}>
+      <div class="sidebar-page" data-sidebar-page hidden={pageIndex !== 0}>
         <ul class="recent-featured" role="list">
           {posts.slice(0, 2).map((post) => (
             <li>
@@ -82,28 +98,47 @@ const recentPages = Array.from(
             </li>
           ))}
         </ul>
-        <ul class="recent-list" role="list">
+        <ul class="sidebar-list" role="list">
           {posts.slice(2).map((post) => (
             <li><a href={`/posts/${post.id}/`} title={post.data.title}>{post.data.title}</a></li>
           ))}
         </ul>
-        {posts.length === 0 && <p class="recent-empty">投稿はまだありません。</p>}
+        {posts.length === 0 && <p class="sidebar-empty">投稿はまだありません。</p>}
       </div>
     ))}
   </section>
-</recent-posts>
+</sidebar-pager>
 
-<section class="sidebar-item sidebar-galleries">
-  <div class="sidebar-item-header">
-    <h2><a href="/g/">ギャラリーリスト</a></h2>
-  </div>
-  <div class="sidebar-item-list">
-    - ギャラリー 1
-    - ギャラリー 2
-    - ギャラリー 3
-    - ギャラリー 4
-  </div>
-</section>
+<sidebar-pager>
+  <section class="sidebar-item sidebar-galleries" aria-label="ギャラリーリスト">
+    <div class="sidebar-item-header">
+      <h2><a href="/g/">ギャラリーリスト</a></h2>
+      {galleryPages.length > 1 && (
+        <div class="sidebar-pagination" data-sidebar-controls hidden>
+          <span data-sidebar-counter aria-live="polite" aria-atomic="true">1/{galleryPages.length}</span>
+          <div class="sidebar-pagination-buttons">
+            <button type="button" data-sidebar-prev aria-label="ギャラリーリストの前のページ" disabled>
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M8 1 2 7l6 6Z" fill="currentColor" /></svg>
+            </button>
+            <button type="button" data-sidebar-next aria-label="ギャラリーリストの次のページ">
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="m2 1 6 6-6 6Z" fill="currentColor" /></svg>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+    {galleryPages.map((entries, pageIndex) => (
+      <div class="sidebar-page" data-sidebar-page hidden={pageIndex !== 0}>
+        <ul class="sidebar-list" role="list" style={`--gallery-rows: ${Math.max(1, Math.ceil(entries.length / 2))}`}>
+          {entries.map((gallery) => (
+            <li><a href={`/g/${gallery.id}/`} title={gallery.data.title}>{gallery.data.title}</a></li>
+          ))}
+        </ul>
+        {entries.length === 0 && <p class="sidebar-empty">ギャラリーはまだありません。</p>}
+      </div>
+    ))}
+  </section>
+</sidebar-pager>
 
 <section class="sidebar-item">
   <div class="sidebar-item-header">
@@ -114,25 +149,25 @@ const recentPages = Array.from(
   </div>
 </section>
 
-<section class="sidebar-item">
+<!-- <section class="sidebar-item">
   <div class="sidebar-item-header">
     <h2>ニュース</h2>
   </div>
   <div class="sidebar-item-">
     blah blah...
   </div>
-</section>
+</section> -->
 
 <script>
-  class RecentPosts extends HTMLElement {
+  class SidebarPager extends HTMLElement {
     private controller?: AbortController;
 
     connectedCallback() {
-      const pages = Array.from(this.querySelectorAll<HTMLElement>('[data-recent-page]'));
-      const controls = this.querySelector<HTMLElement>('[data-recent-controls]');
-      const counter = this.querySelector<HTMLElement>('[data-recent-counter]');
-      const previous = this.querySelector<HTMLButtonElement>('[data-recent-prev]');
-      const next = this.querySelector<HTMLButtonElement>('[data-recent-next]');
+      const pages = Array.from(this.querySelectorAll<HTMLElement>('[data-sidebar-page]'));
+      const controls = this.querySelector<HTMLElement>('[data-sidebar-controls]');
+      const counter = this.querySelector<HTMLElement>('[data-sidebar-counter]');
+      const previous = this.querySelector<HTMLButtonElement>('[data-sidebar-prev]');
+      const next = this.querySelector<HTMLButtonElement>('[data-sidebar-next]');
       if (!controls || !counter || !previous || !next) return;
 
       this.controller?.abort();
@@ -158,7 +193,7 @@ const recentPages = Array.from(
     }
   }
 
-  if (!customElements.get('recent-posts')) customElements.define('recent-posts', RecentPosts);
+  if (!customElements.get('sidebar-pager')) customElements.define('sidebar-pager', SidebarPager);
 </script>
 
 <style>
@@ -257,19 +292,21 @@ const recentPages = Array.from(
     color: var(--dc-color-2);
   }
 
-  /* recent posts widget */
-  recent-posts {
+  /* paginated sidebar widgets */
+  sidebar-pager {
     display: block;
   }
-  .sidebar-recent .sidebar-item-header {
+  .sidebar-recent .sidebar-item-header,
+  .sidebar-galleries .sidebar-item-header {
     justify-content: space-between;
     gap: 8px;
   }
-  .sidebar-recent h2 {
+  .sidebar-recent h2,
+  .sidebar-galleries h2 {
     color: #333;
     font-size: var(--text-list-title);
   }
-  .recent-pagination {
+  .sidebar-pagination {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -278,13 +315,13 @@ const recentPages = Array.from(
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .recent-pagination[hidden] {
+  .sidebar-pagination[hidden] {
     display: none;
   }
-  .recent-pagination-buttons {
+  .sidebar-pagination-buttons {
     display: flex;
   }
-  .recent-pagination button {
+  .sidebar-pagination button {
     display: grid;
     place-items: center;
     width: 28px;
@@ -295,26 +332,26 @@ const recentPages = Array.from(
     color: #fff;
     cursor: pointer;
   }
-  .recent-pagination button + button {
+  .sidebar-pagination button + button {
     border-left: 0;
   }
-  .recent-pagination button:hover:not(:disabled) {
+  .sidebar-pagination button:hover:not(:disabled) {
     background-color: var(--dc-color-1);
   }
-  .recent-pagination button:focus-visible {
+  .sidebar-pagination button:focus-visible {
     position: relative;
     outline: 2px solid var(--dc-color-2);
     outline-offset: 2px;
   }
-  .recent-pagination button:disabled {
+  .sidebar-pagination button:disabled {
     opacity: 0.45;
     cursor: default;
   }
-  .recent-page {
+  .sidebar-page {
     padding-top: 10px;
   }
   .recent-featured,
-  .recent-list {
+  .sidebar-list {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -345,20 +382,20 @@ const recentPages = Array.from(
     overflow: hidden;
     overflow-wrap: anywhere;
   }
-  .recent-list li {
+  .sidebar-list li {
     display: grid;
     grid-template-columns: 4px minmax(0, 1fr);
     align-items: center;
     column-gap: 4px;
   }
-  .recent-list li::before {
+  .sidebar-list li::before {
     content: '';
     width: 2px;
     height: 2px;
     border-radius: 50%;
     background-color: #475467;
   }
-  .recent-list a {
+  .sidebar-list a {
     display: block;
     min-width: 0;
     padding: 4px;
@@ -366,23 +403,34 @@ const recentPages = Array.from(
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .sidebar-recent a {
+  .sidebar-galleries .sidebar-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--gallery-rows), auto);
+    grid-auto-flow: column;
+    column-gap: 10px;
+  }
+  .sidebar-recent a,
+  .sidebar-galleries a {
     color: #333;
     text-decoration: none;
   }
-  .recent-page a:visited {
+  .sidebar-page a:visited {
     color: #75568b;
   }
   .sidebar-recent a:hover,
-  .sidebar-recent a:focus-visible {
+  .sidebar-recent a:focus-visible,
+  .sidebar-galleries a:hover,
+  .sidebar-galleries a:focus-visible {
     background-color: #eef0f7;
     text-decoration: underline;
   }
-  .sidebar-recent a:focus-visible {
+  .sidebar-recent a:focus-visible,
+  .sidebar-galleries a:focus-visible {
     outline: 2px solid var(--dc-color-2);
     outline-offset: 1px;
   }
-  .recent-empty {
+  .sidebar-empty {
     margin: 0;
     color: #667085;
   }
