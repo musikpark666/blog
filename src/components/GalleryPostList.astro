@@ -5,18 +5,18 @@ import type { CollectionEntry } from 'astro:content';
 import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
 
 interface Props {
-  gallery: CollectionEntry<'gallery'>;
+  gallery?: CollectionEntry<'gallery'>;
   posts: CollectionEntry<'post'>[];
-  currentPage: number;
-  totalPages: number;
+  currentPage?: number;
+  totalPages?: number;
   currentPostId?: string;
 }
 
 const {
   gallery,
   posts,
-  currentPage,
-  totalPages,
+  currentPage = 1,
+  totalPages = 1,
   currentPostId,
 } = Astro.props;
 
@@ -29,7 +29,8 @@ const postDateFormatter = new Intl.DateTimeFormat('ja-JP',
   });
 const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
 
-const getGalleryPageHref = (page: number) => ( page === 1 ? `/g/${gallery.id}/` : `/g/${gallery.id}/${page}/` );
+const galleryHref = gallery ? `/g/${gallery.id}/` : '/all/';
+const getGalleryPageHref = (page: number) => page === 1 ? galleryHref : `${galleryHref}${page}/`;
 const pageGroups = [5, 7, 10].map((groupSize) => {
   const start = Math.floor((currentPage - 1) / groupSize) * groupSize + 1;
   const end = Math.min(start + groupSize - 1, totalPages);
@@ -62,7 +63,9 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
 
   <div class="post-list">
     {posts.map((post) => {
-      const postHref = `/posts/${post.id}/?g=${encodeURIComponent(gallery.id)}`;
+      const postHref = gallery
+        ? `/posts/${post.id}/?g=${encodeURIComponent(gallery.id)}`
+        : `/posts/${post.id}/`;
       const postImage = post.data.image ?? missingPostImage;
       const isCurrentPost = post.id === currentPostId;
 
@@ -91,7 +94,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     {posts.length === 0 && <p class="post-list-empty">投稿はまだありません。</p>}
   </div>
 
-  <nav class="post-list-pagination" aria-label="ページ切り替え">
+  {(gallery || totalPages > 1) && <nav class="post-list-pagination" aria-label="ページ切り替え">
     {currentPage > 1
       ? <a class="pagination-link" href={getGalleryPageHref(1)} aria-label="最初のページ" title="最初のページ">≪</a>
       : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最初のページ" title="最初のページ">≪</span>}
@@ -120,7 +123,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     {currentPage < totalPages
       ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">≫</a>
       : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">≫</span>}
-  </nav>
+  </nav>}
 </section>
 
 <style>

@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 type Props = { showInfo?: boolean } & (
   | { gallery: CollectionEntry<'gallery'>; postCount: number; title?: never; href?: never }
-  | { gallery?: never; postCount?: never; title: string; href: string }
+  | { gallery?: never; postCount?: number; title: string; href: string }
 );
 
 const { gallery, postCount, title: customTitle, href: customHref, showInfo = true } = Astro.props;

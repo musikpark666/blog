@@ -1,0 +1,163 @@
+---
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GalleryHeader from '../../components/GalleryHeader.astro';
+import GalleryPostList from '../../components/GalleryPostList.astro';
+import thumbnail from '../../assets/imgs/concentration crying cat.avif';
+
+type BlogPost = CollectionEntry<'post'>;
+
+export const getStaticPaths = (async () => {
+  const postsPerPage = 50;
+  const posts = (await getCollection('post')).sort(
+    (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime() || a.id.localeCompare(b.id),
+  );
+  const totalPages = Math.max(1, Math.ceil(posts.length / postsPerPage));
+  const randomCandidates = [...posts];
+  const randomPostCount = Math.min(4, posts.length);
+
+  for (let index = 0; index < randomPostCount; index++) {
+    const randomIndex = index + Math.floor(Math.random() * (randomCandidates.length - index));
+    [randomCandidates[index], randomCandidates[randomIndex]] = [randomCandidates[randomIndex], randomCandidates[index]];
+  }
+
+  const randomPosts = randomCandidates.slice(0, randomPostCount);
+
+  return Array.from({ length: totalPages }, (_, pageIndex) => ({
+    params: { page: pageIndex === 0 ? undefined : String(pageIndex + 1) },
+    props: {
+      posts: posts.slice(pageIndex * postsPerPage, (pageIndex + 1) * postsPerPage),
+      randomPosts,
+      postCount: posts.length,
+      currentPage: pageIndex + 1,
+      totalPages,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  posts: BlogPost[];
+  randomPosts: BlogPost[];
+  postCount: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+const { posts, randomPosts, postCount, currentPage, totalPages } = Astro.props;
+const description = 'カテゴリーを問わず、このブログのすべての投稿を新しい順にまとめています。';
+const pageTitle = currentPage === 1
+  ? '全体 ギャラリー | musik.gallery'
+  : `全体 ギャラリー - ${currentPage}ページ | musik.gallery`;
+---
+
+<BaseLayout title={pageTitle} description={description}>
+  <GalleryHeader title="全体" href="/all/" postCount={postCount} showInfo={false} />
+
+  <div class="gallery-intro">
+    <div class:list={['gallery-intro-layout', { 'has-random-posts': randomPosts.length > 0 }]}>
+      <div class="gallery-intro-info">
+        <Image src={thumbnail} alt="" width={150} height={100} fit="cover" format="avif" quality={60} />
+        <p>{description}</p>
+      </div>
+      {randomPosts.length > 0 && (
+        <section class="gallery-random-posts" aria-label="ランダムな投稿">
+          <ul role="list">
+            {randomPosts.map((post) => (
+              <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  </div>
+
+  <GalleryPostList posts={posts} currentPage={currentPage} totalPages={totalPages} />
+</BaseLayout>
+
+<style>
+  .gallery-intro {
+    padding: 10px 0;
+    border-bottom: 1px solid #d5d5d5;
+    container: gallery-intro / inline-size;
+  }
+  .gallery-intro-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .gallery-intro-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+  }
+  .gallery-intro-info :global(img) {
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+  .gallery-intro-info p {
+    margin: 0;
+    min-width: 0;
+    color: #475467;
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
+    overflow-wrap: anywhere;
+  }
+  .gallery-random-posts {
+    display: none;
+    min-width: 0;
+  }
+  .gallery-random-posts ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-small);
+  }
+  .gallery-random-posts li {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 4px;
+  }
+  .gallery-random-posts li::before {
+    content: '';
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background-color: #475467;
+  }
+  .gallery-random-posts a {
+    display: block;
+    min-width: 0;
+    padding: 2px 4px;
+    color: #475467;
+    line-height: var(--leading-ui);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .gallery-random-posts a:visited {
+    color: #75568b;
+  }
+  .gallery-random-posts a:hover,
+  .gallery-random-posts a:focus-visible {
+    background-color: #eef0f7;
+    text-decoration: underline;
+  }
+  .gallery-random-posts a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 1px;
+  }
+  @container gallery-intro (min-width: 600px) {
+    .gallery-intro-layout.has-random-posts {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+    .gallery-random-posts {
+      display: block;
+    }
+  }
+</style>
