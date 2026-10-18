@@ -17,7 +17,7 @@
       <li><button>夜間モード</button></li>
       <li><button type="button" data-page-scroll="top">トップへ戻る▲</button></li>
     </ul>
-    <p class="copyright">&copy; musik.gallery。特記のない本文・画像は <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="license noopener noreferrer">CC BY-SA 4.0</a>。<span>（第三者素材等を除く）</span></p>
+    <p class="copyright">&copy; musik.gallery。特記のない本文・画像は <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="license noopener noreferrer">CC BY-SA 4.0</a>。<span>（第三者素材等を除く<button class="footer-guide" type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide" aria-label="サイト案内を開く" title="サイト案内"><span aria-hidden="true">↗</span></button>）</span></p>
   </div>
 </footer>
 
@@ -122,15 +122,30 @@
   .copyright span {
     white-space: nowrap;
   }
-  .copyright a:hover,
-  .copyright a:focus {
-    background-color: var(--dc-color-1);
+  .footer-guide {
+    display: inline;
+    /* margin-inline-start: 0.125em; */
+    padding: 0 0.125em;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
     color: #ffed44;
+    font: inherit;
+    vertical-align: baseline;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .copyright a:hover,
+  .copyright a:focus,
+  .footer-guide:hover,
+  .footer-guide:focus-visible {
+    background-color: var(--dc-color-1);
   }
   
   .footer-top nav ul li a:focus-visible,
   .footer-btm ul button:focus-visible,
-  .copyright a:focus-visible {
+  .copyright a:focus-visible,
+  .footer-guide:focus-visible {
     outline: 2px solid #ffed44;
     outline-offset: 2px;
   }
@@ -152,15 +167,19 @@
     .copyright { 
       color: #333;
     }
-    .copyright a {
+    .copyright a,
+    .footer-guide {
       color: var(--dc-color-2);
     }
     .copyright a:hover,
-    .copyright a:focus {
+    .copyright a:focus,
+    .footer-guide:hover,
+    .footer-guide:focus-visible {
       background-color: #eef0f8;
       color: var(--dc-color-1);
     }
-    .copyright a:focus-visible {
+    .copyright a:focus-visible,
+    .footer-guide:focus-visible {
       outline-color: var(--dc-color-3);
     }
   }

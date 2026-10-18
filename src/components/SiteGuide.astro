@@ -1,0 +1,177 @@
+<dialog id="site-guide" aria-labelledby="site-guide-title">
+  <header class="guide-header">
+    <h2 id="site-guide-title" tabindex="-1" autofocus>このサイトのご案内</h2>
+    <button class="guide-close" type="button" data-close-site-guide aria-label="案内を閉じる">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false">
+        <path d="m5 5 14 14M19 5 5 19" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Edit the shared site guidance here. -->
+  <div class="guide-body">
+    <p>musik.gallery へようこそ。ここは、ムシクが日々の出来事や興味のあることを記録する、非商用の個人ブログです。閲覧にあたって、以下をご確認ください。</p>
+
+    <section>
+      <h3>1. 成人の方へ</h3>
+      <p>このサイトは18歳以上の方を対象としています。18歳未満の方は閲覧をご遠慮ください。</p>
+      <p>性的な話題や表現のほか、人によって不快に感じる内容を含むことがあります。苦手な話題に触れたときは、無理をせず閲覧をお控えください。</p>
+    </section>
+
+    <section>
+      <h3>2. 記事の内容について</h3>
+      <p>記事には、執筆時点での個人的な感想や意見、試行錯誤が含まれます。後から考えが変わることもあり、内容の正確さや最新性を保証するものではありません。</p>
+      <p>情報を参考にする際は、必要に応じて原典や公式情報もご確認ください。記事は専門家による個別の助言を目的としたものではありません。</p>
+    </section>
+
+    <section>
+      <h3>3. 引用・転載・再利用について</h3>
+      <p>特記のない本文・画像（第三者素材等を除く）は、CC BY-SA 4.0で公開しています。ライセンスの条件に従う限り、商用・非商用を問わず、転載・再配布・改変が可能です。事前の連絡や許可は必要ありません。</p>
+      <p>再利用の際は、著作者名（ムシク / musik）、元の記事へのリンク、ライセンスへのリンクを明記し、変更を加えた場合はその旨を示してください。改変したものを公開・配布する場合は、原則として同じライセンスを適用してください。個別に利用条件を記載しているものは、その条件をご確認ください。</p>
+      <p>紹介・引用している第三者の文章、画像、作品などの権利は、それぞれの権利者に帰属します。このブログでの掲載は、それらの自由な再利用を認めるものではありません。</p>
+      <p>なお、著作権法上認められる引用などについては、ライセンスとは別に、その要件に従って利用できます。</p>
+    </section>
+
+    <section>
+      <h3>4. 外部サイトへのリンク</h3>
+      <p>「関連サイト」や記事内のリンクから、外部のサイトへ移動することがあります。リンク先の内容や運営方針は、このブログとは異なります。各サイトの案内をご確認ください。</p>
+      <p>リンクの掲載は、リンク先との提携や、その内容すべてへの賛同を意味するものではありません。</p>
+    </section>
+
+    <section>
+      <h3>5. プライバシーについて</h3>
+      <p>18歳以上であると確認したことを記憶するため、お使いのブラウザーのローカルストレージを使用します。ブラウザーのこのサイトのデータを削除すると、次回の訪問時に再び年齢確認が表示されます。</p>
+      <p>外部サイトへ移動した場合の情報の取り扱いについては、移動先のプライバシーポリシーをご確認ください。お問い合わせの際は、パスワードなどの機密情報を送らないでください。</p>
+    </section>
+
+    <section>
+      <h3>6. 訂正・掲載内容に関するご連絡</h3>
+      <p>誤りやリンク切れ、権利・プライバシーに関する問題にお気づきの場合は、<a href="/about/#contact">自己紹介ページの連絡先</a>から、該当する記事のURLと具体的な内容をお知らせください。</p>
+      <p>記事やこの案内は、必要に応じて修正・更新することがあります。</p>
+    </section>
+  </div>
+
+</dialog>
+
+<script>
+  let guideOpener: HTMLButtonElement | null = null;
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const dialog = document.querySelector<HTMLDialogElement>('#site-guide');
+    if (!dialog) return;
+
+    const opener = event.target.closest<HTMLButtonElement>('[data-open-site-guide]');
+    if (opener && !dialog.open) {
+      guideOpener = opener;
+      dialog.showModal();
+      const body = dialog.querySelector<HTMLElement>('.guide-body');
+      if (body) body.scrollTop = 0;
+    } else if (dialog.contains(event.target) && event.target.closest('[data-close-site-guide], a[href]')) {
+      dialog.close();
+    }
+  });
+
+  // Capture also handles the dialog's native Escape dismissal.
+  document.addEventListener('close', (event) => {
+    if (!(event.target instanceof HTMLDialogElement) || event.target.id !== 'site-guide') return;
+    if (guideOpener?.isConnected) guideOpener.focus({ preventScroll: true });
+    guideOpener = null;
+  }, true);
+</script>
+
+<style>
+  :global(html:has(#site-guide:modal)) {
+    overflow: hidden;
+  }
+
+  dialog {
+    width: min(40rem, calc(100% - 24px));
+    max-width: none;
+    max-height: calc(100dvh - 24px - 180px);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--dc-color-2);
+    border-radius: 2px;
+    background: #fff;
+    color: #475467;
+    box-shadow: 0 12px 40px #171b3033;
+    font-size: var(--text-ui);
+    line-height: var(--leading-body);
+  }
+  dialog[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  dialog::backdrop {
+    background: rgb(0 0 0 / 40%);
+  }
+  .guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.25rem 0.375rem 0.25rem 1rem;
+    background: var(--dc-color-3);
+    color: #fff;
+  }
+  h2 {
+    margin: 0;
+    font-size: var(--text-ui);
+    line-height: var(--leading-heading);
+  }
+  h2:focus {
+    outline: none;
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+  }
+  .guide-close {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+  .guide-close:hover {
+    background: rgb(255 255 255 / 15%);
+  }
+  .guide-close:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+  .guide-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem;
+    overflow-wrap: anywhere;
+  }
+  .guide-body > p {
+    margin: 0;
+  }
+  section {
+    margin-top: 1.5rem;
+  }
+  h3 {
+    margin: 0 0 0.5rem;
+    color: #171b30;
+    font-size: inherit;
+  }
+  section p {
+    margin: 0.5rem 0 0;
+  }
+  a {
+    color: var(--dc-color-2);
+    text-underline-offset: 3px;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+</style>

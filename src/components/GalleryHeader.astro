@@ -23,7 +23,7 @@ const relatedSites = gallery?.data.relatedSites ?? [];
   <div class="gallery-header-action">
     {relatedSites.length > 0 && (
       <details class="gallery-related-sites">
-        <summary class="gallery-action">関連サイト</summary>
+        <summary class="gallery-action" aria-label="関連サイト">関連<span class="related-sites-suffix">サイト</span></summary>
         <nav class="related-sites-panel" aria-label={`${title}の関連サイト`}>
           <ul role="list">
             {relatedSites.map(({ title, url, description }) => (
@@ -39,7 +39,7 @@ const relatedSites = gallery?.data.relatedSites ?? [];
         </nav>
       </details>
     )}
-    <button class="gallery-action" type="button">案内</button>
+    <button class="gallery-action" type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide">案内</button>
   </div>
 </header>
 
@@ -62,6 +62,7 @@ const relatedSites = gallery?.data.relatedSites ?? [];
 
 <style>
   .gallery-header {
+    container: gallery-header / inline-size;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -164,6 +165,11 @@ const relatedSites = gallery?.data.relatedSites ?? [];
   }
   .gallery-related-sites > summary::-webkit-details-marker {
     display: none;
+  }
+  @container gallery-header (width < 30rem) {
+    .related-sites-suffix {
+      display: none;
+    }
   }
   .related-sites-panel {
     position: absolute;
