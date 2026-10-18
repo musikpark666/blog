@@ -15,6 +15,9 @@ import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://musik.gallery',
+  output: 'static',
+  trailingSlash: 'always',
   markdown: {
     processor: unified({
       remarkPlugins: [
