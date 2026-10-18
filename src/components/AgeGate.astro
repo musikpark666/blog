@@ -16,7 +16,6 @@
       <button type="button" data-age-decline autofocus>いいえ</button>
     </div>
     <p class="age-gate-denied" role="status" hidden>18歳未満の方は、このサイトをご覧いただけません。</p>
-    <button type="button" class="age-gate-back" hidden>確認画面に戻る</button>
   </dialog>
   <noscript><p class="age-gate-noscript">年齢確認のため、JavaScriptを有効にしてください。</p></noscript>
 </div>
@@ -27,7 +26,6 @@
     if (!dialog || !document.documentElement.hasAttribute('data-age-pending')) return;
     const actions = dialog.querySelector<HTMLElement>('.age-gate-actions')!;
     const denied = dialog.querySelector<HTMLElement>('.age-gate-denied')!;
-    const back = dialog.querySelector<HTMLButtonElement>('.age-gate-back')!;
     const decline = dialog.querySelector<HTMLButtonElement>('[data-age-decline]')!;
 
     dialog.oncancel = (event) => event.preventDefault();
@@ -40,14 +38,6 @@
     decline.onclick = () => {
       actions.hidden = true;
       denied.hidden = false;
-      back.hidden = false;
-      back.focus();
-    };
-    back.onclick = () => {
-      actions.hidden = false;
-      denied.hidden = true;
-      back.hidden = true;
-      decline.focus();
     };
     if (!dialog.open) dialog.showModal();
   }
