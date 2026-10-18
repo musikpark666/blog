@@ -39,18 +39,21 @@ const {
     </Content>
     <Footer />
     <div class="page-scroll" role="group" aria-label="ページ内の移動">
-      <button type="button" data-page-scroll="top" aria-label="ページの先頭へ" title="ページの先頭へ">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <path d="M5 4h14M6 13l6-6 6 6M12 7v13" />
-        </svg>
-      </button>
-      <button type="button" data-page-scroll="bottom" aria-label="ページの末尾へ" title="ページの末尾へ">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <path d="M5 20h14M6 11l6 6 6-6M12 17V4" />
-        </svg>
-      </button>
+      <slot name="page-controls" />
+      <div class="page-scroll-arrows">
+        <button type="button" data-page-scroll="top" aria-label="ページの先頭へ" title="ページの先頭へ">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M5 4h14M6 13l6-6 6 6M12 7v13" />
+          </svg>
+        </button>
+        <button type="button" data-page-scroll="bottom" aria-label="ページの末尾へ" title="ページの末尾へ">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M5 20h14M6 11l6 6 6-6M12 17V4" />
+          </svg>
+        </button>
+      </div>
     </div>
   </body>
 </html>
@@ -76,12 +79,15 @@ const {
     bottom: max(12px, env(safe-area-inset-bottom));
     z-index: 10;
     display: grid;
+    gap: 8px;
+    color: var(--dc-color-2);
+    opacity: 0.6;
+  }
+  .page-scroll-arrows {
     border: 1px solid #cfd4e4;
     border-radius: 3px;
     background: #fff;
-    color: var(--dc-color-2);
     box-shadow: 0 2px 8px #171b3026;
-    opacity: 0.6;
   }
   .page-scroll button {
     display: grid;
@@ -106,7 +112,8 @@ const {
     outline-offset: -3px;
   }
   .page-scroll:hover,
-  .page-scroll:focus-within { opacity: 1; }
+  .page-scroll:focus-within,
+  .page-scroll:has(:global(details[open])) { opacity: 1; }
   @media (min-width: 768px) {
     .page-scroll {
       bottom: max(24px, env(safe-area-inset-bottom));

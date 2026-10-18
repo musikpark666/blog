@@ -17,8 +17,14 @@ const hasSections = headings.some(({ depth }) => depth === 2);
     {!compact && <p class="toc-title"><a href="#post-title" title={title}>{title}</a></p>}
     <Container class:list={{ 'toc-panel': compact }}>
       {compact && (
-        <summary aria-label="目次を開閉">
-          <span>目次</span>
+        <summary aria-label="目次を開閉" title="目次">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" />
+            <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" />
+            <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+            <path d="M9 6h11M9 12h11M9 18h11" />
+          </svg>
         </summary>
       )}
       <nav aria-label="目次">
@@ -58,6 +64,9 @@ const hasSections = headings.some(({ depth }) => depth === 2);
     const events = new AbortController();
     let frame = 0;
     let currentId = '';
+    let headings = allHeadings;
+    let readingLine = 65;
+    let needsRefresh = true;
     const switchMargin = 12;
 
     function setCurrentHeading(id: string) {
@@ -84,12 +93,18 @@ const hasSections = headings.some(({ depth }) => depth === 2);
 
     function updateCurrentHeading() {
       frame = 0;
-      // Closed details can still report heading rectangles. Their summary stays visible.
-      const headings = allHeadings.filter((heading) =>
-        !heading.closest('details:not([open]) > :not(summary)')
-      );
+      if (needsRefresh) {
+        // Visibility and the reading line only need refreshing after layout or details changes.
+        headings = allHeadings.filter((heading) =>
+          !heading.closest('details:not([open]) > :not(summary)')
+        );
+        readingLine = headings.length > 0
+          ? (parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 64) + 1
+          : 65;
+        needsRefresh = false;
+      }
+      if (headings.length === 0) return;
       const currentIndex = headings.findIndex((heading) => heading.id === currentId);
-      const readingLine = (parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 64) + 1;
 
       // Find the last heading above the reading line, even between long sections.
       let start = 0;
@@ -119,9 +134,14 @@ const hasSections = headings.some(({ depth }) => depth === 2);
       if (!events.signal.aborted && !frame) frame = requestAnimationFrame(updateCurrentHeading);
     }
 
+    function refreshTracking() {
+      needsRefresh = true;
+      scheduleUpdate();
+    }
+
     window.addEventListener('scroll', scheduleUpdate, { passive: true, signal: events.signal });
-    window.addEventListener('resize', scheduleUpdate, { signal: events.signal });
-    document.addEventListener('toggle', scheduleUpdate, { capture: true, signal: events.signal });
+    window.addEventListener('resize', refreshTracking, { signal: events.signal });
+    document.addEventListener('toggle', refreshTracking, { capture: true, signal: events.signal });
     window.addEventListener('hashchange', () => {
       selectLinkedHeading(window.location.hash);
       scheduleUpdate();
@@ -129,15 +149,21 @@ const hasSections = headings.some(({ depth }) => depth === 2);
     document.addEventListener('click', (event) => {
       if (!(event.target instanceof Element) || event.defaultPrevented ||
         event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const openPanel = document.querySelector<HTMLDetailsElement>('.toc-compact .toc-panel[open]');
+      if (openPanel && !openPanel.contains(event.target)) openPanel.open = false;
       const link = event.target.closest<HTMLAnchorElement>('.toc a[href^="#"]');
       if (!link) return;
       selectLinkedHeading(link.hash);
-      // Close before native anchor navigation, including clicks on the same hash.
-      const panel = link.closest('.toc-compact')?.querySelector<HTMLDetailsElement>('.toc-panel');
-      if (panel) panel.open = false;
       scheduleUpdate();
     }, { signal: events.signal });
-    const layoutObserver = new ResizeObserver(scheduleUpdate);
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      const panel = document.querySelector<HTMLDetailsElement>('.toc-compact .toc-panel[open]');
+      if (!panel) return;
+      panel.open = false;
+      panel.querySelector('summary')?.focus({ preventScroll: true });
+    }, { signal: events.signal });
+    const layoutObserver = new ResizeObserver(refreshTracking);
     layoutObserver.observe(document.body);
 
     cleanupTracking = () => {
@@ -219,44 +245,30 @@ const hasSections = headings.some(({ depth }) => depth === 2);
   .toc-compact {
     display: block;
     position: relative;
-    border-block: 1px solid #dfe2ee;
-    background-color: #fff;
+    border: 1px solid #cfd4e4;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 2px 8px #171b3026;
   }
 
   summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.5rem 0.625rem;
-    background-color: #f7f8fb;
+    display: grid;
+    place-items: center;
+    width: var(--button-size, 2.75rem);
+    height: var(--button-size, 2.75rem);
+    padding: 0;
+    border-radius: 2px;
+    background: transparent;
     color: var(--dc-color-2);
-    font-size: var(--text-ui);
+    font-size: var(--text-small);
     font-weight: 600;
     cursor: pointer;
     list-style: none;
     white-space: nowrap;
-    min-height: 44px;
   }
 
   summary::-webkit-details-marker {
     display: none;
-  }
-
-  summary::after {
-    content: '▸';
-    flex-shrink: 0;
-  }
-
-  .toc-panel[open] summary::after {
-    content: '▾';
-  }
-
-  summary span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .toc-post-title {
@@ -276,13 +288,16 @@ const hasSections = headings.some(({ depth }) => depth === 2);
 
   .toc-compact nav {
     position: absolute;
-    inset-inline: 0;
-    top: 100%;
-    max-height: 45dvh;
+    inset-inline-end: 0;
+    bottom: calc(100% + 0.5rem);
+    width: min(20rem, calc(100vw - 40px));
+    max-height: min(60dvh, calc(100dvh - 12rem));
+    overscroll-behavior: contain;
     padding: 0.375rem;
     border: 1px solid #dfe2ee;
-    border-top: 0;
-    background-color: #fff;
+    border-radius: 3px;
+    background-color: rgb(255 255 255 / 94%);
+    box-shadow: 0 2px 8px #171b3026;
   }
 
   @media (min-width: 1460px) {
