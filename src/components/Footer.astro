@@ -15,7 +15,7 @@
   <div class="footer-btm">
     <ul>
       <li><button>夜間モード</button></li>
-      <li><button>トップへ戻る▲</button></li>
+      <li><button type="button" data-page-scroll="top">トップへ戻る▲</button></li>
     </ul>
     <p class="copyright">&copy; musik.gallery。特記のない本文・画像は <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="license noopener noreferrer">CC BY-SA 4.0</a>。<span>（第三者素材等を除く）</span></p>
   </div>
@@ -32,6 +32,8 @@
   .footer-btm {
     background-color: var(--dc-color-2);
     padding: 14px 0;
+    /* Keep footer links clear of the fixed page-scroll buttons on small screens. */
+    padding-inline-end: calc(2.75rem + 24px);
   }
 
   /* Footer navigation */
@@ -141,6 +143,7 @@
     }
     .footer-btm {
       background-color: #fff;
+      padding-inline-end: 0;
     }
     .footer-btm ul {
       display: none;
