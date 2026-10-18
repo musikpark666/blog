@@ -367,7 +367,9 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   .post-content :global(h5),
   .post-content :global(h6) {
     clear: both;
-    margin-block: 1.5em 0.5em;
+    /* Keep the heading gap after float clearance, rather than inside it. */
+    margin-block: 0 0.5em;
+    padding-block-start: 2em;
     font-weight: 600;
     line-height: var(--leading-heading);
     scroll-margin-top: 4rem;
@@ -424,6 +426,12 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 
   .post-content :global(li > p + p) {
     margin-block-start: 0.5em;
+  }
+
+  /* Heading padding supplies the gap; avoid adding the previous block's margin. */
+  .post-content > :global(:has(+ :is(h1, h2, h3, h4, h5, h6))),
+  .post-content > :global(:has(+ :is(script, style) + :is(h1, h2, h3, h4, h5, h6))) {
+    margin-block-end: 0;
   }
 
   .post-content :global(blockquote[data-greentext]) {
