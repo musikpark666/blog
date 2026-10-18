@@ -54,7 +54,7 @@ const pageTitle = currentPage === 1
 ---
 
 <BaseLayout title={pageTitle} description={description}>
-  <GalleryHeader title="全体" href="/all/" postCount={postCount} showInfo={false} />
+  <GalleryHeader title="全体" href="/all/" postCount={postCount} />
 
   <div class="gallery-intro">
     <div class:list={['gallery-intro-layout', { 'has-random-posts': randomPosts.length > 0 }]}>
