@@ -10,7 +10,7 @@ interface Props extends PostImage {
 }
 
 const { src, alt = '', caption, source, width, height, align = 'left', float,
-  sizes, loading = 'lazy', quality = 60 } = Astro.props;
+  sizes, loading = 'lazy', quality = 60, spoiler = false } = Astro.props;
 const pendingImage = resolvePostImage(src);
 registerPostImage(Astro.locals, pendingImage);
 const image = await pendingImage;
@@ -31,15 +31,29 @@ const preserveOriginal = typeof image === 'string'
   : ['avif', 'svg', 'gif'].includes(image.format);
 ---
 
-<figure class="post-image" data-align={align} data-float={float} style={`--image-width: ${displayWidth}px`}>
+<figure class="post-image" data-align={align} data-float={float}
+  data-spoiler-hidden={spoiler ? '' : undefined} style={`--image-width: ${displayWidth}px`}>
   <div class="post-image-visual">
     {preserveOriginal ? (
       <img src={typeof image === 'string' ? image : image.src} alt={alt}
-        width={intrinsicWidth} height={intrinsicHeight} loading={loading} decoding="async" />
+        width={intrinsicWidth} height={intrinsicHeight} loading={loading} decoding="async"
+        aria-hidden={spoiler ? 'true' : undefined} />
     ) : (
       <Image src={image} alt={alt} width={displayWidth} height={displayHeight}
         widths={widths} sizes={sizes ?? `(min-width: ${displayWidth + 24}px) ${displayWidth}px, calc(100vw - 24px)`}
-        format="avif" quality={quality} loading={loading} decoding="async" />
+        format="avif" quality={quality} loading={loading} decoding="async"
+        aria-hidden={spoiler ? 'true' : undefined} />
+    )}
+    {spoiler && (
+      <button type="button" class="post-image-spoiler" aria-label="注意が必要な画像を表示" title="画像を表示">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true" focusable="false">
+          <path d="M12 3 2 21h20L12 3Z" />
+          <path d="M12 9v5" />
+          <circle cx="12" cy="17.5" r="0.9" fill="currentColor" stroke="none" />
+        </svg>
+      </button>
     )}
     {sourceHtml && (
       <details class="post-image-source">
@@ -59,6 +73,23 @@ const preserveOriginal = typeof image === 'string'
   {captionHtml && <figcaption class="post-image-caption" set:html={captionHtml} />}
 </figure>
 
+<script>
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest<HTMLButtonElement>('.post-image-spoiler');
+    if (!button) return;
+    const figure = button.closest<HTMLElement>('.post-image')!;
+    const image = figure.querySelector('img')!;
+    figure.removeAttribute('data-spoiler-hidden');
+    image.removeAttribute('aria-hidden');
+    if (document.activeElement === button) {
+      image.tabIndex = -1;
+      image.focus({ preventScroll: true });
+    }
+    button.remove();
+  });
+</script>
+
 <style>
   .post-image {
     width: min(100%, var(--image-width));
@@ -72,6 +103,31 @@ const preserveOriginal = typeof image === 'string'
     display: block;
     width: 100%;
     height: auto;
+  }
+  .post-image[data-spoiler-hidden] .post-image-visual :global(img) {
+    filter: blur(20px);
+    clip-path: inset(0);
+  }
+  .post-image-spoiler {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #ffdf5d;
+    cursor: pointer;
+  }
+  .post-image-spoiler svg {
+    filter: drop-shadow(0 0 1px #171b30) drop-shadow(0 1px 3px #171b30cc);
+  }
+  .post-image-spoiler:hover,
+  .post-image-spoiler:focus-visible { color: #fff2a8; }
+  .post-image-spoiler:focus-visible {
+    outline: 2px solid #ffdf5d;
+    outline-offset: -2px;
   }
   .post-image-caption {
     margin-block-start: 0.5rem;
@@ -89,6 +145,7 @@ const preserveOriginal = typeof image === 'string'
   .post-image-source {
     position: absolute;
     inset: 0;
+    z-index: 2;
     pointer-events: none;
   }
   .post-image-source summary {
@@ -100,6 +157,7 @@ const preserveOriginal = typeof image === 'string'
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
+    background: transparent;
     color: var(--dc-color-2);
     padding: 0;
     line-height: 1;

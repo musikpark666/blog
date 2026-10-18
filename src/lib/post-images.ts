@@ -12,6 +12,7 @@ export interface PostImage {
   width?: number;
   height?: number;
   quality?: number;
+  spoiler?: boolean;
 }
 
 interface ImageDownload {

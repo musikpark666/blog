@@ -12,7 +12,6 @@ This is  my personal blog.
 4. Footer.astro: **btns** implementation
 5. Footer.astro: `.footer-top` wide view
 6. Sidebar.astro: implement several **widgets**
-7. **About Page** implementation
 8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation
 9. GalleryPostList.astro: several btn scripting
 10. additional `astro.config.mjs` settings
