@@ -23,6 +23,15 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta charset="utf-8" />
+    <script is:inline>
+      // Apply before the body is parsed so saved compact views never flash images.
+      try {
+        document.documentElement.dataset.postListView =
+          localStorage.getItem('musik.post-list-view') === 'compact' ? 'compact' : 'images';
+      } catch {
+        document.documentElement.dataset.postListView = 'images';
+      }
+    </script>
     <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png?v=20261014-2" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg?v=20261014-2" />
     <link rel="shortcut icon" href="/favicon/favicon.ico?v=20261014-2" />

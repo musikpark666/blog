@@ -42,7 +42,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
 });
 ---
 
-<section class="gallery-posts">
+<gallery-post-list class="gallery-posts">
 
   <div class="post-list-header">
     <div class="post-list-group">
@@ -50,9 +50,9 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
       <button type="button" aria-pressed="false">人気</button>
       <button type="button" aria-pressed="false">お知らせ</button>
     </div>
-    <div class="post-list-group">
-      <button type="button" aria-pressed="false">簡潔</button>
-      <button type="button" aria-pressed="true">画像</button>
+    <div class="post-list-group" role="group" aria-label="投稿一覧の表示形式">
+      <button type="button" data-list-view-option="compact" aria-pressed="false">簡易</button>
+      <button type="button" data-list-view-option="images" aria-pressed="true">画像</button>
     </div>
   </div>
 
@@ -124,10 +124,68 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
       ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">≫</a>
       : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">≫</span>}
   </nav>}
-</section>
+</gallery-post-list>
+
+<script>
+  const storageKey = 'musik.post-list-view';
+  const changeEvent = 'post-list-view-change';
+
+  function applyView(view: 'compact' | 'images') {
+    document.documentElement.dataset.postListView = view;
+    document.dispatchEvent(new Event(changeEvent));
+  }
+
+  function restoreView() {
+    try {
+      applyView(localStorage.getItem(storageKey) === 'compact' ? 'compact' : 'images');
+    } catch {
+      // Keep this page's selection when browser storage is unavailable.
+    }
+  }
+
+  class GalleryPostList extends HTMLElement {
+    private controller?: AbortController;
+
+    connectedCallback() {
+      this.controller?.abort();
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      const syncButtons = () => {
+        const view = document.documentElement.dataset.postListView ?? 'images';
+        this.querySelectorAll<HTMLButtonElement>('[data-list-view-option]').forEach((option) => {
+          option.setAttribute('aria-pressed', String(option.dataset.listViewOption === view));
+        });
+      };
+
+      this.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const button = event.target.closest<HTMLButtonElement>('[data-list-view-option]');
+        const view = button?.dataset.listViewOption;
+        if (view !== 'compact' && view !== 'images') return;
+        applyView(view);
+        try { localStorage.setItem(storageKey, view); }
+        catch { /* Switching still works on this page when storage is blocked. */ }
+      }, { signal });
+      document.addEventListener(changeEvent, syncButtons, { signal });
+      syncButtons();
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+    }
+  }
+
+  if (!customElements.get('gallery-post-list')) customElements.define('gallery-post-list', GalleryPostList);
+  window.addEventListener('pageshow', restoreView);
+  document.addEventListener('astro:page-load', restoreView);
+  window.addEventListener('storage', (event) => {
+    if (event.key === storageKey || event.key === null) restoreView();
+  });
+</script>
 
 <style>
   .gallery-posts {
+    display: block;
     margin-top: 10px;
     container: gallery-posts / inline-size;
   }
@@ -157,7 +215,9 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     white-space: nowrap;
     cursor: pointer;
   }
-  .post-list-group button[aria-pressed="true"] {
+  .post-list-group button[aria-pressed="true"]:not([data-list-view-option]),
+  :global(html:not([data-post-list-view="compact"])) button[data-list-view-option="images"],
+  :global(html[data-post-list-view="compact"]) button[data-list-view-option="compact"] {
     border-color: var(--dc-color-1);
     background-color: var(--dc-color-2);
     color: #fff;
@@ -169,8 +229,9 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     color: var(--dc-color-2);
     outline: none;
   }
-  .post-list-group button[aria-pressed="true"]:hover,
-  .post-list-group button[aria-pressed="true"]:focus-visible {
+  .post-list-group button[aria-pressed="true"]:not([data-list-view-option]):is(:hover, :focus-visible),
+  :global(html:not([data-post-list-view="compact"])) button[data-list-view-option="images"]:is(:hover, :focus-visible),
+  :global(html[data-post-list-view="compact"]) button[data-list-view-option="compact"]:is(:hover, :focus-visible) {
     color: #ffed44;
   }
 
@@ -205,7 +266,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
   }
   .post-list-item.is-current {
     background: #f4f6ff;
-    box-shadow: inset 3px 0 0 var(--dc-color-2);
+    /* box-shadow: inset 3px 0 0 var(--dc-color-2); */
   }
   
   .post-list a {
@@ -289,6 +350,42 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
     color: var(--dc-color-2);
   }
   
+  /* Compact view keeps titles and dates in a plain, single-line list. */
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-thumbnail,
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-body p,
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-tags {
+    display: none;
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list a {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 7px;
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: baseline;
+    gap: 12px;
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-body {
+    min-width: 0;
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-body h2 {
+    font-size: var(--text-ui);
+    font-weight: 400;
+    line-height: var(--leading-ui);
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list-details {
+    display: block;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list a:hover h2,
+  :global(html[data-post-list-view="compact"]) .gallery-posts .post-list a:focus-visible h2 {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
   /* pagination */
   .post-list-pagination {
     display: flex;
