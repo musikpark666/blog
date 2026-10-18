@@ -1,6 +1,33 @@
 import type { CollectionEntry } from 'astro:content';
 
 export const GALLERY_POSTS_PER_PAGE = 10;
+export const COMPACT_GALLERY_POSTS_PER_PAGE = 30;
+export const ALL_POSTS_PER_PAGE = 50;
+export const COMPACT_ALL_POSTS_PER_PAGE = 100;
+export type PostListView = 'images' | 'compact';
+
+export interface GalleryPostPage {
+  pagePosts: BlogPost[];
+  currentPage: number;
+  totalPages: number;
+}
+
+export function getPostListPageSize(gallery: boolean, view: PostListView) {
+  return gallery
+    ? (view === 'compact' ? COMPACT_GALLERY_POSTS_PER_PAGE : GALLERY_POSTS_PER_PAGE)
+    : (view === 'compact' ? COMPACT_ALL_POSTS_PER_PAGE : ALL_POSTS_PER_PAGE);
+}
+
+export function getPostListPageHref(base: string, page: number) {
+  return page === 1 ? base : `${base}${page}/`;
+}
+
+export function getPostListPage(posts: BlogPost[], requestedPage: number, pageSize: number): GalleryPostPage {
+  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
+  const currentPage = Math.min(Math.max(1, requestedPage), totalPages);
+  const start = (currentPage - 1) * pageSize;
+  return { pagePosts: posts.slice(start, start + pageSize), currentPage, totalPages };
+}
 
 type BlogPost = CollectionEntry<'post'>;
 
@@ -10,6 +37,7 @@ export interface GalleryPostContext {
   postCount: number;
   currentPage: number;
   totalPages: number;
+  compactPage: GalleryPostPage;
 }
 
 export function groupPostsByGallery(posts: BlogPost[]) {
@@ -42,14 +70,13 @@ export function getPostGalleryContexts(
     if (!gallery || postIndex < 0) return [];
 
     const currentPage = Math.floor(postIndex / GALLERY_POSTS_PER_PAGE) + 1;
-    const pageStart = (currentPage - 1) * GALLERY_POSTS_PER_PAGE;
+    const compactCurrentPage = Math.floor(postIndex / COMPACT_GALLERY_POSTS_PER_PAGE) + 1;
 
     return [{
       gallery,
-      pagePosts: galleryPosts.slice(pageStart, pageStart + GALLERY_POSTS_PER_PAGE),
+      ...getPostListPage(galleryPosts, currentPage, GALLERY_POSTS_PER_PAGE),
       postCount: galleryPosts.length,
-      currentPage,
-      totalPages: Math.ceil(galleryPosts.length / GALLERY_POSTS_PER_PAGE),
+      compactPage: getPostListPage(galleryPosts, compactCurrentPage, COMPACT_GALLERY_POSTS_PER_PAGE),
     }];
   });
 }

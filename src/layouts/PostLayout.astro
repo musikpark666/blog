@@ -96,6 +96,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
           currentPage={defaultContext.currentPage}
           totalPages={defaultContext.totalPages}
           currentPostId={post.id}
+          compactPage={defaultContext.compactPage}
         />
       )}
     </div>
@@ -113,6 +114,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
             currentPage={context.currentPage}
             totalPages={context.totalPages}
             currentPostId={post.id}
+            compactPage={context.compactPage}
           />
         </div>
       </template>

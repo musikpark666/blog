@@ -1,0 +1,356 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { getPostListPageHref, type PostListView } from '../lib/gallery';
+
+import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
+
+interface Props {
+  gallery?: CollectionEntry<'gallery'>;
+  posts: CollectionEntry<'post'>[];
+  currentPage?: number;
+  totalPages?: number;
+  currentPostId?: string;
+  view?: PostListView;
+}
+
+const {
+  gallery,
+  posts,
+  currentPage = 1,
+  totalPages = 1,
+  currentPostId,
+  view = 'images',
+} = Astro.props;
+
+const postDateFormatter = new Intl.DateTimeFormat('ja-JP', 
+  {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Tokyo',
+  });
+const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
+
+const galleryHref = gallery ? `/g/${gallery.id}/` : '/all/';
+const getGalleryPageHref = (page: number) => getPostListPageHref(galleryHref, page);
+const pageGroups = [5, 7, 10].map((groupSize) => {
+  const start = Math.floor((currentPage - 1) / groupSize) * groupSize + 1;
+  const end = Math.min(start + groupSize - 1, totalPages);
+
+  return {
+    groupSize,
+    pages: Array.from({ length: end - start + 1 }, (_, index) => start + index),
+  };
+});
+---
+
+<div class="post-list-view-panel" data-view={view}>
+  <div class="post-list-head" aria-hidden="true">
+    <span>投稿</span>
+    <span>公開日</span>
+  </div>
+
+  <div class="post-list">
+    {posts.map((post) => {
+      const postHref = gallery
+        ? `/posts/${post.id}/?g=${encodeURIComponent(gallery.id)}`
+        : `/posts/${post.id}/`;
+      const postImage = post.data.image ?? missingPostImage;
+      const isCurrentPost = post.id === currentPostId;
+
+      return (
+        <article class:list={['post-list-item', {'is-current': isCurrentPost}]}>
+          <a href={postHref} aria-current={isCurrentPost ? 'page' : undefined}>
+            {view === 'images' && <span class="post-list-thumbnail" aria-hidden="true">
+              <Image src={postImage} alt="" loading="lazy" decoding="async" width="96" height="72" />
+            </span>}
+            <div class="post-list-content">
+              <div class="post-list-body">
+                <h2>{post.data.title}</h2>
+                {view === 'images' && <p>{post.data.description}</p>}
+              </div>
+              <div class="post-list-details">
+                {view === 'images' && <div class="post-list-tags">
+                  {post.data.mcategories?.map((mcategory) => <span data-post-tag>{mcategory}</span>)}
+                </div>}
+                <time datetime={post.data.pubDate.toISOString()}>{formatPostDate(post.data.pubDate)}</time>
+              </div>
+            </div>
+          </a>
+        </article>
+      )
+    })}
+    {posts.length === 0 && <p class="post-list-empty">投稿はまだありません。</p>}
+  </div>
+
+  <nav class="post-list-pagination" aria-label="ページ切り替え">
+    {currentPage > 1
+      ? <a class="pagination-link" href={getGalleryPageHref(1)} aria-label="最初のページ" title="最初のページ">≪</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最初のページ" title="最初のページ">≪</span>}
+
+    {currentPage > 1 
+      ? <a class="pagination-direction pagination-link" href={getGalleryPageHref(currentPage - 1)}>前へ</a>
+      : <span class="pagination-direction pagination-link is-disabled" aria-disabled="true">前へ</span>}
+
+    {pageGroups.map(({ groupSize, pages }) => (
+      <div class:list={['pagination-numbers', {
+        'pagination-numbers-medium': groupSize === 7,
+        'pagination-numbers-wide': groupSize === 10,
+      }]}>
+        {pages.map((page) => (
+          page === currentPage
+            ? <span class="pagination-link is-current">{page}</span>
+            : <a class="pagination-link" href={getGalleryPageHref(page)}>{page}</a>
+        ))}
+      </div>
+    ))}
+
+    {currentPage < totalPages
+      ? <a class="pagination-direction pagination-link" href={getGalleryPageHref(currentPage + 1)}>次へ</a>
+      : <span class="pagination-direction pagination-link is-disabled" aria-disabled="true">次へ</span>}
+
+    {currentPage < totalPages
+      ? <a class="pagination-link" href={getGalleryPageHref(totalPages)} aria-label="最後のページ" title="最後のページ">≫</a>
+      : <span class="pagination-link is-disabled" aria-disabled="true" aria-label="最後のページ" title="最後のページ">≫</span>}
+  </nav>
+</div>
+
+<style>
+  .post-list-view-panel[data-view="compact"] {
+    display: none;
+  }
+  :global(html[data-post-list-view="compact"]) .post-list-view-panel[data-view="images"] {
+    display: none;
+  }
+  :global(html[data-post-list-view="compact"]) .post-list-view-panel[data-view="compact"] {
+    display: block;
+  }
+  /* post-list table */
+  .post-list {
+    display: grid;
+  }
+  .post-list-head {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px;
+    border-top: 2px solid var(--dc-color-2);
+    border-bottom: 1px solid #d5dbea;
+    background-color: #f7f8fb;
+    color: #667085;
+    font-size: var(--text-small);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .post-list-empty {
+    border-bottom: 1px solid #e1e4ea;
+    margin: 0;
+    padding: 32px 16px;
+    color: #667085;
+    font-size: var(--text-small);
+    text-align: center;
+  }
+
+  .post-list-item {
+    border-bottom: 1px solid #e1e4ea;
+  }
+  .post-list-item.is-current {
+    background: #f4f6ff;
+    /* box-shadow: inset 3px 0 0 var(--dc-color-2); */
+  }
+  
+  .post-list a {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    padding: 6px 0;
+    color: inherit;
+    text-decoration: none;
+  }
+  .post-list a:hover,
+  .post-list a:focus-visible {
+    background-color: #fafbff;
+    outline: none;
+  }
+  .post-list a:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--dc-color-2);
+  }
+
+  .post-list-thumbnail {
+    display: flex;
+    align-items: center;
+    width: 96px;
+    height: 72px;
+    overflow: hidden;
+    background-color: #e9edff;
+  }
+  .post-list-thumbnail :global(img) {
+  }
+
+  .post-list-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .post-list-body {
+  }
+  .post-list-body h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: var(--text-list-title);
+    line-height: var(--leading-heading);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .post-list a:visited .post-list-body h2 {
+    color: #75568b;
+  }
+  .post-list-body p {
+    display: -webkit-box;
+    margin: 4px 0 0 ;
+    color: #667085;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden; 
+  }
+
+  .post-list-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    color: #667085;
+    font-size: var(--text-small);
+    gap: 4px 8px;
+  }
+  .post-list-tags {
+    display: flex;
+    min-width: 0;
+    gap: 4px;
+    overflow: hidden;
+  }
+  .post-list-tags span {
+    padding: 1px 5px;
+    background-color: #f1f4ff;
+    color: var(--dc-color-2);
+  }
+  
+  /* Compact view keeps titles and dates in a plain, single-line list. */
+  .post-list-view-panel[data-view="compact"] .post-list a {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 7px;
+  }
+  .post-list-view-panel[data-view="compact"] .post-list-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .post-list-view-panel[data-view="compact"] .post-list-body {
+    min-width: 0;
+  }
+  .post-list-view-panel[data-view="compact"] .post-list-body h2 {
+    font-size: var(--text-ui);
+    font-weight: 400;
+    line-height: var(--leading-ui);
+  }
+  .post-list-view-panel[data-view="compact"] .post-list-details {
+    display: block;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+  .post-list-view-panel[data-view="compact"] .post-list a:hover h2,
+  .post-list-view-panel[data-view="compact"] .post-list a:focus-visible h2 {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* pagination */
+  .post-list-pagination {
+    display: flex;
+    justify-content: safe center;
+    gap: 2px;
+    margin-top: 18px;
+    overflow-x: auto;
+  }
+  .pagination-numbers {
+    display: flex;
+    gap: 2px;
+  }
+  .pagination-numbers-medium,
+  .pagination-numbers-wide {
+    display: none;
+  }
+  .pagination-link.pagination-direction {
+    min-width: 2.5rem;
+  }
+  .pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 1.75rem;
+    min-height: 1.875rem;
+    padding: 0.25em 0.25rem;
+    border: 1px solid #d5dbea;
+    background-color: #fff;
+    color: #475467;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
+    text-decoration: none;
+  }
+  .pagination-link.is-current {
+    border-color: var(--dc-color-2);
+    background-color: var(--dc-color-2);
+    color: #fff;
+    font-weight: 700;
+  }
+  .pagination-link.is-disabled {
+    background-color: #f5f6f8;
+    color: #afaab5;
+  }
+  a.pagination-link:hover,
+  a.pagination-link:focus-visible {
+    border-color: var(--dc-color-2);
+    color: var(--dc-color-2);
+    outline: none;
+  }
+
+  /* media queries */
+  @container gallery-posts (min-width: 23.75rem) {
+    .pagination-numbers {
+      display: none;
+    }
+    .pagination-numbers-medium {
+      display: flex;
+    }
+  }
+
+  @container gallery-posts (min-width: 33.75rem) {
+    .post-list-pagination {
+      gap: 6px;
+    }
+    .pagination-numbers {
+      display: none;
+      gap: 4px;
+    }
+    .pagination-numbers-wide {
+      display: flex;
+    }
+    .pagination-link.pagination-direction {
+      min-width: 2.875rem;
+    }
+    .pagination-link {
+      min-width: 1.875rem;
+      padding-inline: 0.5rem;
+    }
+  }
+
+</style>

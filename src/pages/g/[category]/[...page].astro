@@ -7,12 +7,11 @@ import { Image } from 'astro:assets';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import { GALLERY_POSTS_PER_PAGE, groupPostsByGallery } from '../../../lib/gallery';
+import { getPostListPageSize, getPostListPage, getPostListPageHref, groupPostsByGallery, type GalleryPostPage } from '../../../lib/gallery';
 
 type BlogPost = CollectionEntry<'post'>;
 
 export const getStaticPaths = (async () => {
-  const postsPerPage = GALLERY_POSTS_PER_PAGE;
   const [galleries, posts] = await Promise.all([
     getCollection('gallery'),
     getCollection('post'),
@@ -21,7 +20,6 @@ export const getStaticPaths = (async () => {
 
   return galleries.flatMap((gallery) => {
     const galleryPosts = postsByGallery.get(gallery.id) ?? [];
-    const totalPages = Math.max(1, Math.ceil(galleryPosts.length / postsPerPage));
     const randomCandidates = [...galleryPosts];
     const randomPostCount = Math.min(4, randomCandidates.length);
 
@@ -32,16 +30,16 @@ export const getStaticPaths = (async () => {
 
     const randomPosts = randomCandidates.slice(0, randomPostCount);
 
+    const postsPerPage = getPostListPageSize(true, 'images');
+    const totalPages = Math.max(1, Math.ceil(galleryPosts.length / postsPerPage));
     return Array.from({ length: totalPages }, (_, pageIndex) => {
       const currentPage = pageIndex + 1;
-      const pageStart = pageIndex * postsPerPage;
       const props = {
         gallery,
-        pagePosts: galleryPosts.slice(pageStart, pageStart + postsPerPage),
+        ...getPostListPage(galleryPosts, currentPage, postsPerPage),
+        compactPage: getPostListPage(galleryPosts, currentPage, getPostListPageSize(true, 'compact')),
         randomPosts,
         postCount: galleryPosts.length,
-        currentPage,
-        totalPages,
       };
 
       return currentPage === 1
@@ -61,9 +59,12 @@ interface Props {
   postCount: number;
   currentPage: number;
   totalPages: number;
+  compactPage: GalleryPostPage;
 }
 
-const { gallery, pagePosts, randomPosts, postCount, currentPage, totalPages } = Astro.props;
+const { gallery, pagePosts, randomPosts, postCount, currentPage, totalPages, compactPage } = Astro.props;
+const compactPageHref = compactPage.currentPage !== currentPage
+  ? getPostListPageHref(`/g/${gallery.id}/`, compactPage.currentPage) : undefined;
 
 if (Astro.params.page === '1') {
   return Astro.redirect(`/g/${gallery.id}/`);
@@ -104,6 +105,8 @@ const pageTitle = `${title} ギャラリー | musik.gallery`;
     posts={pagePosts}
     currentPage={currentPage}
     totalPages={totalPages}
+    compactPage={compactPage}
+    compactPageHref={compactPageHref}
   />
 </BaseLayout>
 

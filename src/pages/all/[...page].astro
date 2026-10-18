@@ -7,15 +7,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import GalleryHeader from '../../components/GalleryHeader.astro';
 import GalleryPostList from '../../components/GalleryPostList.astro';
 import thumbnail from '../../assets/imgs/concentration crying cat.avif';
+import { getPostListPageSize, getPostListPage, getPostListPageHref, type GalleryPostPage } from '../../lib/gallery';
 
 type BlogPost = CollectionEntry<'post'>;
 
 export const getStaticPaths = (async () => {
-  const postsPerPage = 50;
   const posts = (await getCollection('post')).sort(
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime() || a.id.localeCompare(b.id),
   );
-  const totalPages = Math.max(1, Math.ceil(posts.length / postsPerPage));
   const randomCandidates = [...posts];
   const randomPostCount = Math.min(4, posts.length);
 
@@ -26,10 +25,13 @@ export const getStaticPaths = (async () => {
 
   const randomPosts = randomCandidates.slice(0, randomPostCount);
 
+  const postsPerPage = getPostListPageSize(false, 'images');
+  const totalPages = Math.max(1, Math.ceil(posts.length / postsPerPage));
   return Array.from({ length: totalPages }, (_, pageIndex) => ({
     params: { page: pageIndex === 0 ? undefined : String(pageIndex + 1) },
     props: {
       posts: posts.slice(pageIndex * postsPerPage, (pageIndex + 1) * postsPerPage),
+      compactPage: getPostListPage(posts, pageIndex + 1, getPostListPageSize(false, 'compact')),
       randomPosts,
       postCount: posts.length,
       currentPage: pageIndex + 1,
@@ -44,9 +46,12 @@ interface Props {
   postCount: number;
   currentPage: number;
   totalPages: number;
+  compactPage: GalleryPostPage;
 }
 
-const { posts, randomPosts, postCount, currentPage, totalPages } = Astro.props;
+const { posts, randomPosts, postCount, currentPage, totalPages, compactPage } = Astro.props;
+const compactPageHref = compactPage.currentPage !== currentPage
+  ? getPostListPageHref('/all/', compactPage.currentPage) : undefined;
 const description = 'カテゴリーを問わず、このブログのすべての投稿を新しい順にまとめています。';
 const pageTitle = currentPage === 1
   ? '全体 ギャラリー | musik.gallery'
@@ -74,7 +79,7 @@ const pageTitle = currentPage === 1
     </div>
   </div>
 
-  <GalleryPostList posts={posts} currentPage={currentPage} totalPages={totalPages} />
+  <GalleryPostList posts={posts} currentPage={currentPage} totalPages={totalPages} compactPage={compactPage} compactPageHref={compactPageHref} />
 </BaseLayout>
 
 <style>
