@@ -24,7 +24,7 @@ This is  my personal blog.
 
 >will be soon
 
-1. 
+1. add commentation
 5. focus-visible styling
 6. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
 7. Views (view count) & Comment

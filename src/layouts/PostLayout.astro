@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import GalleryHeader from '../components/GalleryHeader.astro';
 import GalleryPostList from '../components/GalleryPostList.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import { collectPostImages } from '../lib/post-images';
 
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
@@ -34,6 +35,11 @@ function formatPostDate(date: Date, showTime = true) {
 }
 
 const formattedPubDate = formatPostDate(pubDate, !updDate);
+const collectedImages = collectPostImages(Astro.locals);
+// Render once so all nested image components can register their original files.
+const postContent = await Astro.slots.render('default');
+const imageDownloads = [...new Map((await Promise.all(collectedImages))
+  .map((image) => [image.href, image])).values()];
 ---
 
 <BaseLayout title={`${post.data.title} | musik.gallery`} description={post.data.description}>
@@ -60,9 +66,32 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
         <TableOfContents title={post.data.title} headings={tocHeadings} compact />
       </div>
     )}
-    <div class="post-content">
-      <slot />
-    </div>
+    <div class="post-content" set:html={postContent} />
+    {imageDownloads.length > 0 && (
+      <section class="post-attachments" aria-label="本文画像のダウンロード" data-download-name={`${post.id}-images.zip`}>
+        <div class="post-attachments-header">
+          <h2>元画像 <span>{imageDownloads.length}</span></h2>
+          <button type="button" data-download-images title="元画像をZIPでまとめてダウンロード">本文画像のダウンロード</button>
+        </div>
+        <ul role="list">
+          {imageDownloads.map(({ href, name }, index) => {
+            const external = new URL(href, Astro.url).origin !== Astro.url.origin;
+            return (
+              <li>
+                <a href={href} download={external ? undefined : name}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}>
+                  {name}
+                  {external && <span class="visually-hidden">（外部サイト・新しいタブで開く）</span>}
+                </a>
+                {index < imageDownloads.length - 1 && ', '}
+              </li>
+            );
+          })}
+        </ul>
+        <p class="post-attachments-status visually-hidden" role="status"></p>
+      </section>
+    )}
     <div data-post-gallery-list>
       {defaultContext && (
         <GalleryPostList
@@ -96,6 +125,55 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 </BaseLayout>
 
 <script>
+  document.addEventListener('click', async (event) => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest<HTMLButtonElement>('[data-download-images]');
+    const section = button?.closest<HTMLElement>('.post-attachments');
+    if (!button || !section || button.disabled) return;
+    const links = Array.from(section.querySelectorAll<HTMLAnchorElement>('li a'));
+    const status = section.querySelector<HTMLElement>('[role="status"]')!;
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = '準備中…';
+    status.textContent = '';
+    status.classList.add('visually-hidden');
+
+    try {
+      // Load ZIP support only on demand; store already-compressed images unchanged.
+      const { zipSync } = await import('fflate');
+      const files: Record<string, Uint8Array> = Object.create(null);
+      for (const link of links) {
+        const response = await fetch(link.href, { referrerPolicy: 'no-referrer' });
+        if (!response.ok) throw new Error(`Image download failed: ${response.status}`);
+        const originalName = (link.download || link.textContent?.trim() || 'image')
+          .replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_');
+        const dot = originalName.lastIndexOf('.');
+        const stem = dot > 0 ? originalName.slice(0, dot) : originalName;
+        const extension = dot > 0 ? originalName.slice(dot) : '';
+        let name = originalName;
+        for (let suffix = 2; name in files; suffix++) name = `${stem} (${suffix})${extension}`;
+        files[name] = new Uint8Array(await response.arrayBuffer());
+      }
+      const archive = new Blob([new Uint8Array(zipSync(files, { level: 0 }))], { type: 'application/zip' });
+      const url = URL.createObjectURL(archive);
+      const download = document.createElement('a');
+      download.href = url;
+      download.download = (section.dataset.downloadName || 'images.zip').replace(/[\\/]/g, '-');
+      document.body.append(download);
+      download.click();
+      download.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      status.textContent = 'ZIPファイルのダウンロードを開始しました。';
+    } catch (error) {
+      console.error('Image ZIP download failed:', error);
+      status.textContent = '一括ダウンロードに失敗しました。各ファイルのリンクからダウンロードしてください。';
+      status.classList.remove('visually-hidden');
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  });
+
   function selectPostGallery() {
     const root = document.querySelector<HTMLElement>('[data-post-gallery-context]');
     if (!root) return;
@@ -153,6 +231,73 @@ const formattedPubDate = formatPostDate(pubDate, !updDate);
 </style>
 
 <style>
+  .post-attachments {
+    margin-block: 1.5rem 1rem;
+    border-bottom: 1px solid #d5dbea;
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
+  }
+  .post-attachments-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    padding: 7px;
+    border-top: 2px solid var(--dc-color-2);
+    border-bottom: 1px solid #d5dbea;
+    background: #f7f8fb;
+    color: #667085;
+    font-size: var(--text-small);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .post-attachments-header h2 {
+    margin: 0;
+    font-size: inherit;
+    color: inherit;
+    font-weight: inherit;
+  }
+  .post-attachments-header h2 span { color: #b8324a; }
+  .post-attachments-header button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--dc-color-2);
+    font: inherit;
+    cursor: pointer;
+  }
+  .post-attachments-header button:hover { text-decoration: underline; }
+  .post-attachments-header button:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+  .post-attachments-header button:disabled {
+    color: #667085;
+    cursor: wait;
+  }
+  .post-attachments ul {
+    margin: 0;
+    padding: 7px;
+    list-style: none;
+  }
+  .post-attachments li { display: inline; }
+  .post-attachments-status:not(.visually-hidden) {
+    margin: 0 0 7px;
+    color: #b8324a;
+    font-size: var(--text-small);
+  }
+  .post-attachments a {
+    color: var(--dc-color-2);
+    overflow-wrap: anywhere;
+    text-underline-offset: 0.15em;
+  }
+  .post-attachments a:visited { color: #6b46a3; }
+  .post-attachments a:hover { color: var(--dc-color-1); }
+  .post-attachments a:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 2px;
+  }
+
   .post-toc {
     position: sticky;
     top: 0;

@@ -14,6 +14,37 @@ export interface PostImage {
   quality?: number;
 }
 
+interface ImageDownload {
+  href: string;
+  name: string;
+}
+
+// Each page collects its own images, including nested ImgCollage children.
+const imageDownloads = new WeakMap<object, Promise<ImageDownload>[]>();
+const imageNames = new WeakMap<ImageMetadata, string>();
+
+export function collectPostImages(locals: object) {
+  const images: Promise<ImageDownload>[] = [];
+  imageDownloads.set(locals, images);
+  return images;
+}
+
+export function registerPostImage(locals: object, pendingImage: Promise<PostImage['src']>) {
+  const images = imageDownloads.get(locals);
+  if (!images) return;
+  // Reserve the position before loading so async images retain their document order.
+  images.push(pendingImage.then((image) => {
+    // Reading the imported source also keeps the unmodified file in Astro's build.
+    const href = typeof image === 'string' ? image : image.src;
+    let name = typeof image === 'string' ? undefined : imageNames.get(image);
+    if (!name) {
+      name = new URL(href, 'https://musik.gallery').pathname.split('/').pop() || 'image';
+      try { name = decodeURIComponent(name); } catch { /* Keep malformed escapes as written. */ }
+    }
+    return { href, name };
+  }));
+}
+
 const assets = import.meta.glob<ImageMetadata>(
   '/src/assets/**/*.{avif,webp,png,jpg,jpeg,gif,svg}', { import: 'default' },
 );
@@ -28,7 +59,9 @@ export async function resolvePostImage(src: PostImage['src']) {
   if (matches.length !== 1) {
     throw new Error(`<Img>: ${matches.length ? 'Ambiguous' : 'Missing'} image "${src}". Use a path relative to src/assets, e.g. "imgs/chip log.avif".`);
   }
-  return assets[matches[0]]();
+  const image = await assets[matches[0]]();
+  imageNames.set(image, matches[0].split('/').pop()!);
+  return image;
 }
 
 // Reuse one processor; there is no Markdown parser in the visitor's browser.

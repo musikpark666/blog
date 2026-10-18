@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { resolvePostImage, renderImageText, type PostImage } from '../../lib/post-images';
+import { resolvePostImage, renderImageText, registerPostImage, type PostImage } from '../../lib/post-images';
 
 interface Props extends PostImage {
   align?: 'left' | 'center' | 'right';
@@ -11,7 +11,9 @@ interface Props extends PostImage {
 
 const { src, alt = '', caption, source, width, height, align = 'left', float,
   sizes, loading = 'lazy', quality = 60 } = Astro.props;
-const image = await resolvePostImage(src);
+const pendingImage = resolvePostImage(src);
+registerPostImage(Astro.locals, pendingImage);
+const image = await pendingImage;
 if (typeof image === 'string' && (!width || !height)) {
   throw new Error('<Img>: public/ and remote images require width and height to reserve their aspect ratio.');
 }
