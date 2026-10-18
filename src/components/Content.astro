@@ -6,22 +6,30 @@ import Sidebar from './Sidebar.astro';
   <div class="content-left">
     <slot name="left" />
   </div>
-  <article>
-    <slot />
-  </article>
-  <aside>
-    <Sidebar />
-  </aside>
+  <div class="content-main">
+    <article>
+      <slot />
+    </article>
+    <aside>
+      <Sidebar />
+    </aside>
+  </div>
 </div>
 
 <style>
   .content-wrapper {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    max-width: var(--layout-max-width);
-    margin: 0 auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--layout-max-width)) minmax(0, 1fr);
     width: 100%;
     flex: 1;
+  }
+
+  .content-main {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
   }
 
   aside {
@@ -39,13 +47,8 @@ import Sidebar from './Sidebar.astro';
   }
 
   @media (min-width: 768px) {
-    .content-wrapper {
-      grid-template-columns: var(--layout-left-width) minmax(0, 1fr) calc(260px + 12px);
-    }
-
-    .content-left {
-      display: block;
-      min-width: 0;
+    .content-main {
+      grid-template-columns: minmax(0, 1fr) calc(260px + 12px);
     }
 
     aside {
@@ -55,13 +58,21 @@ import Sidebar from './Sidebar.astro';
   }
 
   @media (min-width: 992px) { 
-    .content-wrapper {
-      grid-template-columns: var(--layout-left-width) minmax(0, 1fr) calc(300px + 12px);
+    .content-main {
+      grid-template-columns: minmax(0, 1fr) calc(300px + 12px);
     }
   }
 
-  @media (min-width: 1200px) {
+  /* 1100px main area plus 180px of space on each side. */
+  @media (min-width: 1460px) {
     .content-left {
+      display: block;
+      grid-column: 1;
+      grid-row: 1;
+      width: var(--layout-left-width);
+      max-width: 100%;
+      min-width: 0;
+      justify-self: end;
       position: sticky;
       top: 1rem;
       align-self: start;

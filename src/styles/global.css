@@ -3,9 +3,9 @@
   --dc-color-2: #29367c;
   --dc-color-3: #3b4890;
 
-  --layout-max-width: 1200px;
+  --layout-max-width: 1100px;
   --layout-min-width: 320px;
-  --layout-left-width: clamp(0px, calc(100vw - 1020px), 180px);
+  --layout-left-width: 180px;
 
   --font-body: var(--font-pretendard-jp);
   --font-code: ui-monospace, Consolas, monospace;
