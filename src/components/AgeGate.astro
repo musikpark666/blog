@@ -1,0 +1,174 @@
+<div class="age-gate">
+  <script is:inline>
+    try {
+      if (localStorage.getItem('musik.age-confirmed') === '1') {
+        document.documentElement.removeAttribute('data-age-pending');
+      }
+    } catch { /* Ask again when browser storage is unavailable. */ }
+  </script>
+
+  <dialog class="age-gate-dialog" aria-labelledby="age-gate-title" aria-describedby="age-gate-description" closedby="none">
+    <p class="age-gate-brand">musik.gallery</p>
+    <h2 id="age-gate-title">年齢確認</h2>
+    <p id="age-gate-description">このサイトは成人向けです。<br />あなたは<mark><strong>18歳以上</strong></mark>ですか？</p>
+    <div class="age-gate-actions">
+      <button type="button" data-age-accept>はい</button>
+      <button type="button" data-age-decline autofocus>いいえ</button>
+    </div>
+    <p class="age-gate-denied" role="status" hidden>18歳未満の方は、このサイトをご覧いただけません。</p>
+    <button type="button" class="age-gate-back" hidden>確認画面に戻る</button>
+  </dialog>
+  <noscript><p class="age-gate-noscript">年齢確認のため、JavaScriptを有効にしてください。</p></noscript>
+</div>
+
+<script>
+  function initAgeGate() {
+    const dialog = document.querySelector<HTMLDialogElement>('.age-gate-dialog');
+    if (!dialog || !document.documentElement.hasAttribute('data-age-pending')) return;
+    const actions = dialog.querySelector<HTMLElement>('.age-gate-actions')!;
+    const denied = dialog.querySelector<HTMLElement>('.age-gate-denied')!;
+    const back = dialog.querySelector<HTMLButtonElement>('.age-gate-back')!;
+    const decline = dialog.querySelector<HTMLButtonElement>('[data-age-decline]')!;
+
+    dialog.oncancel = (event) => event.preventDefault();
+    dialog.querySelector<HTMLButtonElement>('[data-age-accept]')!.onclick = () => {
+      try { localStorage.setItem('musik.age-confirmed', '1'); }
+      catch { /* Confirmation still applies to this page when storage is blocked. */ }
+      document.documentElement.removeAttribute('data-age-pending');
+      dialog.close();
+    };
+    decline.onclick = () => {
+      actions.hidden = true;
+      denied.hidden = false;
+      back.hidden = false;
+      back.focus();
+    };
+    back.onclick = () => {
+      actions.hidden = false;
+      denied.hidden = true;
+      back.hidden = true;
+      decline.focus();
+    };
+    if (!dialog.open) dialog.showModal();
+  }
+
+  initAgeGate();
+  document.addEventListener('astro:page-load', initAgeGate);
+</script>
+
+<style>
+  :global(html[data-age-pending]) {
+    overflow: hidden;
+  }
+
+  :global(html[data-age-pending] body > :not(.age-gate)) {
+    visibility: hidden;
+  }
+
+  .age-gate {
+    display: contents;
+  }
+
+  .age-gate-dialog {
+    width: min(28rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    padding: 1.5rem;
+    border: 1px solid #cfd4e4;
+    border-top: 3px solid var(--dc-color-2);
+    border-radius: 3px;
+    background: #fff;
+    color: #171b30;
+    box-shadow: 0 4px 20px #171b301a;
+    font-size: var(--text-ui);
+    line-height: var(--leading-body);
+    text-align: center;
+  }
+
+  .age-gate-dialog::backdrop {
+    background: #f7f8fb;
+  }
+
+  @supports (backdrop-filter: blur(24px)) or (-webkit-backdrop-filter: blur(24px)) {
+    :global(html[data-age-pending]:has(.age-gate-dialog:modal) body > :not(.age-gate)) {
+      visibility: visible;
+    }
+
+    .age-gate-dialog::backdrop {
+      background: rgb(247 248 251 / 45%);
+      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(24px);
+    }
+
+  }
+
+  .age-gate-brand {
+    margin: 0 0 0.1rem;
+    color: var(--dc-color-2);
+    font-weight: 600;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: var(--text-title);
+    line-height: var(--leading-heading);
+  }
+
+  #age-gate-description {
+    margin: .7rem 0 1.4rem;
+  }
+
+  mark {
+    padding-inline: 1px;
+    background: linear-gradient(transparent 60%, #ff6 60%);
+  }
+
+  .age-gate-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: 0.5rem;
+    border: 1px solid #cfd4e4;
+    border-radius: 2px;
+    background: #f8f9fc;
+    color: var(--dc-color-2);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  [data-age-accept] {
+    border-color: var(--dc-color-2);
+    background: var(--dc-color-2);
+    color: #fff;
+  }
+
+  button:hover {
+    background: #e9ecf8;
+  }
+
+  [data-age-accept]:hover {
+    background: var(--dc-color-1);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--dc-color-2);
+    outline-offset: 3px;
+  }
+
+  .age-gate-denied {
+    margin: 0 0 1rem;
+    color: #b42318;
+  }
+
+  .age-gate-dialog [hidden] {
+    display: none;
+  }
+
+  .age-gate-noscript {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+</style>

@@ -4,6 +4,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Content from '../components/Content.astro';
 import Footer from '../components/Footer.astro';
+import AgeGate from '../components/AgeGate.astro';
 
 interface Props {
   title: string;
@@ -16,7 +17,7 @@ const {
 } = Astro.props;
 ---
 
-<html lang="ja">
+<html lang="ja" data-age-pending>
   <head>
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -32,6 +33,7 @@ const {
     <Font cssVariable="--font-pretendard-jp" />
   </head>
   <body>
+    <AgeGate />
     <Header />
     <Content>
       <slot name="left" slot="left" />
