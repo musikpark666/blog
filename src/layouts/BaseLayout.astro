@@ -6,6 +6,7 @@ import Content from '../components/Content.astro';
 import Footer from '../components/Footer.astro';
 import AgeGate from '../components/AgeGate.astro';
 import SiteGuide from '../components/SiteGuide.astro';
+import { themes } from '../lib/themes';
 
 interface Props {
   title: string;
@@ -23,11 +24,11 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta charset="utf-8" />
-    <script is:inline>
+    <script is:inline define:vars={{ themeIds: themes.map((theme) => theme.id) }}>
       // Restore before the first paint; the default stays light regardless of OS settings.
       try {
-        document.documentElement.dataset.theme =
-          localStorage.getItem('musik.theme') === 'dark' ? 'dark' : 'light';
+        const savedTheme = localStorage.getItem('musik.theme');
+        document.documentElement.dataset.theme = themeIds.includes(savedTheme) ? savedTheme : 'light';
       } catch { /* The light default still works when storage is unavailable. */ }
       // Apply before the body is parsed so saved compact views never flash images.
       try {
@@ -77,19 +78,17 @@ const {
 </html>
 
 <script>
-  type Theme = 'light' | 'dark';
+  import { normalizeTheme, type Theme } from '../lib/themes';
   function applyTheme(theme: Theme) {
     document.documentElement.dataset.theme = theme;
-    const label = theme === 'dark' ? '通常モードに切り替え' : '夜間モードに切り替え';
-    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
-      button.setAttribute('aria-label', label);
-      button.title = label;
+    document.querySelectorAll<HTMLInputElement>('[data-theme-choice]').forEach((input) => {
+      input.checked = input.value === theme;
     });
   }
 
   function restoreTheme() {
-    try { applyTheme(localStorage.getItem('musik.theme') === 'dark' ? 'dark' : 'light'); }
-    catch { applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'); }
+    try { applyTheme(normalizeTheme(localStorage.getItem('musik.theme'))); }
+    catch { applyTheme(normalizeTheme(document.documentElement.dataset.theme)); }
   }
 
   restoreTheme();
@@ -97,19 +96,20 @@ const {
   document.addEventListener('astro:page-load', restoreTheme);
   window.addEventListener('storage', (event) => {
     if (event.key === 'musik.theme' || event.key === null) {
-      applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
+      applyTheme(normalizeTheme(event.newValue));
     }
+  });
+
+  document.addEventListener('change', (event) => {
+    if (!(event.target instanceof HTMLInputElement) || !event.target.matches('[data-theme-choice]')) return;
+    const theme = normalizeTheme(event.target.value);
+    applyTheme(theme);
+    try { localStorage.setItem('musik.theme', theme); }
+    catch { /* Theme switching still works on this page without storage. */ }
   });
 
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
-    if (event.target.closest('[data-theme-toggle]')) {
-      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      applyTheme(theme);
-      try { localStorage.setItem('musik.theme', theme); }
-      catch { /* Theme switching still works on this page without storage. */ }
-      return;
-    }
     const button = event.target.closest<HTMLButtonElement>('[data-page-scroll]');
     if (!button) return;
     window.scrollTo({

@@ -1,6 +1,6 @@
 /* Shared colors, layout, and typography. */
 :root {
-  /* Shared brand and media colors stay consistent in both themes. */
+  /* Default brand colors and shared media colors. */
   --color-brand-strong: #1d2761;
   --color-brand: #29367c;
   --color-brand-soft: #3b4890;
@@ -109,6 +109,124 @@
   --color-age-blur: rgb(21 24 32 / 65%);
 }
 
+/* Deep black. */
+:root[data-theme='black'] {
+  color-scheme: dark;
+  --color-brand-strong: #121212;
+  --color-brand: #202020;
+  --color-brand-soft: #303030;
+  --color-on-brand-muted: #c7c7c7;
+  --color-on-brand-hover: #fff;
+  --color-stat-posts: #e0e0e0;
+  --color-stat-characters: #c7c7c7;
+  --color-page: #000;
+  --color-surface: #0c0c0c;
+  --color-surface-muted: #171717;
+  --color-hover: #222;
+  --color-selected: #2b2b2b;
+  --color-text: #dedede;
+  --color-text-soft: var(--color-text);
+  --color-heading: #f0f0f0;
+  --color-secondary: #bdbdbd;
+  --color-muted: #a3a3a3;
+  --color-disabled: #808080;
+  --color-border: #343434;
+  --color-border-strong: #555;
+  --color-accent-border: #777;
+  --color-link: #c9d4e5;
+  --color-link-hover: #fff;
+  --color-visited: #c5b6d1;
+  --color-focus: var(--color-link);
+  --color-danger: #efa4aa;
+  --color-success: #9bc9b4;
+  --color-warning: #d8bd8c;
+  --color-greentext: #b2c793;
+  --color-highlight: #4d461c;
+  --color-shadow: #00000080;
+  --color-overlay: rgb(12 12 12 / 97%);
+  --color-age-backdrop: var(--color-page);
+  --color-age-blur: rgb(0 0 0 / 75%);
+}
+
+/* Paper and ink. */
+:root[data-theme='ink'] {
+  color-scheme: light;
+  --color-brand-strong: #111;
+  --color-brand: #222;
+  --color-brand-soft: #3d3d3d;
+  --color-on-brand-muted: #ddd;
+  --color-on-brand-hover: #fff;
+  --color-stat-posts: #fff;
+  --color-stat-characters: #ddd;
+  --color-page: #f5f5f2;
+  --color-surface: #fcfcfa;
+  --color-surface-muted: #ebebe7;
+  --color-hover: #e4e4df;
+  --color-selected: #ddddd6;
+  --color-text: #171717;
+  --color-text-soft: #292929;
+  --color-heading: #111;
+  --color-secondary: #3d3d3d;
+  --color-muted: #5c5c57;
+  --color-disabled: #777772;
+  --color-border: #b7b7ae;
+  --color-border-strong: #84847d;
+  --color-accent-border: #444;
+  --color-link: #292929;
+  --color-link-hover: #000;
+  --color-visited: #575752;
+  --color-focus: #222;
+  --color-danger: #333;
+  --color-success: #333;
+  --color-warning: #333;
+  --color-greentext: #444;
+  --color-highlight: #d5d5cb;
+  --color-shadow: #0000001a;
+  --color-overlay: rgb(252 252 250 / 96%);
+  --color-age-backdrop: var(--color-page);
+  --color-age-blur: rgb(245 245 242 / 75%);
+}
+
+/* Warm paper and forest green. */
+:root[data-theme='sepia'] {
+  color-scheme: light;
+  --color-brand-strong: #263e35;
+  --color-brand: #365246;
+  --color-brand-soft: #466456;
+  --color-on-brand: #fffaf0;
+  --color-on-brand-muted: #d9dfcf;
+  --color-on-brand-hover: #ffe5a8;
+  --color-stat-posts: #f6d6b9;
+  --color-stat-characters: #e7e6b8;
+  --color-page: #f5efdf;
+  --color-surface: #fcf8ed;
+  --color-surface-muted: #ede5d1;
+  --color-hover: #e7dec7;
+  --color-selected: #e0e5d2;
+  --color-text: #302d25;
+  --color-text-soft: #423e33;
+  --color-heading: #263e35;
+  --color-secondary: #555044;
+  --color-muted: #706857;
+  --color-disabled: #8a806c;
+  --color-border: #cec3aa;
+  --color-border-strong: #a6987d;
+  --color-accent-border: #627865;
+  --color-link: #365b48;
+  --color-link-hover: #1e3e2d;
+  --color-visited: #785c69;
+  --color-focus: var(--color-link);
+  --color-danger: #a23f38;
+  --color-success: #3e684e;
+  --color-warning: #855a22;
+  --color-greentext: #526b36;
+  --color-highlight: #ead18b;
+  --color-shadow: #493c2426;
+  --color-overlay: rgb(252 248 237 / 96%);
+  --color-age-backdrop: var(--color-page);
+  --color-age-blur: rgb(245 239 223 / 65%);
+}
+
 *,*::before,*::after {
   box-sizing: border-box;
 }
@@ -136,10 +254,6 @@ body {
 a { color: var(--color-link); }
 a:visited { color: var(--color-visited); }
 mark { color: inherit; }
-
-.theme-label-dark,
-:root[data-theme='dark'] .theme-label-light { display: none; }
-:root[data-theme='dark'] .theme-label-dark { display: inline; }
 
 button,
 input,

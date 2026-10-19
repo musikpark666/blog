@@ -75,7 +75,12 @@
   // Capture also handles the dialog's native Escape dismissal.
   document.addEventListener('close', (event) => {
     if (!(event.target instanceof HTMLDialogElement) || event.target.id !== 'site-guide') return;
-    if (guideOpener?.isConnected) guideOpener.focus({ preventScroll: true });
+    if (guideOpener?.isConnected && guideOpener.checkVisibility()) {
+      guideOpener.focus({ preventScroll: true });
+    } else {
+      Array.from(document.querySelectorAll<HTMLButtonElement>('[popovertarget="site-menu"]'))
+        .find((button) => button.checkVisibility())?.focus({ preventScroll: true });
+    }
     guideOpener = null;
   }, true);
 </script>

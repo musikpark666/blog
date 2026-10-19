@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Navigation from '../components/Navigation.astro';
 import TitleSVG from '../../public/brand-title.svg';
 import brandLogo from '../assets/imgs/brand-logo-foiled.png';
+import { themes } from '../lib/themes';
 ---
 
 <header>
@@ -23,7 +24,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       <TitleSVG class="header-brand-title" fill="currentColor" />
     </a>
     <div class="header-search">
-      <button class="header-search-menu">
+      <button class="header-search-menu" type="button" popovertarget="site-menu" aria-label="メニュー">
      	  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
       </button>
       <search>
@@ -44,12 +45,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     </div>
     <ul class="header-menu">
       <li>
-        <button class="header-menu-nightmode" type="button" data-theme-toggle aria-label="夜間モードに切り替え">
-          <span class="theme-label-light">🌙夜間モード</span><span class="theme-label-dark">☀️通常モード</span>
-        </button>
-      </li>
-      <li>
-        <button class="header-menu-btn" type="button" aria-label="メニュー">
+        <button class="header-menu-btn" type="button" popovertarget="site-menu" aria-label="メニュー">
           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
           </svg>
@@ -59,6 +55,44 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
   </div>
   <Navigation />
 </header>
+
+<div id="site-menu" popover aria-labelledby="site-menu-title">
+  <div class="menu-heading">
+    <h2 id="site-menu-title">メニュー</h2>
+    <button class="menu-close" type="button" popovertarget="site-menu" popovertargetaction="hide" aria-label="メニューを閉じる">×</button>
+  </div>
+  <fieldset class="theme-picker">
+    <legend>表示テーマ</legend>
+    {themes.map((theme) => (
+      <label class="theme-option">
+        <input type="radio" name="site-theme" value={theme.id} data-theme-choice checked={theme.id === 'light'} />
+        <span><strong>{theme.label}</strong><small>{theme.description}</small></span>
+      </label>
+    ))}
+  </fieldset>
+  <nav class="menu-links" aria-label="サイトメニュー">
+    <a href="/about/">このブログについて <span aria-hidden="true">↗</span></a>
+    <button type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide">サイトのご案内 <span aria-hidden="true">↗</span></button>
+    <a href="/all/">すべての投稿 <span aria-hidden="true">↗</span></a>
+  </nav>
+  <section class="menu-planned" aria-labelledby="menu-planned-title">
+    <h3 id="menu-planned-title">これから</h3>
+    <ul>
+      <li>ランダム記事 <small>準備中</small></li>
+      <li>最近見た記事 <small>準備中</small></li>
+      <li>RSSを購読 <small>準備中</small></li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('#site-menu a[href], #site-menu [data-open-site-guide]')) {
+      document.getElementById('site-menu')?.hidePopover();
+    }
+  });
+</script>
 
 <style>
   header {
@@ -178,20 +212,6 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
   .header-menu {
     display: none;
   }
-  .header-menu-nightmode {
-    padding: 4px 2px;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-  }
-  .header-menu-nightmode:hover { color: var(--color-link); }
-  .header-menu-nightmode:focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
-  }
-
   /* Header Hover and Focus */
   .header-brand:hover,
   .header-brand:focus {
@@ -323,4 +343,44 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     }
   }
 
+  /* Native popover supplies outside-click dismissal and Escape handling. */
+  #site-menu {
+    position: fixed;
+    inset: 60px 12px auto auto;
+    width: min(320px, calc(100vw - 24px));
+    max-height: calc(100dvh - 84px);
+    overflow-y: auto;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--color-accent-border);
+    border-radius: 3px;
+    background: var(--color-overlay);
+    color: var(--color-text-soft);
+    box-shadow: 0 6px 24px var(--color-shadow);
+    font-size: var(--text-ui);
+    line-height: var(--leading-ui);
+  }
+  .menu-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .menu-heading h2 { margin: 0; color: var(--color-heading); font-size: var(--text-list-title); }
+  .menu-close { width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: inherit; font-size: var(--text-heading); cursor: pointer; }
+  .theme-picker { margin: 0; padding: 0 0 12px; border: 0; }
+  .theme-picker legend, .menu-planned h3 { margin: 0 0 6px; padding: 0; color: var(--color-muted); font-size: var(--text-small); font-weight: 400; }
+  .theme-option { display: flex; gap: 10px; align-items: center; padding: 7px 8px; border: 1px solid transparent; border-radius: 2px; cursor: pointer; }
+  .theme-option:has(input:checked) { border-color: var(--color-border); background: var(--color-selected); }
+  .theme-option input { margin: 0; accent-color: var(--color-link); }
+  .theme-option strong { display: block; font-weight: 500; color: var(--color-heading); }
+  .theme-option small { display: block; color: var(--color-muted); font-size: var(--text-small); }
+  .theme-option:has(input:checked) small { color: var(--color-secondary); }
+  .menu-links { display: grid; padding-block: 8px; border-block: 1px solid var(--color-border); }
+  .menu-links a, .menu-links button { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px; border: 0; background: transparent; color: var(--color-link); font: inherit; text-decoration: none; text-align: start; cursor: pointer; }
+  .menu-links span { color: var(--color-muted); }
+  .theme-option:hover, .menu-links a:hover, .menu-links button:hover, .menu-close:hover { background: var(--color-hover); }
+  .menu-links :is(a, button):focus-visible, .menu-close:focus-visible, .theme-option:has(input:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+  .menu-planned { padding: 12px 8px 2px; }
+  .menu-planned ul { margin: 0; padding: 0; list-style: none; }
+  .menu-planned li { display: flex; justify-content: space-between; gap: 8px; padding-block: 4px; color: var(--color-muted); }
+  .menu-planned small { font-size: var(--text-small); }
+  @media (min-width: 768px) {
+    #site-menu { top: 64px; right: max(12px, calc((100vw - var(--layout-max-width)) / 2 + 4px)); }
+  }
 </style>
