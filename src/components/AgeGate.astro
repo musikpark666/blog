@@ -63,19 +63,19 @@
     width: min(28rem, calc(100% - 2rem));
     max-height: calc(100dvh - 2rem);
     padding: 1.5rem;
-    border: 1px solid #cfd4e4;
-    border-top: 3px solid var(--dc-color-2);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-accent-border);
     border-radius: 3px;
-    background: #fff;
-    color: #171b30;
-    box-shadow: 0 4px 20px #171b301a;
+    background: var(--color-surface);
+    color: var(--color-heading);
+    box-shadow: 0 4px 20px var(--color-shadow);
     font-size: var(--text-ui);
     line-height: var(--leading-body);
     text-align: center;
   }
 
   .age-gate-dialog::backdrop {
-    background: #f7f8fb;
+    background: var(--color-age-backdrop);
   }
 
   @supports (backdrop-filter: blur(24px)) or (-webkit-backdrop-filter: blur(24px)) {
@@ -84,7 +84,7 @@
     }
 
     .age-gate-dialog::backdrop {
-      background: rgb(247 248 251 / 45%);
+      background: var(--color-age-blur);
       -webkit-backdrop-filter: blur(24px);
       backdrop-filter: blur(24px);
     }
@@ -93,7 +93,7 @@
 
   .age-gate-brand {
     margin: 0 0 0.1rem;
-    color: var(--dc-color-2);
+    color: var(--color-link);
     font-weight: 600;
   }
 
@@ -109,7 +109,7 @@
 
   mark {
     padding-inline: 1px;
-    background: linear-gradient(transparent 60%, #ff6 60%);
+    background: linear-gradient(transparent 60%, var(--color-highlight) 60%);
   }
 
   .age-gate-actions {
@@ -121,36 +121,36 @@
   button {
     min-height: 2.75rem;
     padding: 0.5rem;
-    border: 1px solid #cfd4e4;
+    border: 1px solid var(--color-border);
     border-radius: 2px;
-    background: #f8f9fc;
-    color: var(--dc-color-2);
+    background: var(--color-surface-muted);
+    color: var(--color-link);
     font: inherit;
     cursor: pointer;
   }
 
   [data-age-accept] {
-    border-color: var(--dc-color-2);
-    background: var(--dc-color-2);
-    color: #fff;
+    border-color: var(--color-accent-border);
+    background: var(--color-brand);
+    color: var(--color-on-brand);
   }
 
   button:hover {
-    background: #e9ecf8;
+    background: var(--color-selected);
   }
 
   [data-age-accept]:hover {
-    background: var(--dc-color-1);
+    background: var(--color-brand-strong);
   }
 
   button:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
 
   .age-gate-denied {
     margin: 0 0 1rem;
-    color: #b42318;
+    color: var(--color-danger);
   }
 
   .age-gate-dialog [hidden] {

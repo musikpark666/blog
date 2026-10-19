@@ -43,7 +43,11 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       <button class="header-search-resentpage">最近の訪問</button>
     </div>
     <ul class="header-menu">
-      <li><span class="header-menu-nightmode">🌙夜間モード</span></li>
+      <li>
+        <button class="header-menu-nightmode" type="button" data-theme-toggle aria-label="夜間モードに切り替え">
+          <span class="theme-label-light">🌙夜間モード</span><span class="theme-label-dark">☀️通常モード</span>
+        </button>
+      </li>
       <li>
         <button class="header-menu-btn" type="button" aria-label="メニュー">
           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -58,7 +62,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
 
 <style>
   header {
-    background-color: var(--dc-color-2);
+    background-color: var(--color-brand);
   }
   .header-container {
     display: flex;
@@ -92,8 +96,8 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     width: 100%;
     min-width: 0;
     margin: 8px 8px 8px 0;
-    background-color: #fff;
-    border: 1px solid var(--dc-color-1);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-accent-border);
   }
   .header-search button {
     padding: 0;
@@ -117,6 +121,8 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     padding: 0 6px;
     border: none;
     outline: none;
+    background: transparent;
+    color: inherit;
     font-size: var(--text-ui);
     line-height: var(--leading-ui);
   }
@@ -124,9 +130,13 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--dc-color-3);
+    color: var(--color-link);
     width: 30px;
     flex-shrink: 0;
+  }
+  .header-search input::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
   }
 
   .header-search-menu {
@@ -135,8 +145,8 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     justify-content: center;
     height: 100%;
     width: 34px;
-    border-right: 1px solid #e1e3ef !important;
-    color: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid var(--color-border) !important;
+    color: var(--color-muted);
     flex-shrink: 0;
   }
 
@@ -145,7 +155,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     align-items: center;
     padding: 0 6px !important;
     height: 100%;
-    color: #555;
+    color: var(--color-muted);
     flex-shrink: 0;
     font-weight: 700;
     font-size: var(--text-small);
@@ -161,29 +171,42 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     transform: translateY(-50%);
     width: 1px;
     height: 1.25rem;
-    background-color: #e1e3ef;
+    background-color: var(--color-border);
   }
 
   /* Header Menu */
   .header-menu {
     display: none;
   }
+  .header-menu-nightmode {
+    padding: 4px 2px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .header-menu-nightmode:hover { color: var(--color-link); }
+  .header-menu-nightmode:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 
   /* Header Hover and Focus */
   .header-brand:hover,
   .header-brand:focus {
-    background-color: var(--dc-color-3);
+    background-color: var(--color-brand-soft);
   }
   .header-brand:focus-visible {
-    outline: 2px solid #ffed44;
+    outline: 2px solid var(--color-on-brand-hover);
     outline-offset: -2px;
   }
 
   .header-search button:hover,
   .header-search button:focus,
   .header-search form input:focus {
-    background-color: #eef0f8;
-    color: var(--dc-color-1);
+    background-color: var(--color-hover);
+    color: var(--color-link-hover);
   }
 
   /* Header Queries */
@@ -192,13 +215,13 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       display: block;
       height: 50%;
       width: auto;
-      color: #fff;
+      color: var(--color-on-brand);
     }
   }
 
   @media (min-width: 768px) {
     header {
-      background-color: #fff;
+      background-color: var(--color-surface);
     }
     .header-container {
       display: grid;
@@ -213,30 +236,30 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     }
     .header-brand:hover,
     .header-brand:focus {
-      background-color: #eef0f8;
+      background-color: var(--color-hover);
     }
     .header-brand:focus-visible {
-      outline-color: var(--dc-color-3);
+      outline-color: var(--color-focus);
     }
     .header-brand-logo {
       height: 48px;
     }
     .header-brand-title {
-      color: #000;
+      color: var(--color-text);
       height: 21px;
     }
 
     .header-search {
       height: 2.875rem;
       margin: auto 0;
-      border: 4px solid var(--dc-color-3);
+      border: 4px solid var(--color-accent-border);
     }
     .header-search form input {
       padding: 0 8px;
     }
     .header-search form button {
-      background-color: var(--dc-color-3);
-      color: #fff;
+      background-color: var(--color-brand-soft);
+      color: var(--color-on-brand);
       width: 40px;
       padding-left: 4px;
     }
@@ -249,7 +272,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
     }
     .header-search form button:hover,
     .header-search form button:focus {
-      background-color: var(--dc-color-2);
+      background-color: var(--color-brand);
     }
 
     .header-search-menu,
@@ -268,7 +291,7 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       margin: 0 4px;
       padding: 0;
       gap: 8px;
-      color: #4d5266;
+      color: var(--color-muted);
       font-size: var(--text-small);
       line-height: var(--leading-ui);
       list-style: none;
@@ -284,18 +307,18 @@ import brandLogo from '../assets/imgs/brand-logo-foiled.png';
       width: 28px;
       height: 28px;
       padding: 0;
-      border: 1px solid var(--dc-color-2);
+      border: 1px solid var(--color-accent-border);
       border-radius: 2px;
-      background-color: var(--dc-color-3);
-      color: #fff;
+      background-color: var(--color-brand-soft);
+      color: var(--color-on-brand);
       cursor: pointer;
     }
     .header-menu-btn:hover {
-      border-color: var(--dc-color-1);
-      background-color: var(--dc-color-2);
+      border-color: var(--color-accent-border);
+      background-color: var(--color-brand);
     }
     .header-menu-btn:focus-visible {
-      outline: 2px solid var(--dc-color-3);
+      outline: 2px solid var(--color-focus);
       outline-offset: 2px;
     }
   }

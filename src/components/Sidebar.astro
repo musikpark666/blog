@@ -193,7 +193,8 @@ const galleryPages = Array.from(
 <style>
   /* about widget */
   .sidebar-about {
-    border: 1px solid var(--dc-color-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-accent-border);
     margin-bottom: 12px;
   }
   .my-info {
@@ -215,7 +216,7 @@ const galleryPages = Array.from(
     border-radius: 50%;
   }
   .info-avatar-link:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
   .info-avatar {
@@ -227,24 +228,24 @@ const galleryPages = Array.from(
   }
   .info-name {
     font-size: var(--text-list-title);
-    color: var(--dc-color-2);
+    color: var(--color-link);
     text-decoration: none;
   }
   .info-description {
     margin: 0;
     min-width: 0;
-    color: #475467;
+    color: var(--color-secondary);
     font-size: var(--text-ui);
     line-height: var(--leading-body);
     overflow-wrap: anywhere;
   }
   .info-name:hover,
   .info-name:focus-visible {
-    color: var(--dc-color-1);
+    color: var(--color-link-hover);
     text-decoration: underline;
   }
   .info-name:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
     border-radius: 2px;
   }
@@ -254,14 +255,15 @@ const galleryPages = Array.from(
     justify-content: center;
     padding: 0 12px;
     min-height: 2.25rem;
-    background-color: #f3f3f3;
+    background-color: var(--color-surface-muted);
   }
 
   /* batch styles */
   .sidebar-item {
+    background: var(--color-surface);
     padding: 12px 12px;
     margin-bottom: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     font-size: var(--text-ui);
     line-height: var(--leading-ui);
   }
@@ -270,7 +272,7 @@ const galleryPages = Array.from(
     align-items: center;
     padding-bottom: 8px;
     padding-left: 2px;
-    border-bottom: 1px dashed #aaa;
+    border-bottom: 1px dashed var(--color-border-strong);
   }
   .sidebar-item-header h2 {
     font-size: var(--text-ui);
@@ -279,11 +281,11 @@ const galleryPages = Array.from(
     font-weight: 700;
   }
   .sidebar-item-header a {
-    color: #333;
+    color: var(--color-text-soft);
     text-decoration: none;
   }
   .sidebar-item-header a:hover {
-    color: var(--dc-color-2);
+    color: var(--color-link);
   }
 
   /* paginated sidebar widgets */
@@ -297,14 +299,14 @@ const galleryPages = Array.from(
   }
   .sidebar-recent h2,
   .sidebar-galleries h2 {
-    color: #333;
+    color: var(--color-text-soft);
     font-size: var(--text-list-title);
   }
   .sidebar-pagination {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #333;
+    color: var(--color-text-soft);
     font-size: var(--text-ui);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -336,7 +338,7 @@ const galleryPages = Array.from(
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border: 1px solid #d5dbea;
+    border: 1px solid var(--color-border);
   }
   .recent-featured span {
     display: -webkit-box;
@@ -358,7 +360,7 @@ const galleryPages = Array.from(
     width: 2px;
     height: 2px;
     border-radius: 50%;
-    background-color: #475467;
+    background-color: var(--color-secondary);
   }
   .sidebar-list a {
     display: block;
@@ -377,26 +379,26 @@ const galleryPages = Array.from(
   }
   .sidebar-recent a,
   .sidebar-galleries a {
-    color: #333;
+    color: var(--color-text-soft);
     text-decoration: none;
   }
   .sidebar-page a:visited {
-    color: #75568b;
+    color: var(--color-visited);
   }
   .sidebar-recent a:hover,
   .sidebar-recent a:focus-visible,
   .sidebar-galleries a:hover,
   .sidebar-galleries a:focus-visible {
-    background-color: #eef0f7;
+    background-color: var(--color-hover);
     text-decoration: underline;
   }
   .sidebar-recent a:focus-visible,
   .sidebar-galleries a:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 1px;
   }
   .sidebar-empty {
     margin: 0;
-    color: #667085;
+    color: var(--color-muted);
   }
 </style>

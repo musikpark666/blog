@@ -18,12 +18,17 @@ const {
 } = Astro.props;
 ---
 
-<html lang="ja" data-age-pending>
+<html lang="ja" data-theme="light" data-age-pending>
   <head>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta charset="utf-8" />
     <script is:inline>
+      // Restore before the first paint; the default stays light regardless of OS settings.
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem('musik.theme') === 'dark' ? 'dark' : 'light';
+      } catch { /* The light default still works when storage is unavailable. */ }
       // Apply before the body is parsed so saved compact views never flash images.
       try {
         document.documentElement.dataset.postListView =
@@ -72,8 +77,39 @@ const {
 </html>
 
 <script>
+  type Theme = 'light' | 'dark';
+  function applyTheme(theme: Theme) {
+    document.documentElement.dataset.theme = theme;
+    const label = theme === 'dark' ? '通常モードに切り替え' : '夜間モードに切り替え';
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    });
+  }
+
+  function restoreTheme() {
+    try { applyTheme(localStorage.getItem('musik.theme') === 'dark' ? 'dark' : 'light'); }
+    catch { applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'); }
+  }
+
+  restoreTheme();
+  window.addEventListener('pageshow', restoreTheme);
+  document.addEventListener('astro:page-load', restoreTheme);
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'musik.theme' || event.key === null) {
+      applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
+    }
+  });
+
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
+    if (event.target.closest('[data-theme-toggle]')) {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(theme);
+      try { localStorage.setItem('musik.theme', theme); }
+      catch { /* Theme switching still works on this page without storage. */ }
+      return;
+    }
     const button = event.target.closest<HTMLButtonElement>('[data-page-scroll]');
     if (!button) return;
     window.scrollTo({
@@ -93,14 +129,14 @@ const {
     z-index: 10;
     display: grid;
     gap: 8px;
-    color: var(--dc-color-2);
+    color: var(--color-link);
     opacity: 0.6;
   }
   .page-scroll-arrows {
-    border: 1px solid #cfd4e4;
+    border: 1px solid var(--color-border);
     border-radius: 3px;
-    background: #fff;
-    box-shadow: 0 2px 8px #171b3026;
+    background: var(--color-surface);
+    box-shadow: 0 2px 8px var(--color-shadow);
   }
   .page-scroll button {
     display: grid;
@@ -114,14 +150,14 @@ const {
     color: inherit;
     cursor: pointer;
   }
-  .page-scroll button + button { border-top: 1px solid #cfd4e4; }
+  .page-scroll button + button { border-top: 1px solid var(--color-border); }
   .page-scroll button:hover,
   .page-scroll button:focus-visible {
-    background: #eef0f8;
-    color: var(--dc-color-1);
+    background: var(--color-hover);
+    color: var(--color-link-hover);
   }
   .page-scroll button:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: -3px;
   }
   .page-scroll:hover,

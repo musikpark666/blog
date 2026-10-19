@@ -231,7 +231,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 <style>
   .post-attachments {
     margin-block: 1.5rem 1rem;
-    border-bottom: 1px solid #d5dbea;
+    border-bottom: 1px solid var(--color-border);
     font-size: var(--text-ui);
     line-height: var(--leading-ui);
   }
@@ -241,10 +241,10 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     align-items: baseline;
     gap: 0.4rem 0.75rem;
     padding: 7px;
-    border-top: 2px solid var(--dc-color-2);
-    border-bottom: 1px solid #d5dbea;
-    background: #f7f8fb;
-    color: #667085;
+    border-top: 2px solid var(--color-accent-border);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-muted);
+    color: var(--color-muted);
     font-size: var(--text-small);
     font-weight: 600;
     line-height: 1.4;
@@ -255,12 +255,12 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     color: inherit;
     font-weight: inherit;
   }
-  .post-attachments-header h2 span { color: #b8324a; }
+  .post-attachments-header h2 span { color: var(--color-danger); }
   .post-attachments-header button {
     padding: 0;
     border: 0;
     background: none;
-    color: var(--dc-color-2);
+    color: var(--color-link);
     font: inherit;
     cursor: pointer;
   }
@@ -269,16 +269,16 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     display: inline-block;
     height: 0.85em;
     margin-inline-start: 0.75rem;
-    border-inline-start: 1px solid #c3cad8;
+    border-inline-start: 1px solid var(--color-border);
     vertical-align: -0.05em;
   }
   .post-attachments-header button:hover { text-decoration: underline; }
   .post-attachments-header button:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
   .post-attachments-header button:disabled {
-    color: #667085;
+    color: var(--color-muted);
     cursor: wait;
   }
   .post-attachments ul {
@@ -289,29 +289,29 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   .post-attachments li { display: inline; }
   .post-attachments-status:not(.visually-hidden) {
     margin: 0 0 7px;
-    color: #b8324a;
+    color: var(--color-danger);
     font-size: var(--text-small);
   }
   .post-attachments a {
-    color: var(--dc-color-2);
+    color: var(--color-link);
     overflow-wrap: anywhere;
     text-underline-offset: 0.15em;
   }
-  .post-attachments a:visited { color: #6b46a3; }
-  .post-attachments a:hover { color: var(--dc-color-1); }
+  .post-attachments a:visited { color: var(--color-visited); }
+  .post-attachments a:hover { color: var(--color-link-hover); }
   .post-attachments a:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
   /* Post Header */
   .post-header {
-    border-bottom: 1px solid #dfe2ee;
+    border-bottom: 1px solid var(--color-border);
     padding: .75rem 0 .5rem 0;
   }
   .post-header h1 {
     margin: 0;
-    color: #171b30;
+    color: var(--color-heading);
     font-size: var(--text-title);
     line-height: var(--leading-heading);
     font-weight: 600;
@@ -320,12 +320,12 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   }
   .post-description {
     margin: 0.25em 0;
-    color: #475467;
+    color: var(--color-secondary);
     font-size: var(--text-ui);
   }
   .post-dates {
     margin: 0;
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-small);
   }
 
@@ -339,17 +339,17 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   }
 
   .post-content :global(a) {
-    color: var(--dc-color-2);
+    color: var(--color-link);
     text-underline-offset: 0.15em;
   }
   .post-content :global(a:visited) {
-    color: #6b46a3;
+    color: var(--color-visited);
   }
   .post-content :global(a:hover) {
-    color: var(--dc-color-1);
+    color: var(--color-link-hover);
   }
   .post-content :global(a:focus-visible) {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
@@ -371,17 +371,17 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   .post-content :global(h2) {
     font-size: var(--text-heading);
     padding-block-end: 0.35em;
-    border-bottom: 1px solid #cfd4e4;
+    border-bottom: 1px solid var(--color-border);
   }
   .post-content :global(h3) {
     font-size: var(--text-subheading);
     padding-block-end: 0.35em;
-    border-bottom: 1px solid #e1e4ec;
+    border-bottom: 1px solid var(--color-border);
   }
   .post-content :global(h2::before),
   .post-content :global(h3::before) {
     margin-inline-end: 0.4em;
-    color: var(--dc-color-2);
+    color: var(--color-link);
     font-family: var(--font-code);
   }
   .post-content :global(h2::before) {
@@ -429,7 +429,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 
   .post-content :global(blockquote[data-greentext]) {
     margin-inline: 0;
-    color: #4c6b23;
+    color: var(--color-greentext);
   }
   .post-content :global(.greentext-line) {
     display: block;
@@ -445,28 +445,28 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 
   /* Use the plugin's structure and icons with the blog's typography. */
   .post-content :global(.callout) {
-    --rc-color-light: var(--dc-color-2);
+    --rc-color-light: var(--color-link);
 
     padding: 0.75rem;
-    border-inline-start: 3px solid var(--rc-color-light, #667085);
+    border-inline-start: 3px solid var(--rc-color-light, var(--color-muted));
     border-radius: 2px;
     line-height: inherit;
     mix-blend-mode: normal;
   }
   .post-content :global(.callout:is([data-callout='abstract'], [data-callout='summary'], [data-callout='tldr'], [data-callout='tip'], [data-callout='hint'], [data-callout='important'], [data-callout='success'], [data-callout='check'], [data-callout='done'])) {
-    --rc-color-light: #24756a;
+    --rc-color-light: var(--color-success);
   }
   .post-content :global(.callout:is([data-callout='question'], [data-callout='help'], [data-callout='faq'], [data-callout='warning'], [data-callout='attention'], [data-callout='caution'])) {
-    --rc-color-light: #945a16;
+    --rc-color-light: var(--color-warning);
   }
   .post-content :global(.callout:is([data-callout='failure'], [data-callout='missing'], [data-callout='fail'], [data-callout='danger'], [data-callout='error'], [data-callout='bug'])) {
-    --rc-color-light: #b8324a;
+    --rc-color-light: var(--color-danger);
   }
   .post-content :global(.callout[data-callout='example']) {
-    --rc-color-light: #6b46a3;
+    --rc-color-light: var(--color-visited);
   }
   .post-content :global(.callout:is([data-callout='quote'], [data-callout='cite'])) {
-    --rc-color-light: #59636f;
+    --rc-color-light: var(--color-secondary);
   }
   .post-content :global(.callout-title) {
     align-items: baseline;
@@ -482,7 +482,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     align-self: center;
   }
   .post-content :global(summary.callout-title:focus-visible) {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
   .post-content :global(.callout-content > :first-child) {
@@ -494,7 +494,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 
   .post-content :global(a[data-footnote-ref]),
   .post-content :global(a[data-footnote-backref]) {
-    color: var(--dc-color-2);
+    color: var(--color-link);
     text-decoration: none;
     white-space: nowrap;
     scroll-margin-top: 4rem;
@@ -505,7 +505,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   }
   .post-content :global(a[data-footnote-ref]:focus-visible),
   .post-content :global(a[data-footnote-backref]:focus-visible) {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
   .post-content :global(.footnotes) {
@@ -517,7 +517,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     justify-content: space-between;
     gap: 0.5em;
     padding-block-end: 0.35em;
-    border-bottom: 1px solid #cfd4e4;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
     list-style: none;
   }
@@ -526,7 +526,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   }
   .post-content :global(.footnotes summary::after) {
     content: '▸';
-    color: var(--dc-color-2);
+    color: var(--color-link);
   }
   .post-content :global(.footnotes details[open] > summary::after) {
     content: '▾';
@@ -537,10 +537,10 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     border: 0;
   }
   .post-content :global(.footnotes summary:hover) {
-    color: var(--dc-color-2);
+    color: var(--color-link);
   }
   .post-content :global(.footnotes summary:focus-visible) {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
   .post-content :global(.footnotes > details > ol) {
@@ -573,25 +573,25 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   .post-content :global(samp:not(pre samp)) {
     font-size: 0.875em;
     padding: 0.08em 0.35em;
-    border: 1px solid #30363d;
+    border: 1px solid var(--color-code-border);
     border-radius: 3px;
-    background-color: #24292e;
-    color: #e6edf3;
+    background-color: var(--color-code-surface);
+    color: var(--color-code-text);
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
   }
   .post-content :global(code:not(pre code)) {
     vertical-align: 0.05em;
-    border-color: #e1e4e8;
-    background-color: #f3f4f6;
-    color: #b8324a;
+    border-color: var(--color-border);
+    background-color: var(--color-surface-muted);
+    color: var(--color-danger);
   }
   .post-content :global(kbd:not(pre kbd)) {
     display: inline-block;
     padding-inline: 0.45em;
     line-height: var(--leading-ui);
     white-space: nowrap;
-    box-shadow: inset 0 -2px 0 #161b22;
+    box-shadow: inset 0 -2px 0 var(--color-code-shadow);
   }
   /* Expressive Code controls the font, padding and scrolling of its own blocks. */
   .post-content :global(pre:not(.expressive-code pre)) {
@@ -627,6 +627,6 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     font-weight: 700;
   }
   .post-content :global(mark) {
-    background: linear-gradient(transparent 60%, #ff6 60%);
+    background: linear-gradient(transparent 60%, var(--color-highlight) 60%);
   }
 </style>

@@ -220,10 +220,11 @@ const interval = 20_000;
 
 <style>
   random-quote {
+    background: var(--color-surface);
     display: block;
     padding: 12px;
     margin-bottom: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     font-size: var(--text-ui);
     line-height: var(--leading-body);
     overflow-wrap: anywhere;
@@ -235,9 +236,9 @@ const interval = 20_000;
     justify-content: space-between;
     min-height: 22px;
     padding: 0 0 8px 2px;
-    border-bottom: 1px dashed #aaa;
+    border-bottom: 1px dashed var(--color-border-strong);
   }
-  h2 { margin: 0; font-size: var(--text-list-title); line-height: var(--leading-heading); color: #333; }
+  h2 { margin: 0; font-size: var(--text-list-title); line-height: var(--leading-heading); color: var(--color-text-soft); }
   .quote-controls { display: flex; align-items: center; gap: 6px; }
   .quote-controls[hidden] { display: none; }
   .quote-playback {
@@ -246,14 +247,14 @@ const interval = 20_000;
     width: 24px;
     height: 22px;
     padding: 0;
-    border: 1px solid #d5dbea;
-    background: #f7f8fb;
-    color: var(--dc-color-2);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-muted);
+    color: var(--color-link);
     font: inherit;
     cursor: pointer;
   }
-  .quote-playback:hover { background: #eef0f7; }
-  .quote-playback:focus-visible { outline: 2px solid var(--dc-color-2); outline-offset: 2px; }
+  .quote-playback:hover { background: var(--color-hover); }
+  .quote-playback:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
   .quote-body { padding-top: 10px; }
   blockquote {
     margin: 0;
@@ -271,15 +272,15 @@ const interval = 20_000;
   }
   .quote-meta:not(:has(p:not([hidden]))) { display: none; }
   p { margin: 0; white-space: pre-line; }
-  .quote-speaker, .quote-source { color: #475467; }
+  .quote-speaker, .quote-source { color: var(--color-secondary); }
   .quote-description {
     margin-top: 4px;
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-small);
     line-height: var(--leading-ui);
     text-align: left;
   }
-  .quote-source :global(a) { color: var(--dc-color-2); text-decoration: none; }
-  .quote-source :global(a:hover) { color: var(--dc-color-1); }
-  .quote-source :global(a:focus-visible) { outline: 2px solid var(--dc-color-2); outline-offset: 2px; }
+  .quote-source :global(a) { color: var(--color-link); text-decoration: none; }
+  .quote-source :global(a:hover) { color: var(--color-link-hover); }
+  .quote-source :global(a:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 </style>

@@ -73,7 +73,7 @@ const formattedCharacterCount = numberFormatter.format(characterCount);
 
 <style>
   nav {
-    background-color: var(--dc-color-3);
+    background-color: var(--color-brand-soft);
   }
   .nav-container {
     display: flex;
@@ -98,7 +98,7 @@ const formattedCharacterCount = numberFormatter.format(characterCount);
     align-items: center;
     min-height: 2.375rem;
     padding: 0.375em 0.4em;
-    color: #fff;
+    color: var(--color-on-brand);
     font-size: var(--text-ui);
     font-weight: 700;
     line-height: var(--leading-ui);
@@ -107,8 +107,8 @@ const formattedCharacterCount = numberFormatter.format(characterCount);
   }
   nav ul a:hover,
   nav ul a:focus {
-    background-color: var(--dc-color-2);
-    color: #ffed44;
+    background-color: var(--color-brand);
+    color: var(--color-on-brand-hover);
   }
 
   .extra-info {
@@ -141,16 +141,16 @@ const formattedCharacterCount = numberFormatter.format(characterCount);
       display: grid;
       align-self: center;
       padding: 0.375em 0.625em;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--color-on-brand-muted);
       font-size: var(--text-small);
       text-align: right;
       white-space: nowrap;
     }
     .extra-info .em1 {
-      color: #ffbbee;
+      color: var(--color-stat-posts);
     }
     .extra-info .em2 {
-      color: #ffff99;
+      color: var(--color-stat-characters);
     }
   }
 

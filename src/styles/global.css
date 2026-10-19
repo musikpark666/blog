@@ -1,7 +1,26 @@
+/* Shared colors, layout, and typography. */
 :root {
-  --dc-color-1: #1d2761;
-  --dc-color-2: #29367c;
-  --dc-color-3: #3b4890;
+  /* Shared brand and media colors stay consistent in both themes. */
+  --color-brand-strong: #1d2761;
+  --color-brand: #29367c;
+  --color-brand-soft: #3b4890;
+  --color-on-brand: #fff;
+  --color-on-brand-muted: #c4cae9;
+  --color-on-brand-hover: #ffed44;
+  --color-stat-posts: #ffbbee;
+  --color-stat-characters: #ffff99;
+  --color-spoiler: #ffdf5d;
+  --color-spoiler-hover: #fff2a8;
+  --color-spoiler-shadow: #171b30;
+  --color-spoiler-shadow-soft: #171b30cc;
+  --color-code-border: #30363d;
+  --color-code-surface: #24292e;
+  --color-code-text: #e6edf3;
+  --color-code-chrome: #161b22;
+  --color-code-title-text: #c9d1d9;
+  --color-code-shadow: var(--color-code-chrome);
+  --color-dialog-backdrop: rgb(0 0 0 / 40%);
+  --color-on-brand-overlay: rgb(255 255 255 / 15%);
 
   --layout-max-width: 1100px;
   --layout-min-width: 320px;
@@ -26,6 +45,70 @@
   --leading-code: 1.6;
 }
 
+/* Default light theme, including when no theme attribute is present. */
+:root {
+  color-scheme: light;
+  --color-page: #fff;
+  --color-surface: var(--color-page);
+  --color-surface-muted: #f7f8fb;
+  --color-hover: #f0f2f8;
+  --color-selected: #edf0fc;
+  --color-text: #000;
+  --color-text-soft: #333;
+  --color-heading: #171b30;
+  --color-secondary: #475467;
+  --color-muted: #667085;
+  --color-disabled: #afaab5;
+  --color-border: #d5dbea;
+  --color-border-strong: #aaa;
+  --color-accent-border: var(--color-brand);
+  --color-link: var(--color-brand);
+  --color-link-hover: var(--color-brand-strong);
+  --color-visited: #75568b;
+  --color-focus: var(--color-brand);
+  --color-danger: #b8324a;
+  --color-success: #24756a;
+  --color-warning: #945a16;
+  --color-greentext: #4c6b23;
+  --color-highlight: #ff6;
+  --color-shadow: #171b3026;
+  --color-overlay: rgb(255 255 255 / 94%);
+  --color-age-backdrop: var(--color-surface-muted);
+  --color-age-blur: rgb(247 248 251 / 45%);
+}
+
+/* Dark theme overrides. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-page: #151820;
+  --color-surface: #1d222d;
+  --color-surface-muted: #252c39;
+  --color-hover: #2c3548;
+  --color-selected: #303b55;
+  --color-text: #e0e4ec;
+  --color-text-soft: var(--color-text);
+  --color-heading: #eef1f7;
+  --color-secondary: #bac4d5;
+  --color-muted: #a5afbf;
+  --color-disabled: #8690a2;
+  --color-border: #394355;
+  --color-border-strong: #59667d;
+  --color-accent-border: #7787c4;
+  --color-link: #a5b4ff;
+  --color-link-hover: #ced6ff;
+  --color-visited: #c7a6e6;
+  --color-focus: var(--color-link);
+  --color-danger: #ffa0ab;
+  --color-success: #80c9b9;
+  --color-warning: #e5ba77;
+  --color-greentext: #a8ca83;
+  --color-highlight: #665a1b;
+  --color-shadow: #00000066;
+  --color-overlay: rgb(29 34 45 / 96%);
+  --color-age-backdrop: var(--color-page);
+  --color-age-blur: rgb(21 24 32 / 65%);
+}
+
 *,*::before,*::after {
   box-sizing: border-box;
 }
@@ -46,7 +129,17 @@ body {
   font-family: var(--font-body);
   font-weight: 400;
   line-height: var(--leading-ui);
+  background-color: var(--color-page);
+  color: var(--color-text);
 }
+
+a { color: var(--color-link); }
+a:visited { color: var(--color-visited); }
+mark { color: inherit; }
+
+.theme-label-dark,
+:root[data-theme='dark'] .theme-label-light { display: none; }
+:root[data-theme='dark'] .theme-label-dark { display: inline; }
 
 button,
 input,
@@ -72,20 +165,20 @@ samp {
   width: 24px;
   height: 22px;
   padding: 0;
-  border: 1px solid var(--dc-color-2);
-  background-color: var(--dc-color-3);
-  color: #fff;
+  border: 1px solid var(--color-accent-border);
+  background-color: var(--color-brand-soft);
+  color: var(--color-on-brand);
   cursor: pointer;
 }
 .sidebar-pagination-buttons button + button {
   border-left: 0;
 }
 .sidebar-pagination-buttons button:hover:not(:disabled) {
-  background-color: var(--dc-color-1);
+  background-color: var(--color-brand-strong);
 }
 .sidebar-pagination-buttons button:focus-visible {
   position: relative;
-  outline: 2px solid var(--dc-color-2);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 .sidebar-pagination-buttons button:disabled {

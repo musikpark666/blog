@@ -97,7 +97,7 @@ for (const post of posts) {
   }
   .page-header p {
     margin: 0;
-    color: #333;
+    color: var(--color-text-soft);
     font-size: var(--text-ui);
     font-weight: 700;
     overflow: hidden;
@@ -105,12 +105,12 @@ for (const post of posts) {
     white-space: nowrap;
   }
   .page-header span {
-    color: var(--dc-color-2);
+    color: var(--color-link);
   }
   .separator {
     border: none;
     height: 2px;
-    background-color: var(--dc-color-2);
+    background-color: var(--color-brand);
     margin: 0 0 5px 0;
   }
 
@@ -136,8 +136,8 @@ for (const post of posts) {
   .gallery-card:focus-visible {
     transform: translateY(-2px);
     box-shadow:
-      0 10px 24px rgba(30, 45, 90, 0.12),
-      0 2px 8px rgba(30, 45, 90, 0.08);
+      0 10px 24px var(--color-shadow),
+      0 2px 8px var(--color-shadow);
   }
 
   .gallery-thumbnail {
@@ -145,7 +145,7 @@ for (const post of posts) {
     align-self: stretch;
     overflow: hidden;
     aspect-ratio: 3 / 2;
-    background: linear-gradient(135deg, #eff3ff 0%, #f8fbff 100%);
+    background: var(--color-surface-muted);
   }
   .gallery-thumbnail :global(img) {
     position: absolute;
@@ -170,7 +170,7 @@ for (const post of posts) {
     white-space: nowrap;
   }
   .gallery-card-meta h2 {
-    color: var(--dc-color-2);
+    color: var(--color-link);
     font-size: var(--text-list-title);
     line-height: var(--leading-heading);
     overflow: hidden;
@@ -178,7 +178,7 @@ for (const post of posts) {
     min-width: 0;
   }
   .gallery-card-count {
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-small);
     white-space: nowrap;
   }
@@ -188,7 +188,7 @@ for (const post of posts) {
 
   .gallery-card-body p {
     margin-top: 2px;
-    color: #475467;
+    color: var(--color-secondary);
     font-size: var(--text-ui);
   }
   .gallery-card-description {
@@ -219,7 +219,7 @@ for (const post of posts) {
     .gallery-card-body .gallery-card-latest {
       display: block;
       margin-top: auto;
-      color: #1f2937;
+      color: var(--color-heading);
       font-size: var(--text-small);
       font-weight: 700;
       overflow: hidden;

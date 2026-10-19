@@ -14,7 +14,7 @@
   </div>
   <div class="footer-btm">
     <ul>
-      <li><button>夜間モード</button></li>
+      <li><button type="button" data-theme-toggle aria-label="夜間モードに切り替え"><span class="theme-label-light">夜間モード</span><span class="theme-label-dark">通常モード</span></button></li>
       <li><button type="button" data-page-scroll="top">トップへ戻る▲</button></li>
     </ul>
     <p class="copyright">&copy; musik.gallery。特記のない本文・画像は <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="license noopener noreferrer">CC BY-SA 4.0</a>。<span>（第三者素材等を除く<button class="footer-guide" type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide" aria-label="サイト案内を開く" title="サイト案内"><span aria-hidden="true">↗</span></button>）</span></p>
@@ -27,10 +27,10 @@
     margin-top: auto;
   }
   .footer-top {
-    background-color: var(--dc-color-3);
+    background-color: var(--color-brand-soft);
   }
   .footer-btm {
-    background-color: var(--dc-color-2);
+    background-color: var(--color-brand);
     padding: 14px 0;
     /* Keep footer links clear of the fixed page-scroll buttons on small screens. */
     padding-inline-end: calc(2.75rem + 24px);
@@ -59,21 +59,21 @@
     padding: 0.375em 0.5em;
     font-size: var(--text-small);
     line-height: var(--leading-ui);
-    color: #ebecf0;
+    color: var(--color-on-brand);
     text-decoration: none;
     white-space: nowrap;
   }
   .footer-top nav ul li a:hover,
   .footer-top nav ul li a:focus {
-    background-color: var(--dc-color-2);
-    color: #ffed44;
+    background-color: var(--color-brand);
+    color: var(--color-on-brand-hover);
   }
   /* Add a vertical line between the list items */
   .footer-top nav li:not(:last-child)::after {
     content: "";
     width: 1px;
     height: 10px;
-    background-color: var(--dc-color-1);
+    background-color: var(--color-brand-strong);
   }
 
   /* Footer bottom (copyright etc.) */
@@ -94,30 +94,30 @@
     padding: 0.25em 1em;
     font-size: var(--text-small);
     line-height: var(--leading-ui);
-    color: #c4cae9;
-    border: 1px solid var(--dc-color-1);
+    color: var(--color-on-brand-muted);
+    border: 1px solid var(--color-accent-border);
     border-radius: 10px;
     background: transparent;
     cursor: pointer;
   }
   .footer-btm ul button:hover,
   .footer-btm ul button:focus {
-    background-color: var(--dc-color-3);
-    border-color: #c4cae9;
-    color: #ffed44;
+    background-color: var(--color-brand-soft);
+    border-color: var(--color-on-brand-muted);
+    color: var(--color-on-brand-hover);
   }
 
   .copyright {
     text-align: center;
     font-size: var(--text-small);
     line-height: var(--leading-ui);
-    color: #c4cae9;
+    color: var(--color-on-brand-muted);
     padding: 0 12px;
     overflow-wrap: anywhere;
     margin: 0;
   }
   .copyright a {
-    color: #ffed44;
+    color: var(--color-on-brand-hover);
   }
   .copyright span {
     white-space: nowrap;
@@ -129,7 +129,7 @@
     border: 0;
     border-radius: 2px;
     background: transparent;
-    color: #ffed44;
+    color: var(--color-on-brand-hover);
     font: inherit;
     vertical-align: baseline;
     cursor: pointer;
@@ -139,14 +139,14 @@
   .copyright a:focus,
   .footer-guide:hover,
   .footer-guide:focus-visible {
-    background-color: var(--dc-color-1);
+    background-color: var(--color-brand-strong);
   }
   
   .footer-top nav ul li a:focus-visible,
   .footer-btm ul button:focus-visible,
   .copyright a:focus-visible,
   .footer-guide:focus-visible {
-    outline: 2px solid #ffed44;
+    outline: 2px solid var(--color-on-brand-hover);
     outline-offset: 2px;
   }
 
@@ -157,7 +157,7 @@
       display: none;
     }
     .footer-btm {
-      background-color: #fff;
+      background-color: var(--color-surface);
       padding-inline-end: 0;
     }
     .footer-btm ul {
@@ -165,22 +165,22 @@
     }
 
     .copyright { 
-      color: #333;
+      color: var(--color-text-soft);
     }
     .copyright a,
     .footer-guide {
-      color: var(--dc-color-2);
+      color: var(--color-link);
     }
     .copyright a:hover,
     .copyright a:focus,
     .footer-guide:hover,
     .footer-guide:focus-visible {
-      background-color: #eef0f8;
-      color: var(--dc-color-1);
+      background-color: var(--color-hover);
+      color: var(--color-link-hover);
     }
     .copyright a:focus-visible,
     .footer-guide:focus-visible {
-      outline-color: var(--dc-color-3);
+      outline-color: var(--color-focus);
     }
   }
 </style>

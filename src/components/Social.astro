@@ -67,14 +67,14 @@
     justify-content: center;
     padding: 4px;
     margin: 0 4px;
-    color: rgba(0, 0, 0, .5);
+    color: var(--color-muted);
   }
   a:hover {
-    color: var(--dc-color-2);
+    color: var(--color-link);
   }
   a:focus-visible {
 		border-radius: 2px;
-		outline: 2px solid var(--dc-color-3);
+		outline: 2px solid var(--color-focus);
 		outline-offset: 1px;
 	}
 
@@ -86,7 +86,7 @@
     content: "";
     width: 1px;
     height: 10px;
-    background-color: #ccc;
+    background-color: var(--color-border);
   }
 
   svg {

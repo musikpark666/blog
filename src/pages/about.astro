@@ -132,7 +132,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
 <style>
   .about-page {
     container: about / inline-size;
-    color: #344054;
+    color: var(--color-secondary);
     font-size: var(--text-body);
     line-height: var(--leading-body);
     overflow-wrap: anywhere;
@@ -157,7 +157,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   }
   .about-name {
     margin: 0;
-    color: #171b30;
+    color: var(--color-heading);
     font-size: 1.75rem;
     font-weight: 700;
     line-height: var(--leading-heading);
@@ -165,7 +165,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   .about-name span {
     display: block;
     margin-top: 4px;
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-ui);
     font-weight: 400;
   }
@@ -179,8 +179,8 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
     flex-wrap: wrap;
     gap: 4px 8px;
     padding: 8px 0;
-    border-top: 1px dashed #d5dbea;
-    border-bottom: 1px solid #d5dbea;
+    border-top: 1px dashed var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     font-size: var(--text-ui);
   }
   .about-nav a {
@@ -188,7 +188,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
     text-decoration: none;
   }
   .about-nav a:hover {
-    background-color: #eef0f7;
+    background-color: var(--color-hover);
   }
   .about-section {
     margin-top: 40px;
@@ -197,32 +197,32 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   h2 {
     margin: 0 0 14px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #d5dbea;
-    color: #000;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
     font-size: var(--text-heading);
     line-height: var(--leading-heading);
   }
   h2::before {
     content: '#';
     margin-inline-end: 0.4em;
-    color: var(--dc-color-2);
+    color: var(--color-link);
     font-family: var(--font-code);
   }
   .about-section > p {
     margin: 0 0 12px;
   }
   a {
-    color: var(--dc-color-2);
+    color: var(--color-link);
     text-underline-offset: 0.2em;
   }
   a:visited {
-    color: #75568b;
+    color: var(--color-visited);
   }
   a:hover {
-    color: var(--dc-color-1);
+    color: var(--color-link-hover);
   }
   a:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
   .about-text-link {
@@ -231,8 +231,8 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   .about-quote {
     margin: 18px 0 0;
     padding: 10px 14px;
-    border-left: 3px solid var(--dc-color-3);
-    background-color: #f7f8fb;
+    border-left: 3px solid var(--color-accent-border);
+    background-color: var(--color-surface-muted);
     font-size: var(--text-ui);
   }
   .about-quote p {
@@ -243,7 +243,7 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   }
   .about-interests > div {
     padding: 12px 0;
-    border-bottom: 1px dashed #d5dbea;
+    border-bottom: 1px dashed var(--color-border);
   }
   .about-interests > div:first-child {
     padding-top: 0;
@@ -254,14 +254,14 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
   }
   .about-interests dt {
     margin-bottom: 4px;
-    color: #1f2937;
+    color: var(--color-heading);
     font-weight: 700;
   }
   .about-interests dd {
     margin: 0;
   }
   .about-note {
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-ui);
   }
   .about-history {
@@ -273,19 +273,19 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
     display: grid;
     gap: 4px;
     padding: 14px 0;
-    border-bottom: 1px solid #e1e4ea;
+    border-bottom: 1px solid var(--color-border);
   }
   .about-history li:last-child {
     border-bottom: 0;
   }
   .about-history time {
-    color: #667085;
+    color: var(--color-muted);
     font-size: var(--text-ui);
     font-variant-numeric: tabular-nums;
   }
   .about-history h3 {
     margin: 0 0 6px;
-    color: #1f2937;
+    color: var(--color-heading);
     font-size: var(--text-list-title);
     line-height: var(--leading-heading);
   }
@@ -301,8 +301,8 @@ import profileImage from '../assets/imgs/profile cat foil.avif';
     gap: 12px;
     margin-bottom: 24px;
     padding: 10px 12px;
-    border: 1px solid #d5dbea;
-    background-color: #f7f8fb;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-muted);
     font-size: var(--text-ui);
   }
 

@@ -85,7 +85,7 @@ const pageTitle = currentPage === 1
 <style>
   .gallery-intro {
     padding: 10px 0;
-    border-bottom: 1px solid #d5d5d5;
+    border-bottom: 1px solid var(--color-border);
     container: gallery-intro / inline-size;
   }
   .gallery-intro-layout {
@@ -106,7 +106,7 @@ const pageTitle = currentPage === 1
   .gallery-intro-info p {
     margin: 0;
     min-width: 0;
-    color: #475467;
+    color: var(--color-secondary);
     font-size: var(--text-ui);
     line-height: var(--leading-ui);
     overflow-wrap: anywhere;
@@ -132,13 +132,13 @@ const pageTitle = currentPage === 1
     width: 2px;
     height: 2px;
     border-radius: 50%;
-    background-color: #475467;
+    background-color: var(--color-secondary);
   }
   .gallery-random-posts a {
     display: block;
     min-width: 0;
     padding: 2px 4px;
-    color: #475467;
+    color: var(--color-secondary);
     line-height: var(--leading-ui);
     text-decoration: none;
     overflow: hidden;
@@ -146,15 +146,15 @@ const pageTitle = currentPage === 1
     white-space: nowrap;
   }
   .gallery-random-posts a:visited {
-    color: #75568b;
+    color: var(--color-visited);
   }
   .gallery-random-posts a:hover,
   .gallery-random-posts a:focus-visible {
-    background-color: #eef0f7;
+    background-color: var(--color-hover);
     text-decoration: underline;
   }
   .gallery-random-posts a:focus-visible {
-    outline: 2px solid var(--dc-color-2);
+    outline: 2px solid var(--color-focus);
     outline-offset: 1px;
   }
   @container gallery-intro (min-width: 600px) {
