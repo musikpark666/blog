@@ -13,10 +13,6 @@
     </nav>
   </div>
   <div class="footer-btm">
-    <ul>
-      <li><button type="button" popovertarget="site-menu">テーマ・メニュー</button></li>
-      <li><button type="button" data-page-scroll="top">トップへ戻る▲</button></li>
-    </ul>
     <p class="copyright">&copy; musik.gallery。特記のない本文・画像は <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="license noopener noreferrer">CC BY-SA 4.0</a>。<span>（第三者素材等を除く<button class="footer-guide" type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide" aria-label="サイト案内を開く" title="サイト案内"><span aria-hidden="true">↗</span></button>）</span></p>
   </div>
 </footer>
@@ -77,36 +73,6 @@
   }
 
   /* Footer bottom (copyright etc.) */
-  .footer-btm ul {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0 0 8px 0;
-    gap: 10px;
-    list-style: none;
-  }
-  .footer-btm ul button {
-    display: flex;
-    align-items: center;
-    min-height: 1.75rem;
-    padding: 0.25em 1em;
-    font-size: var(--text-small);
-    line-height: var(--leading-ui);
-    color: var(--color-on-brand-muted);
-    border: 1px solid var(--color-accent-border);
-    border-radius: 10px;
-    background: transparent;
-    cursor: pointer;
-  }
-  .footer-btm ul button:hover,
-  .footer-btm ul button:focus {
-    background-color: var(--color-brand-soft);
-    border-color: var(--color-on-brand-muted);
-    color: var(--color-on-brand-hover);
-  }
-
   .copyright {
     text-align: center;
     font-size: var(--text-small);
@@ -143,7 +109,6 @@
   }
   
   .footer-top nav ul li a:focus-visible,
-  .footer-btm ul button:focus-visible,
   .copyright a:focus-visible,
   .footer-guide:focus-visible {
     outline: 2px solid var(--color-on-brand-hover);
@@ -159,9 +124,6 @@
     .footer-btm {
       background-color: var(--color-surface);
       padding-inline-end: 0;
-    }
-    .footer-btm ul {
-      display: none;
     }
 
     .copyright { 

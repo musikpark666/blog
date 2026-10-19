@@ -238,7 +238,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     const status = document.createElement('p');
     status.className = 'gallery-context-status';
     status.setAttribute('role', 'status');
-    status.textContent = '投稿一覧を読み込み中…';
+    status.textContent = '記事一覧を読み込み中…';
     listTarget.replaceChildren(status);
     try {
       const [images, compact] = await Promise.all([
@@ -258,7 +258,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
       listTarget.replaceChildren(list);
     } catch {
       if (request !== galleryRequest || !root.isConnected) return;
-      status.textContent = '投稿一覧を読み込めませんでした。';
+      status.textContent = '記事一覧を読み込めませんでした。';
       const link = document.createElement('a');
       link.href = selected.dataset.pageHref;
       link.textContent = 'ギャラリーで一覧を見る';
@@ -551,6 +551,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 
   .post-content :global(a) {
     color: var(--color-link);
+    text-decoration: none;
     text-underline-offset: 0.15em;
   }
   .post-content :global(a:visited) {
@@ -558,8 +559,10 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   }
   .post-content :global(a:hover) {
     color: var(--color-link-hover);
+    text-decoration: underline;
   }
   .post-content :global(a:focus-visible) {
+    text-decoration: underline;
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }

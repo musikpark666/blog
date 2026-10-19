@@ -29,7 +29,7 @@ const gallery = defineCollection({
 
 // Independent display groups for /m/; these are not parent galleries.
 const minorGroup = defineCollection({
-  loader: file('./src/data/minor-gallery-groups.yaml'),
+  loader: file('./src/content/minor-gallery-groups.yaml'),
   schema: z.object({
     title: z.string(),
     order: z.number().int().nonnegative(),

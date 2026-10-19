@@ -24,11 +24,11 @@ const previews = new Map(await Promise.all(galleries.map(async (gallery) => [gal
 groups.sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
 ---
 
-<BaseLayout title="マイナーギャラリー | musik.gallery" description="細かなテーマから投稿を探せるマイナーギャラリーの一覧です。">
+<BaseLayout title="マイナーギャラリー | musik.gallery" description="細かなテーマから記事を探せるマイナーギャラリーの一覧です。">
   <section class="minor-directory" aria-labelledby="minor-directory-title">
     <header class="directory-header">
       <h1 id="minor-directory-title" class="visually-hidden">マイナーギャラリー一覧</h1>
-      <p>各<span>マイナーギャラリー</span>では、細かなテーマ別に投稿をまとめて見ることができます。</p>
+      <p>各<span>マイナーギャラリー</span>では、細かなテーマ別に記事をまとめて見ることができます。</p>
     </header>
     <hr class="separator" />
     <div class="minor-groups">
@@ -42,7 +42,7 @@ groups.sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
                 <li>
                   <a class="minor-link" href={getGalleryHref(gallery)}>
                     <span class="minor-name">{gallery.data.title}</span>
-                    <small class="minor-count" aria-label={`${counts.get(gallery.id) ?? 0}件の投稿`}>{counts.get(gallery.id) ?? 0}</small>
+                    <small class="minor-count" aria-label={`${counts.get(gallery.id) ?? 0}件の記事`}>{counts.get(gallery.id) ?? 0}</small>
                     {previews.get(gallery.id) && <span class="minor-preview" aria-hidden="true">
                       <img data-preview-src={previews.get(gallery.id)} alt="" width="144" height="96" decoding="async" />
                     </span>}

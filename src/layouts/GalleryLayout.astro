@@ -22,7 +22,7 @@ const pageTitle = `${title} ギャラリー${getGalleryKind(gallery) === 'm' ? '
         <p>{description}</p>
       </div>
       {randomPosts.length > 0 && (
-        <section class="gallery-random-posts" aria-label="ランダムな投稿">
+        <section class="gallery-random-posts" aria-label="ランダムな記事">
           <ul role="list">
             {randomPosts.map((post) => (
               <li>

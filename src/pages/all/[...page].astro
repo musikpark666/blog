@@ -52,7 +52,7 @@ interface Props {
 const { posts, randomPosts, postCount, currentPage, totalPages, compactPage } = Astro.props;
 const compactPageHref = compactPage.currentPage !== currentPage
   ? getPostListPageHref('/all/', compactPage.currentPage) : undefined;
-const description = 'カテゴリーを問わず、このブログのすべての投稿を新しい順にまとめています。';
+const description = 'カテゴリーを問わず、このブログのすべての記事を新しい順にまとめています。';
 const pageTitle = currentPage === 1
   ? '全体 ギャラリー | musik.gallery'
   : `全体 ギャラリー - ${currentPage}ページ | musik.gallery`;
@@ -68,7 +68,7 @@ const pageTitle = currentPage === 1
         <p>{description}</p>
       </div>
       {randomPosts.length > 0 && (
-        <section class="gallery-random-posts" aria-label="ランダムな投稿">
+        <section class="gallery-random-posts" aria-label="ランダムな記事">
           <ul role="list">
             {randomPosts.map((post) => (
               <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>

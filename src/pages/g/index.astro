@@ -44,7 +44,7 @@ for (const post of posts) {
   <section class="gallery-list">
     <header class="page-header">
       <h1 class="visually-hidden">ギャラリー一覧</h1>
-      <p>各<span>ギャラリー</span>では、カテゴリー別に投稿をまとめて見ることができます。</p>
+      <p>各<span>ギャラリー</span>では、カテゴリー別に記事をまとめて見ることができます。</p>
     </header>
 
     <hr class="separator" />
@@ -69,13 +69,13 @@ for (const post of posts) {
               <div class="gallery-card-meta">
                 <h2>{gallery.data.title}</h2>
                 <span class="gallery-card-count">
-                  <span class="count-full">{postCount}件の投稿</span>
+                  <span class="count-full">{postCount}件の記事</span>
                   <span class="count-short">[{postCount}]</span>
                 </span>
               </div>
               <p class="gallery-card-description">{gallery.data.description}</p>
               <p class="gallery-card-latest">
-                最近: {stats?.latestPost.data.title ?? '投稿はまだありません'}
+                最近: {stats?.latestPost.data.title ?? '記事はまだありません'}
               </p>
             </div>
           </a>
