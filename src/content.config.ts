@@ -1,4 +1,4 @@
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 import { defineCollection, reference } from "astro:content";
 import { z } from "astro/zod";
 
@@ -27,6 +27,34 @@ const gallery = defineCollection({
   }),
 });
 
+// Independent display groups for /m/; these are not parent galleries.
+const minorGroup = defineCollection({
+  loader: file('./src/data/minor-gallery-groups.yaml'),
+  schema: z.object({
+    title: z.string(),
+    order: z.number().int().nonnegative(),
+  }),
+});
+
+const minorGallery = defineCollection({
+  loader: glob({
+    pattern: '*.{yaml,yml}',
+    base: './src/content/minor-gallery',
+    generateId: ({ entry }) => {
+      const id = entry.replace(/\.(yaml|yml)$/, '');
+      return z.string().regex(/^[a-z]+(?:-[a-z]+)*$/, 'Use lowercase English words separated by hyphens.').parse(id);
+    },
+  }),
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    yomi: z.string().optional(),
+    description: z.string(),
+    group: reference('minorGroup'),
+    thumbnail: image().optional(),
+    relatedSites: z.array(relatedSiteSchema).default([]),
+  }),
+});
+
 const post = defineCollection({
   loader: glob({ 
     pattern: '**/[^_]*.{md,mdx}',
@@ -37,10 +65,10 @@ const post = defineCollection({
     description: z.string(),
     image: image().optional(),
     categories: z.array(reference('gallery')).min(1),
-    mcategories: z.array(z.string()).optional(),
+    mcategories: z.array(reference('minorGallery')).default([]),
     pubDate: postDateSchema,
     updDate: postDateSchema.optional(),
   }),
 });
 
-export const collections = { post, gallery };
+export const collections = { post, gallery, minorGroup, minorGallery };

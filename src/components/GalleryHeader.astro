@@ -1,14 +1,15 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import { getGalleryHref, getGalleryKind, type GalleryEntry } from '../lib/gallery';
 
 type Props = (
-  | { gallery: CollectionEntry<'gallery'>; postCount: number; title?: never; href?: never }
+  | { gallery: GalleryEntry; postCount: number; title?: never; href?: never }
   | { gallery?: never; postCount?: number; title: string; href: string }
 );
 
 const { gallery, postCount, title: customTitle, href: customHref } = Astro.props;
 const title = gallery?.data.title ?? customTitle;
-const href = gallery ? `/g/${gallery.id}/` : customHref;
+const href = gallery ? getGalleryHref(gallery) : customHref;
+const isMinor = gallery && getGalleryKind(gallery) === 'm';
 const relatedSites = gallery?.data.relatedSites ?? [];
 ---
 
@@ -17,6 +18,7 @@ const relatedSites = gallery?.data.relatedSites ?? [];
     <a href={href}>
       <span class="gallery-title-name">{title}</span>
       <span class="gallery-title-kind">ギャラリー</span>
+      {isMinor && <span class="gallery-title-minor" aria-label="マイナー">ⓜ</span>}
     </a>
     {postCount !== undefined && <small>({postCount}件)</small>}
   </h1>
@@ -83,13 +85,14 @@ const relatedSites = gallery?.data.relatedSites ?? [];
   }
   .gallery-header  h1 a {
     display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    height: 1lh;
+    align-items: baseline;
     min-width: 0;
     color: var(--color-link);
     text-decoration: none;
     overflow: hidden;
+  }
+  .gallery-title-minor {
+    flex-shrink: 0;
   }
   .gallery-header h1 small {
     color: var(--color-muted);
@@ -167,6 +170,7 @@ const relatedSites = gallery?.data.relatedSites ?? [];
     display: none;
   }
   @container gallery-header (width < 30rem) {
+    .gallery-title-kind,
     .related-sites-suffix {
       display: none;
     }

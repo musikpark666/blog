@@ -1,10 +1,10 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import GalleryPostListBody from './GalleryPostListBody.astro';
-import type { GalleryPostPage } from '../lib/gallery';
+import type { GalleryEntry, GalleryPostPage } from '../lib/gallery';
 
 interface Props {
-  gallery?: CollectionEntry<'gallery'>;
+  gallery?: GalleryEntry;
   posts: CollectionEntry<'post'>[];
   currentPage?: number;
   totalPages?: number;

@@ -5,6 +5,14 @@ export const COMPACT_GALLERY_POSTS_PER_PAGE = 30;
 export const ALL_POSTS_PER_PAGE = 50;
 export const COMPACT_ALL_POSTS_PER_PAGE = 100;
 export type PostListView = 'images' | 'compact';
+export type GalleryEntry = CollectionEntry<'gallery'> | CollectionEntry<'minorGallery'>;
+export type GalleryKind = 'g' | 'm';
+
+export const getGalleryKind = (gallery: GalleryEntry): GalleryKind => gallery.collection === 'minorGallery' ? 'm' : 'g';
+export const getGalleryHref = (gallery: GalleryEntry) => `/${getGalleryKind(gallery)}/${gallery.id}/`;
+export const getGalleryContextKey = (gallery: GalleryEntry) => `${getGalleryKind(gallery)}:${gallery.id}`;
+export const getGalleryPostHref = (gallery: GalleryEntry, postId: string) =>
+  `/posts/${postId}/?${getGalleryKind(gallery)}=${encodeURIComponent(gallery.id)}`;
 
 export interface GalleryPostPage {
   pagePosts: BlogPost[];
@@ -32,7 +40,7 @@ export function getPostListPage(posts: BlogPost[], requestedPage: number, pageSi
 type BlogPost = CollectionEntry<'post'>;
 
 export interface GalleryPostContext {
-  gallery: CollectionEntry<'gallery'>;
+  gallery: GalleryEntry;
   pagePosts: BlogPost[];
   postCount: number;
   currentPage: number;
@@ -40,11 +48,11 @@ export interface GalleryPostContext {
   compactPage: GalleryPostPage;
 }
 
-export function groupPostsByGallery(posts: BlogPost[]) {
+export function groupPostsByGallery(posts: BlogPost[], kind: GalleryKind = 'g') {
   const postsByGallery = new Map<string, BlogPost[]>();
 
   for (const post of posts) {
-    for (const category of post.data.categories) {
+    for (const category of kind === 'm' ? post.data.mcategories : post.data.categories) {
       const galleryPosts = postsByGallery.get(category.id) ?? [];
       galleryPosts.push(post);
       postsByGallery.set(category.id, galleryPosts);
@@ -60,10 +68,12 @@ export function groupPostsByGallery(posts: BlogPost[]) {
 
 export function getPostGalleryContexts(
   post: BlogPost,
-  galleriesById: Map<string, CollectionEntry<'gallery'>>,
+  galleriesById: ReadonlyMap<string, GalleryEntry>,
   postsByGallery: Map<string, BlogPost[]>,
+  kind: GalleryKind = 'g',
 ): GalleryPostContext[] {
-  return post.data.categories.flatMap((category) => {
+  const categories = kind === 'm' ? post.data.mcategories : post.data.categories;
+  return categories.flatMap((category) => {
     const gallery = galleriesById.get(category.id);
     const galleryPosts = postsByGallery.get(category.id) ?? [];
     const postIndex = galleryPosts.findIndex((entry) => entry.id === post.id);
@@ -78,5 +88,37 @@ export function getPostGalleryContexts(
       postCount: galleryPosts.length,
       compactPage: getPostListPage(galleryPosts, compactCurrentPage, COMPACT_GALLERY_POSTS_PER_PAGE),
     }];
+  });
+}
+
+export interface GalleryPageProps extends GalleryPostPage {
+  gallery: GalleryEntry;
+  randomPosts: BlogPost[];
+  postCount: number;
+  compactPage: GalleryPostPage;
+}
+
+/** Both gallery types use the same page sizes, ordering, and route aliases. */
+export function createGalleryPaths(galleries: GalleryEntry[], posts: BlogPost[], kind: GalleryKind = 'g') {
+  const grouped = groupPostsByGallery(posts, kind);
+  return galleries.flatMap((gallery) => {
+    const galleryPosts = grouped.get(gallery.id) ?? [];
+    const candidates = [...galleryPosts];
+    const count = Math.min(4, candidates.length);
+    for (let index = 0; index < count; index++) {
+      const randomIndex = index + Math.floor(Math.random() * (candidates.length - index));
+      [candidates[index], candidates[randomIndex]] = [candidates[randomIndex], candidates[index]];
+    }
+    const totalPages = Math.max(1, Math.ceil(galleryPosts.length / GALLERY_POSTS_PER_PAGE));
+    return Array.from({ length: totalPages }, (_, index) => {
+      const page = index + 1;
+      const props: GalleryPageProps = {
+        gallery, ...getPostListPage(galleryPosts, page, GALLERY_POSTS_PER_PAGE),
+        compactPage: getPostListPage(galleryPosts, page, COMPACT_GALLERY_POSTS_PER_PAGE),
+        randomPosts: candidates.slice(0, count), postCount: galleryPosts.length,
+      };
+      return (page === 1 ? [undefined, '1'] : [String(page)])
+        .map((page) => ({ params: { category: gallery.id, page }, props }));
+    }).flat();
   });
 }

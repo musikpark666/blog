@@ -7,16 +7,22 @@ import { getPostGalleryContexts, groupPostsByGallery } from '../../lib/gallery';
 import type { GalleryPostContext } from '../../lib/gallery';
 
 export const getStaticPaths = (async () => {
-  const [posts, galleries] = await Promise.all([
+  const [posts, galleries, minors] = await Promise.all([
     getCollection('post'),
     getCollection('gallery'),
+    getCollection('minorGallery'),
   ]);
   const galleriesById = new Map(galleries.map((gallery) => [gallery.id, gallery]));
   const postsByGallery = groupPostsByGallery(posts);
+  const minorsById = new Map(minors.map((gallery) => [gallery.id, gallery]));
+  const postsByMinor = groupPostsByGallery(posts, 'm');
 
   return posts.map((post) => ({
     params: { id: post.id },
-    props: { post, galleryContexts: getPostGalleryContexts(post, galleriesById, postsByGallery) },
+    props: { post, galleryContexts: [
+      ...getPostGalleryContexts(post, galleriesById, postsByGallery),
+      ...getPostGalleryContexts(post, minorsById, postsByMinor, 'm'),
+    ] },
   }));
 }) satisfies GetStaticPaths;
 

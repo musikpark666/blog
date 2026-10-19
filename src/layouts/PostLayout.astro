@@ -7,7 +7,7 @@ import { collectPostImages } from '../lib/post-images';
 
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import type { GalleryPostContext } from '../lib/gallery';
+import { getGalleryContextKey, getGalleryHref, getGalleryKind, getPostListPageHref, type GalleryPostContext } from '../lib/gallery';
 
 interface Props {
   post: CollectionEntry<'post'>;
@@ -47,7 +47,9 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   <TableOfContents slot="page-controls" title={post.data.title} headings={tocHeadings} compact />
   <div
     data-post-gallery-context
-    data-gallery-id={defaultContext?.gallery.id}
+    data-gallery-id={defaultContext && getGalleryContextKey(defaultContext.gallery)}
+    data-default-gallery={defaultContext && getGalleryContextKey(defaultContext.gallery)}
+    data-post-id={post.id}
   >
     <div data-post-gallery-header>
       {defaultContext && (
@@ -57,6 +59,15 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     <header class="post-header">
       <h1 id="post-title">{post.data.title}</h1>
       <p class="post-description">{post.data.description}</p>
+      {galleryContexts.length > 0 && <nav class="post-categories" aria-label="所属ギャラリー">
+        <ul role="list">
+          {galleryContexts.map(({ gallery }) => (
+            <li>
+              <a href={getGalleryHref(gallery)}>#{gallery.data.title}{getGalleryKind(gallery) === 'm' && <span aria-label="マイナー">ⓜ</span>}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>}
       <p class="post-dates">
         <time datetime={pubDate.toISOString()}>{formattedPubDate}</time>
         {updDate && <span>（更新：<time datetime={updDate.toISOString()}>{formatPostDate(updDate)}</time>）</span>}
@@ -101,21 +112,13 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
       )}
     </div>
 
-    <!-- Prepare gallery variants only when this post belongs to multiple galleries. -->
+    <!-- Only headers and source URLs vary; load another context's list on demand. -->
     {galleryContexts.length > 1 && galleryContexts.map((context) => (
-      <template data-gallery-variant={context.gallery.id}>
+      <template data-gallery-variant={getGalleryContextKey(context.gallery)}
+        data-page-href={getPostListPageHref(getGalleryHref(context.gallery), context.currentPage)}
+        data-compact-href={getPostListPageHref(getGalleryHref(context.gallery), context.compactPage.currentPage)}>
         <div data-context-header>
           <GalleryHeader gallery={context.gallery} postCount={context.postCount} />
-        </div>
-        <div data-context-list>
-          <GalleryPostList
-            gallery={context.gallery}
-            posts={context.pagePosts}
-            currentPage={context.currentPage}
-            totalPages={context.totalPages}
-            currentPostId={post.id}
-            compactPage={context.compactPage}
-          />
         </div>
       </template>
     ))}
@@ -179,30 +182,94 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     }
   });
 
-  function selectPostGallery() {
+  let galleryRoot: HTMLElement | null = null;
+  let defaultHeader: Node[] = [];
+  let defaultList: Node[] = [];
+  let galleryRequest = 0;
+  const galleryLists = new Map<string, Promise<HTMLElement>>();
+
+  function loadGalleryList(href: string) {
+    let pending = galleryLists.get(href);
+    if (!pending) {
+      pending = (async () => {
+        const response = await fetch(href, { signal: AbortSignal.timeout(10_000) });
+        if (!response.ok) throw new Error(`Gallery request failed: ${response.status}`);
+        const parsed = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const source = parsed.querySelector<HTMLElement>('gallery-post-list');
+        if (!source) throw new Error('Gallery list not found');
+        const list = document.importNode(source, true);
+        list.removeAttribute('data-compact-page-href');
+        return list;
+      })();
+      galleryLists.set(href, pending);
+      pending.catch(() => galleryLists.delete(href));
+    }
+    return pending;
+  }
+
+  async function selectPostGallery() {
     const root = document.querySelector<HTMLElement>('[data-post-gallery-context]');
     if (!root) return;
-
+    const headerTarget = root.querySelector<HTMLElement>('[data-post-gallery-header]');
+    const listTarget = root.querySelector<HTMLElement>('[data-post-gallery-list]');
+    if (!headerTarget || !listTarget) return;
+    if (galleryRoot !== root) {
+      galleryRoot = root;
+      defaultHeader = Array.from(headerTarget.childNodes, (node) => node.cloneNode(true));
+      defaultList = Array.from(listTarget.childNodes, (node) => node.cloneNode(true));
+      galleryLists.clear();
+    }
     const templates = Array.from(root.querySelectorAll<HTMLTemplateElement>('template[data-gallery-variant]'));
-    const requestedGallery = new URLSearchParams(window.location.search).get('g');
-    const selected = templates.find((template) => template.dataset.galleryVariant === requestedGallery) ?? templates[0];
-    if (!selected || root.dataset.galleryId === selected.dataset.galleryVariant) return;
-
-    const fragment = selected.content.cloneNode(true) as DocumentFragment;
-    const header = fragment.querySelector('[data-context-header]');
-    const list = fragment.querySelector('[data-context-list]');
-    const headerTarget = root.querySelector('[data-post-gallery-header]');
-    const listTarget = root.querySelector('[data-post-gallery-list]');
-    if (!header || !list || !headerTarget || !listTarget) return;
-
-    headerTarget.replaceChildren(...header.childNodes);
-    listTarget.replaceChildren(...list.childNodes);
-    root.dataset.galleryId = selected.dataset.galleryVariant;
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.has('m') ? `m:${params.get('m')}` : `g:${params.get('g')}`;
+    const selected = templates.find((template) => template.dataset.galleryVariant === requested);
+    const key = selected?.dataset.galleryVariant ?? root.dataset.defaultGallery;
+    if (root.dataset.galleryId === key) return;
+    const request = ++galleryRequest;
+    root.dataset.galleryId = key;
+    if (key === root.dataset.defaultGallery || !selected) {
+      headerTarget.replaceChildren(...defaultHeader.map((node) => node.cloneNode(true)));
+      listTarget.replaceChildren(...defaultList.map((node) => node.cloneNode(true)));
+      return;
+    }
+    const header = selected.content.querySelector('[data-context-header]');
+    if (!header || !selected.dataset.pageHref || !selected.dataset.compactHref) return;
+    headerTarget.replaceChildren(...Array.from(header.childNodes, (node) => node.cloneNode(true)));
+    const status = document.createElement('p');
+    status.className = 'gallery-context-status';
+    status.setAttribute('role', 'status');
+    status.textContent = '投稿一覧を読み込み中…';
+    listTarget.replaceChildren(status);
+    try {
+      const [images, compact] = await Promise.all([
+        loadGalleryList(selected.dataset.pageHref), loadGalleryList(selected.dataset.compactHref),
+      ]);
+      if (request !== galleryRequest || !root.isConnected) return;
+      const list = images.cloneNode(true) as HTMLElement;
+      const compactPanel = compact.querySelector('[data-view="compact"]');
+      if (compactPanel) list.querySelector('[data-view="compact"]')?.replaceWith(compactPanel.cloneNode(true));
+      list.querySelectorAll<HTMLElement>('[data-post-id]').forEach((item) => {
+        const current = item.dataset.postId === root.dataset.postId;
+        item.classList.toggle('is-current', current);
+        const link = item.querySelector('a');
+        if (current) link?.setAttribute('aria-current', 'page');
+        else link?.removeAttribute('aria-current');
+      });
+      listTarget.replaceChildren(list);
+    } catch {
+      if (request !== galleryRequest || !root.isConnected) return;
+      status.textContent = '投稿一覧を読み込めませんでした。';
+      const link = document.createElement('a');
+      link.href = selected.dataset.pageHref;
+      link.textContent = 'ギャラリーで一覧を見る';
+      status.append(' ', link);
+    }
   }
 
   selectPostGallery();
   document.addEventListener('astro:page-load', selectPostGallery);
   window.addEventListener('popstate', selectPostGallery);
+  window.addEventListener('pageshow', selectPostGallery);
 
   function revealFootnotes(hash: string, scroll = false) {
     if (!hash || hash === '#') return;
@@ -290,6 +357,11 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 </style>
 
 <style>
+  [data-post-gallery-list] :global(.gallery-context-status) {
+    margin-block: 1rem;
+    color: var(--color-muted);
+    font-size: var(--text-ui);
+  }
   :global(html:has(#footnote-dialog:modal)) {
     overflow: hidden;
   }
@@ -441,6 +513,31 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     margin: 0;
     color: var(--color-muted);
     font-size: var(--text-small);
+  }
+  .post-categories ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    margin: 0.25em 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
+  }
+  .post-categories a {
+    color: var(--color-secondary);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .post-categories a:hover,
+  .post-categories a:focus-visible {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .post-categories a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 
   /* Post Content */

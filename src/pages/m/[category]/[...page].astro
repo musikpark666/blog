@@ -1,0 +1,14 @@
+---
+import GalleryLayout from '../../../layouts/GalleryLayout.astro';
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import { createGalleryPaths, getGalleryHref, type GalleryPageProps } from '../../../lib/gallery';
+export const getStaticPaths = (async () => {
+  const [galleries, posts] = await Promise.all([getCollection('minorGallery'), getCollection('post')]);
+  return createGalleryPaths(galleries, posts, 'm');
+}) satisfies GetStaticPaths;
+interface Props extends GalleryPageProps {}
+if (Astro.params.page === '1') return Astro.redirect(getGalleryHref(Astro.props.gallery));
+---
+
+<GalleryLayout {...Astro.props} />

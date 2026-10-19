@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
-import { getPostListPageHref, type PostListView } from '../lib/gallery';
+import { getEntries, type CollectionEntry } from 'astro:content';
+import { getGalleryHref, getGalleryPostHref, getPostListPageHref, type GalleryEntry, type PostListView } from '../lib/gallery';
 
 import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
 
 interface Props {
-  gallery?: CollectionEntry<'gallery'>;
+  gallery?: GalleryEntry;
   posts: CollectionEntry<'post'>[];
   currentPage?: number;
   totalPages?: number;
@@ -23,6 +23,12 @@ const {
   view = 'images',
 } = Astro.props;
 
+// Resolve only the categories used on this page, rather than loading the whole directory.
+const minorReferences = [...new Map(posts.flatMap((post) => post.data.mcategories)
+  .map((category) => [category.id, category])).values()];
+const minorTitles = new Map((await getEntries(minorReferences))
+  .map((entry) => [entry.id, entry.data.title]));
+
 const postDateFormatter = new Intl.DateTimeFormat('ja-JP', 
   {
     year: 'numeric',
@@ -32,7 +38,7 @@ const postDateFormatter = new Intl.DateTimeFormat('ja-JP',
   });
 const formatPostDate = (date: Date) => postDateFormatter.format(date).replaceAll('/', '.');
 
-const galleryHref = gallery ? `/g/${gallery.id}/` : '/all/';
+const galleryHref = gallery ? getGalleryHref(gallery) : '/all/';
 const getGalleryPageHref = (page: number) => getPostListPageHref(galleryHref, page);
 const pageGroups = [5, 7, 10].map((groupSize) => {
   const start = Math.floor((currentPage - 1) / groupSize) * groupSize + 1;
@@ -54,13 +60,13 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
   <div class="post-list">
     {posts.map((post) => {
       const postHref = gallery
-        ? `/posts/${post.id}/?g=${encodeURIComponent(gallery.id)}`
+        ? getGalleryPostHref(gallery, post.id)
         : `/posts/${post.id}/`;
       const postImage = post.data.image ?? missingPostImage;
       const isCurrentPost = post.id === currentPostId;
 
       return (
-        <article class:list={['post-list-item', {'is-current': isCurrentPost}]}>
+        <article data-post-id={post.id} class:list={['post-list-item', {'is-current': isCurrentPost}]}>
           <a href={postHref} aria-current={isCurrentPost ? 'page' : undefined}>
             {view === 'images' && <span class="post-list-thumbnail" aria-hidden="true">
               <Image src={postImage} alt="" loading="lazy" decoding="async" width="96" height="72" />
@@ -72,7 +78,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
               </div>
               <div class="post-list-details">
                 {view === 'images' && <div class="post-list-tags">
-                  {post.data.mcategories?.map((mcategory) => <span data-post-tag>{mcategory}</span>)}
+                  {post.data.mcategories.map((mcategory) => <span data-post-tag>{minorTitles.get(mcategory.id) ?? mcategory.id}</span>)}
                 </div>}
                 <time datetime={post.data.pubDate.toISOString()}>{formatPostDate(post.data.pubDate)}</time>
               </div>
@@ -221,7 +227,7 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
 
   .post-list-details {
     display: flex;
-    flex-wrap: wrap;
+    min-width: 0;
     align-items: center;
     justify-content: space-between;
     margin-top: auto;
@@ -231,14 +237,21 @@ const pageGroups = [5, 7, 10].map((groupSize) => {
   }
   .post-list-tags {
     display: flex;
+    flex: 1;
     min-width: 0;
     gap: 4px;
     overflow: hidden;
   }
   .post-list-tags span {
+    flex-shrink: 0;
+    white-space: nowrap;
     padding: 1px 5px;
     background-color: var(--color-selected);
     color: var(--color-link);
+  }
+  .post-list-details time {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   
   /* Compact view keeps titles and dates in a plain, single-line list. */

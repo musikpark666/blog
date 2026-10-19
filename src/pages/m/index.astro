@@ -1,8 +1,97 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+import { getGalleryHref } from '../../lib/gallery';
+const [groups, galleries, posts] = await Promise.all([
+  getCollection('minorGroup'), getCollection('minorGallery'), getCollection('post'),
+]);
+const counts = new Map<string, number>();
+for (const post of posts) for (const category of post.data.mcategories) {
+  counts.set(category.id, (counts.get(category.id) ?? 0) + 1);
+}
+const grouped = new Map(groups.map((group) => [group.id, [] as typeof galleries]));
+for (const gallery of galleries) {
+  const group = grouped.get(gallery.data.group.id);
+  if (!group) throw new Error(`Unknown minor-gallery group: ${gallery.data.group.id}`);
+  group.push(gallery);
+}
+for (const entries of grouped.values()) entries.sort((a, b) =>
+  (a.data.yomi || a.data.title).localeCompare(b.data.yomi || b.data.title, 'ja') || a.id.localeCompare(b.id));
+const previews = new Map(await Promise.all(galleries.map(async (gallery) => [gallery.id,
+  gallery.data.thumbnail ? (await getImage({ src: gallery.data.thumbnail, width: 144, height: 96, fit: 'cover', format: 'webp' })).src : undefined,
+] as const)));
+groups.sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
 ---
 
-<BaseLayout title="マイナー | musik.gallery">
-  <h1>マイナー</h1>
-  <p>here is minor categories page.</p>
+<BaseLayout title="マイナーギャラリー | musik.gallery" description="細かなテーマから投稿を探せるマイナーギャラリーの一覧です。">
+  <section class="minor-directory" aria-labelledby="minor-directory-title">
+    <header class="directory-header">
+      <h1 id="minor-directory-title" class="visually-hidden">マイナーギャラリー一覧</h1>
+      <p>各<span>マイナーギャラリー</span>では、細かなテーマ別に投稿をまとめて見ることができます。</p>
+    </header>
+    <hr class="separator" />
+    <div class="minor-groups">
+      {groups.map((group) => {
+        const entries = grouped.get(group.id)!;
+        return (
+          <section class="minor-group" aria-labelledby={`minor-group-${group.id}`}>
+            <h2 id={`minor-group-${group.id}`}>{group.data.title}<small>({entries.length})</small></h2>
+            <ul role="list">
+              {entries.map((gallery) => (
+                <li>
+                  <a class="minor-link" href={getGalleryHref(gallery)}>
+                    <span class="minor-name">{gallery.data.title}</span>
+                    <small class="minor-count" aria-label={`${counts.get(gallery.id) ?? 0}件の投稿`}>{counts.get(gallery.id) ?? 0}</small>
+                    {previews.get(gallery.id) && <span class="minor-preview" aria-hidden="true">
+                      <img data-preview-src={previews.get(gallery.id)} alt="" width="144" height="96" decoding="async" />
+                    </span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  </section>
 </BaseLayout>
+
+<script>
+  function loadPreview(event: Event) {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest('.minor-link');
+    const image = link?.querySelector<HTMLImageElement>('img[data-preview-src]');
+    if (image?.dataset.previewSrc) {
+      image.src = image.dataset.previewSrc;
+      delete image.dataset.previewSrc;
+    }
+  }
+  document.addEventListener('pointerover', (event) => {
+    if (event.pointerType === 'mouse') loadPreview(event);
+  });
+  document.addEventListener('focusin', loadPreview);
+</script>
+
+<style>
+  .minor-directory { container: minor-directory / inline-size; display: grid; gap: 4px; }
+  .directory-header { min-width: 0; }
+  .directory-header p { margin: 0; color: var(--color-text-soft); font-size: var(--text-ui); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .directory-header span { color: var(--color-link); }
+  .separator { border: none; height: 2px; background-color: var(--color-brand); margin: 0 0 5px; }
+  .minor-groups { display: grid; grid-template-columns: minmax(0, 1fr); border-inline-start: 1px solid var(--color-border); }
+  .minor-group { min-width: 0; border-inline-end: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+  .minor-group h2 { display: flex; align-items: baseline; gap: 0.4em; margin: 0; padding: 8px 12px; border-top: 1px solid var(--color-accent-border); border-bottom: 1px solid var(--color-border); background: var(--color-surface-muted); color: var(--color-link); font-size: var(--text-ui); font-weight: 600; }
+  .minor-group h2 small { color: var(--color-muted); font-size: var(--text-small); font-weight: 400; }
+  .minor-group ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); align-content: start; column-gap: 16px; margin: 0; padding: 10px 12px 14px; list-style: none; }
+  .minor-link { position: relative; display: flex; align-items: baseline; gap: 8px; width: fit-content; max-width: 100%; padding-block: 4px; color: var(--color-secondary); font-size: var(--text-ui); line-height: var(--leading-ui); text-decoration: none; }
+  .minor-name { overflow-wrap: anywhere; }
+  .minor-count { color: var(--color-muted); font-size: var(--text-small); font-variant-numeric: tabular-nums; }
+  .minor-link:hover, .minor-link:focus-visible { color: var(--color-link); text-decoration: underline; text-underline-offset: 3px; }
+  .minor-link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .minor-preview { display: none; position: absolute; left: 0; top: calc(100% + 3px); z-index: 20; padding: 4px; border: 1px solid var(--color-border); border-radius: 2px; background: var(--color-surface); box-shadow: 0 3px 12px var(--color-shadow); pointer-events: none; }
+  .minor-preview img { display: block; width: 144px; height: 96px; object-fit: cover; }
+  .minor-link:focus-visible .minor-preview { display: block; }
+  @media (hover: hover) { .minor-link:hover .minor-preview { display: block; } }
+  @container minor-directory (min-width: 560px) { .minor-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

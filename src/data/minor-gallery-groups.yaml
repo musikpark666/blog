@@ -1,0 +1,13 @@
+# Display order and headings for the minor-gallery directory; independent of /g/.
+- id: computing
+  title: デジタル・IT
+  order: 10
+- id: creative-work
+  title: 創作・制作
+  order: 20
+- id: culture
+  title: 文化・学び
+  order: 30
+- id: daily-life
+  title: 日常・記録
+  order: 40
