@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Social from './Social.astro';
+import QuoteWidget from './QuoteWidget.astro';
 import profileImage from '../assets/imgs/profile cat foil.avif';
 import missingPostImage from '../assets/imgs/missing-image-mustbechange.avif';
 
@@ -140,14 +141,7 @@ const galleryPages = Array.from(
   </section>
 </sidebar-pager>
 
-<section class="sidebar-item">
-  <div class="sidebar-item-header">
-    <h2>名言</h2>
-  </div>
-  <div class="sidebar-item-">
-    blah blah...
-  </div>
-</section>
+<QuoteWidget />
 
 <!-- <section class="sidebar-item">
   <div class="sidebar-item-header">
@@ -274,7 +268,7 @@ const galleryPages = Array.from(
   .sidebar-item-header {
     display: flex;
     align-items: center;
-    padding-bottom: 4px;
+    padding-bottom: 8px;
     padding-left: 2px;
     border-bottom: 1px dashed #aaa;
   }
@@ -317,35 +311,6 @@ const galleryPages = Array.from(
   }
   .sidebar-pagination[hidden] {
     display: none;
-  }
-  .sidebar-pagination-buttons {
-    display: flex;
-  }
-  .sidebar-pagination button {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: 1px solid var(--dc-color-2);
-    background-color: var(--dc-color-3);
-    color: #fff;
-    cursor: pointer;
-  }
-  .sidebar-pagination button + button {
-    border-left: 0;
-  }
-  .sidebar-pagination button:hover:not(:disabled) {
-    background-color: var(--dc-color-1);
-  }
-  .sidebar-pagination button:focus-visible {
-    position: relative;
-    outline: 2px solid var(--dc-color-2);
-    outline-offset: 2px;
-  }
-  .sidebar-pagination button:disabled {
-    opacity: 0.45;
-    cursor: default;
   }
   .sidebar-page {
     padding-top: 10px;

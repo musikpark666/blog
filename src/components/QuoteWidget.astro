@@ -1,0 +1,285 @@
+---
+import source from '../content/quotes.yaml?raw';
+import { createQuoteData } from '../lib/quotes.mjs';
+
+const { quotes, version } = createQuoteData(source);
+const quotesUrl = `${import.meta.env.BASE_URL}quotes-data/${version}.json`;
+const interval = 20_000;
+---
+
+{quotes.length > 0 && (
+  <random-quote data-url={quotesUrl} data-interval={interval}>
+    <section aria-label="名言">
+      <div class="quote-header">
+        <h2>名言</h2>
+        <div class="quote-controls" data-quote-controls hidden>
+          <button class="quote-playback" type="button" data-quote-pause aria-label="名言の自動切り替えを停止" title="自動切り替えを停止" aria-pressed="false">Ⅱ</button>
+          <div class="sidebar-pagination-buttons">
+            <button type="button" data-quote-prev aria-label="前の名言" title="前の名言" disabled>
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M8 1 2 7l6 6Z" fill="currentColor" /></svg>
+            </button>
+            <button type="button" data-quote-next aria-label="次の名言" title="次の名言">
+              <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="m2 1 6 6-6 6Z" fill="currentColor" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="quote-body">
+        <blockquote data-quote-text>読み込み中…</blockquote>
+        <p class="quote-description" data-quote-description hidden></p>
+        <div class="quote-meta">
+          <p class="quote-speaker" data-quote-speaker hidden></p>
+          <p class="quote-source" data-quote-source hidden></p>
+        </div>
+      </div>
+    </section>
+  </random-quote>
+)}
+
+<script>
+  interface PublicQuote {
+    text: string;
+    speaker?: string;
+    description?: string;
+    source?: { title?: string; location?: string; url?: string };
+  }
+
+  function createQuoteNavigator(count: number, random = Math.random) {
+    let order: number[] = [];
+    const history: number[] = [];
+    let cursor = -1;
+    return {
+      hasPrevious: () => cursor > 0,
+      previous: () => history[cursor = Math.max(0, cursor - 1)] ?? -1,
+      next() {
+        if (count < 1) return -1;
+        if (cursor + 1 < history.length) return history[++cursor];
+        if (!order.length) {
+          // O(n) once per cycle; navigating an existing sequence needs no shuffle.
+          order = Array.from({ length: count }, (_, index) => index);
+          for (let index = count - 1; index > 0; index--) {
+            const other = Math.floor(random() * (index + 1));
+            [order[index], order[other]] = [order[other], order[index]];
+          }
+          if (count > 1 && order[count - 1] === history[cursor]) {
+            const other = Math.floor(random() * (count - 1));
+            [order[other], order[count - 1]] = [order[count - 1], order[other]];
+          }
+        }
+        history.push(order.pop()!);
+        cursor++;
+        // Keep recent history bounded, trimming only once per cycle.
+        if (history.length > count * 2) {
+          history.splice(0, count);
+          cursor -= count;
+        }
+        return history[cursor];
+      },
+    };
+  }
+
+  // Share an in-flight request among widgets; HTTP caching covers full page navigation.
+  const requests = new Map<string, Promise<PublicQuote[]>>();
+  function loadQuotes(url: string) {
+    let request = requests.get(url);
+    if (!request) {
+      request = fetch(url, { signal: AbortSignal.timeout(10_000) }).then(async (response) => {
+        if (!response.ok) throw new Error(`Quotes: HTTP ${response.status}`);
+        return await response.json() as PublicQuote[];
+      }).catch((error) => {
+        requests.delete(url);
+        throw error;
+      });
+      requests.set(url, request);
+    }
+    return request;
+  }
+
+  class RandomQuote extends HTMLElement {
+    private controller?: AbortController;
+    private observer?: IntersectionObserver;
+    private timer?: ReturnType<typeof setTimeout>;
+    private visible = false;
+    private hovered = false;
+    private paused = false;
+    private loading = false;
+    private quotes?: PublicQuote[];
+    private navigation?: ReturnType<typeof createQuoteNavigator>;
+
+    connectedCallback() {
+      this.controller?.abort();
+      this.hovered = this.matches(':hover');
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      this.observer?.disconnect();
+      this.observer = new IntersectionObserver(([entry]) => {
+        this.visible = entry.isIntersecting;
+        this.update();
+      });
+      this.observer.observe(this);
+      document.addEventListener('visibilitychange', () => this.update(), { signal });
+      this.addEventListener('mouseenter', () => { this.hovered = true; this.update(); }, { signal });
+      this.addEventListener('mouseleave', () => { this.hovered = false; this.update(); }, { signal });
+      this.addEventListener('focusin', () => this.update(), { signal });
+      this.addEventListener('focusout', () => queueMicrotask(() => this.update()), { signal });
+      this.querySelector('[data-quote-prev]')?.addEventListener('click', () => {
+        this.showQuote(this.navigation!.previous());
+        this.update();
+      }, { signal });
+      this.querySelector('[data-quote-next]')?.addEventListener('click', () => {
+        this.showQuote(this.navigation!.next());
+        this.update();
+      }, { signal });
+      this.querySelector('[data-quote-pause]')?.addEventListener('click', () => {
+        this.paused = !this.paused;
+        const button = this.querySelector<HTMLButtonElement>('[data-quote-pause]')!;
+        const label = this.paused ? '名言の自動切り替えを再開' : '名言の自動切り替えを停止';
+        button.textContent = this.paused ? '▶' : 'Ⅱ';
+        button.setAttribute('aria-pressed', String(this.paused));
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        this.update();
+      }, { signal });
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      this.observer?.disconnect();
+      clearTimeout(this.timer);
+      this.visible = false;
+    }
+
+    private update() {
+      clearTimeout(this.timer);
+      if (!this.isConnected || !this.visible || document.hidden) return;
+      if (!this.quotes) {
+        if (!this.loading) void this.load();
+        return;
+      }
+      if (this.quotes.length < 2 || this.paused || this.hovered || this.contains(document.activeElement)) return;
+      this.timer = setTimeout(() => {
+        this.showQuote(this.navigation!.next());
+        this.update();
+      }, Number(this.dataset.interval) || 20_000);
+    }
+
+    private async load() {
+      this.loading = true;
+      try {
+        this.quotes = await loadQuotes(this.dataset.url!);
+        if (!this.quotes.length) { this.hidden = true; return; }
+        this.navigation = createQuoteNavigator(this.quotes.length);
+        this.showQuote(this.navigation.next());
+        this.querySelector<HTMLElement>('[data-quote-controls]')!.hidden = this.quotes.length < 2;
+        this.update();
+      } catch (error) {
+        console.error('Quote loading failed:', error);
+        if (this.isConnected) this.querySelector('[data-quote-text]')!.textContent = '名言を読み込めませんでした。';
+      } finally {
+        this.loading = false;
+      }
+    }
+
+    private showQuote(index: number) {
+      const quote = this.quotes![index];
+      this.querySelector<HTMLButtonElement>('[data-quote-prev]')!.disabled = !this.navigation!.hasPrevious();
+      const setText = (selector: string, value?: string) => {
+        const element = this.querySelector<HTMLElement>(selector)!;
+        element.textContent = value || '';
+        element.hidden = !value;
+      };
+      setText('[data-quote-text]', quote.text);
+      setText('[data-quote-speaker]', quote.speaker ? `— ${quote.speaker}` : undefined);
+      setText('[data-quote-description]', quote.description);
+      const source = this.querySelector<HTMLElement>('[data-quote-source]')!;
+      source.replaceChildren();
+      source.hidden = !quote.source;
+      if (quote.source) {
+        const { title, location, url } = quote.source;
+        if (title && url) {
+          const link = document.createElement('a');
+          link.textContent = title;
+          link.href = url;
+          if (new URL(url).origin !== window.location.origin) {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            const announcement = document.createElement('span');
+            announcement.className = 'visually-hidden';
+            announcement.textContent = '（新しいタブで開く）';
+            link.append(announcement);
+          }
+          source.append(link);
+        } else if (title) source.append(title);
+        if (location) source.append(`${title ? ' · ' : ''}${location}`);
+      }
+    }
+  }
+
+  if (!customElements.get('random-quote')) customElements.define('random-quote', RandomQuote);
+</script>
+
+<style>
+  random-quote {
+    display: block;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    font-size: var(--text-ui);
+    line-height: var(--leading-body);
+    overflow-wrap: anywhere;
+  }
+  random-quote[hidden], [hidden] { display: none; }
+  .quote-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 22px;
+    padding: 0 0 8px 2px;
+    border-bottom: 1px dashed #aaa;
+  }
+  h2 { margin: 0; font-size: var(--text-list-title); line-height: var(--leading-heading); color: #333; }
+  .quote-controls { display: flex; align-items: center; gap: 6px; }
+  .quote-controls[hidden] { display: none; }
+  .quote-playback {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid #d5dbea;
+    background: #f7f8fb;
+    color: var(--dc-color-2);
+    font: inherit;
+    cursor: pointer;
+  }
+  .quote-playback:hover { background: #eef0f7; }
+  .quote-playback:focus-visible { outline: 2px solid var(--dc-color-2); outline-offset: 2px; }
+  .quote-body { padding-top: 10px; }
+  blockquote {
+    margin: 0;
+    font-family: 'Yu Mincho', 'Hiragino Mincho ProN', 'Noto Serif JP', 'Noto Serif KR', Batang, Georgia, serif;
+    white-space: pre-line;
+  }
+  .quote-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 8px;
+    font-size: var(--text-small);
+    line-height: 1.4;
+    text-align: right;
+  }
+  .quote-meta:not(:has(p:not([hidden]))) { display: none; }
+  p { margin: 0; white-space: pre-line; }
+  .quote-speaker, .quote-source { color: #475467; }
+  .quote-description {
+    margin-top: 4px;
+    color: #667085;
+    font-size: var(--text-small);
+    line-height: var(--leading-ui);
+    text-align: left;
+  }
+  .quote-source :global(a) { color: var(--dc-color-2); text-decoration: none; }
+  .quote-source :global(a:hover) { color: var(--dc-color-1); }
+  .quote-source :global(a:focus-visible) { outline: 2px solid var(--dc-color-2); outline-offset: 2px; }
+</style>

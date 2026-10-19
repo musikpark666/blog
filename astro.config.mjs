@@ -18,6 +18,12 @@ export default defineConfig({
   site: 'https://musik.gallery',
   output: 'static',
   trailingSlash: 'always',
+  vite: {
+    build: {
+      // Cache the shared quote widget script instead of repeating it in every page.
+      assetsInlineLimit: (filePath) => filePath.includes('QuoteWidget.astro') && filePath.endsWith('.js') ? false : undefined,
+    },
+  },
   markdown: {
     processor: unified({
       remarkPlugins: [

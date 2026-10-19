@@ -62,6 +62,37 @@ samp {
   font-family: var(--font-code);
 }
 
+/* Shared arrow controls for every sidebar widget. */
+.sidebar-pagination-buttons {
+  display: flex;
+}
+.sidebar-pagination-buttons button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--dc-color-2);
+  background-color: var(--dc-color-3);
+  color: #fff;
+  cursor: pointer;
+}
+.sidebar-pagination-buttons button + button {
+  border-left: 0;
+}
+.sidebar-pagination-buttons button:hover:not(:disabled) {
+  background-color: var(--dc-color-1);
+}
+.sidebar-pagination-buttons button:focus-visible {
+  position: relative;
+  outline: 2px solid var(--dc-color-2);
+  outline-offset: 2px;
+}
+.sidebar-pagination-buttons button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
