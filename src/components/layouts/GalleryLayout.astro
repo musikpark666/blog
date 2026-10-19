@@ -13,6 +13,7 @@ const pageTitle = `${title} ギャラリー${getGalleryKind(gallery) === 'm' ? '
 ---
 
 <BaseLayout title={pageTitle} description={description}>
+  <span hidden data-visited-gallery data-kind={getGalleryKind(gallery)} data-id={gallery.id} data-title={title}></span>
   <GalleryHeader gallery={gallery} postCount={postCount} />
 
   <div class="gallery-intro">

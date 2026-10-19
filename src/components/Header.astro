@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Navigation from '../components/Navigation.astro';
+import RecentGalleries from './RecentGalleries.astro';
 import TitleSVG from '../../public/brand-title.svg';
 import brandLogo from '../assets/imgs/brand-logo-foiled.png';
 import { themes } from '../lib/themes';
@@ -41,7 +42,6 @@ import { themes } from '../lib/themes';
           </button>
         </form>
       </search>
-      <button class="header-search-resentpage">最近の訪問</button>
     </div>
     <ul class="header-menu">
       <li>
@@ -54,6 +54,7 @@ import { themes } from '../lib/themes';
     </ul>
   </div>
   <Navigation />
+  <RecentGalleries />
 </header>
 
 <div id="site-menu" popover aria-labelledby="site-menu-title">
@@ -74,6 +75,7 @@ import { themes } from '../lib/themes';
     <a href="/about/">このブログについて <span aria-hidden="true">↗</span></a>
     <button type="button" data-open-site-guide aria-haspopup="dialog" aria-controls="site-guide">サイトのご案内 <span aria-hidden="true">↗</span></button>
     <a href="/all/">すべての記事 <span aria-hidden="true">↗</span></a>
+    <button type="button" data-show-recent-galleries aria-controls="recent-galleries">最近の訪問を表示 <span aria-hidden="true">↗</span></button>
   </nav>
   <section class="menu-planned" aria-labelledby="menu-planned-title">
     <h3 id="menu-planned-title">これから</h3>
@@ -184,30 +186,6 @@ import { themes } from '../lib/themes';
     flex-shrink: 0;
   }
 
-  .header-search-resentpage {
-    display: flex;
-    align-items: center;
-    padding: 0 6px !important;
-    height: 100%;
-    color: var(--color-muted);
-    flex-shrink: 0;
-    font-weight: 700;
-    font-size: var(--text-small);
-    line-height: var(--leading-ui);
-    white-space: nowrap;
-    position: relative;
-  }
-  .header-search-resentpage::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 1.25rem;
-    background-color: var(--color-border);
-  }
-
   /* Header Menu */
   .header-menu {
     display: none;
@@ -295,8 +273,7 @@ import { themes } from '../lib/themes';
       background-color: var(--color-brand);
     }
 
-    .header-search-menu,
-    .header-search-resentpage {
+    .header-search-menu {
       display: none;
     }
 

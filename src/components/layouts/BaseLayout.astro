@@ -37,6 +37,10 @@ const {
       } catch {
         document.documentElement.dataset.postListView = 'images';
       }
+      try {
+        document.documentElement.dataset.recentGalleriesHidden =
+          String(localStorage.getItem('musik.recent-galleries-hidden') === 'true');
+      } catch { /* Show recent galleries by default when storage is unavailable. */ }
     </script>
     <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png?v=20261014-2" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg?v=20261014-2" />
