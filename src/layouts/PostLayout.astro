@@ -239,7 +239,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.4rem 1rem;
+    gap: 0.4rem 0.75rem;
     padding: 7px;
     border-top: 2px solid var(--dc-color-2);
     border-bottom: 1px solid #d5dbea;
@@ -263,6 +263,14 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     color: var(--dc-color-2);
     font: inherit;
     cursor: pointer;
+  }
+  .post-attachments-header h2::after {
+    content: '';
+    display: inline-block;
+    height: 0.85em;
+    margin-inline-start: 0.75rem;
+    border-inline-start: 1px solid #c3cad8;
+    vertical-align: -0.05em;
   }
   .post-attachments-header button:hover { text-decoration: underline; }
   .post-attachments-header button:focus-visible {
