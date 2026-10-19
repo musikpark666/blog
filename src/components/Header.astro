@@ -308,7 +308,7 @@ import { themes } from '../lib/themes';
       flex-wrap: wrap;
       justify-content: flex-end;
       min-width: 0;
-      margin: 0 4px;
+      margin: 0 12px 0 4px;
       padding: 0;
       gap: 8px;
       color: var(--color-muted);
@@ -381,6 +381,6 @@ import { themes } from '../lib/themes';
   .menu-planned li { display: flex; justify-content: space-between; gap: 8px; padding-block: 4px; color: var(--color-muted); }
   .menu-planned small { font-size: var(--text-small); }
   @media (min-width: 768px) {
-    #site-menu { top: 64px; right: max(12px, calc((100vw - var(--layout-max-width)) / 2 + 4px)); }
+    #site-menu { top: 64px; right: max(12px, calc((100% - var(--layout-max-width)) / 2 + 12px)); }
   }
 </style>

@@ -120,6 +120,13 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
       </template>
     ))}
   </div>
+  <dialog id="footnote-dialog" aria-labelledby="footnote-dialog-title">
+    <h2 id="footnote-dialog-title" class="visually-hidden">参考</h2>
+    <div class="post-content footnote-dialog-body" tabindex="-1" autofocus></div>
+    <form method="dialog" class="footnote-dialog-footer">
+      <button type="submit">閉じる</button>
+    </form>
+  </dialog>
 </BaseLayout>
 
 <script>
@@ -198,6 +205,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
   window.addEventListener('popstate', selectPostGallery);
 
   function revealFootnotes(hash: string, scroll = false) {
+    if (!hash || hash === '#') return;
     let id: string;
     try {
       id = decodeURIComponent(hash.slice(1));
@@ -211,13 +219,66 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     if (scroll) target!.scrollIntoView();
   }
 
-  // Open before native anchor navigation, including repeated clicks on the same hash.
+  let footnoteOpener: HTMLAnchorElement | null = null;
+  let backdropPointerDown = false;
+
+  function outsideDialog(event: MouseEvent, dialog: HTMLDialogElement) {
+    const rect = dialog.getBoundingClientRect();
+    return event.clientX < rect.left || event.clientX > rect.right ||
+      event.clientY < rect.top || event.clientY > rect.bottom;
+  }
+
+  document.addEventListener('pointerdown', (event) => {
+    const dialog = event.target instanceof HTMLDialogElement && event.target.id === 'footnote-dialog'
+      ? event.target : null;
+    backdropPointerDown = !!dialog?.open && event.target === dialog && outsideDialog(event, dialog);
+  });
+
+  // Keep anchor URLs as a fallback and for modified clicks / direct links.
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element) || event.button !== 0 ||
       event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!link && !(event.target instanceof HTMLDialogElement && event.target.id === 'footnote-dialog')) return;
+    const dialog = document.querySelector<HTMLDialogElement>('#footnote-dialog');
+    if (dialog?.open && event.target === dialog && backdropPointerDown && outsideDialog(event, dialog)) {
+      dialog.close();
+      return;
+    }
+    if (link?.hasAttribute('data-footnote-ref') && dialog) {
+      let id: string;
+      try { id = decodeURIComponent(link.hash.slice(1)); }
+      catch { return; }
+      const item = document.getElementById(id);
+      const content = item?.closest('.footnotes') && item.querySelector<HTMLElement>('.footnote-content');
+      const body = dialog.querySelector<HTMLElement>('.footnote-dialog-body');
+      if (content && body) {
+        event.preventDefault();
+        const copy = content.cloneNode(true) as HTMLElement;
+        // The original reference list remains in the page; never duplicate its IDs.
+        copy.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        body.replaceChildren(...copy.childNodes);
+        dialog.querySelector('#footnote-dialog-title')!.textContent = `参考 ${link.textContent?.trim() ?? ''}`;
+        if (!dialog.open) {
+          footnoteOpener = link;
+          dialog.showModal();
+        }
+        body.scrollTop = 0;
+        body.focus({ preventScroll: true });
+        return;
+      }
+    }
+    // Other same-page links inside a note should navigate normally after closing.
+    if (link && dialog?.contains(link)) dialog.close();
     if (link) revealFootnotes(link.hash);
   });
+  document.addEventListener('close', (event) => {
+    if (!(event.target instanceof HTMLDialogElement) || event.target.id !== 'footnote-dialog') return;
+    event.target.querySelector('.footnote-dialog-body')?.replaceChildren();
+    if (footnoteOpener?.isConnected) footnoteOpener.focus({ preventScroll: true });
+    footnoteOpener = null;
+    backdropPointerDown = false;
+  }, true);
   const revealLinkedFootnote = () => revealFootnotes(window.location.hash, true);
   revealLinkedFootnote();
   window.addEventListener('hashchange', revealLinkedFootnote);
@@ -229,6 +290,59 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
 </style>
 
 <style>
+  :global(html:has(#footnote-dialog:modal)) {
+    overflow: hidden;
+  }
+  #footnote-dialog {
+    --footnote-dialog-top: clamp(24px, 10dvh, 96px);
+    position: fixed;
+    width: min(44rem, calc(100% - 24px));
+    max-width: none;
+    max-height: calc(100dvh - var(--footnote-dialog-top) - 24px);
+    margin: var(--footnote-dialog-top) auto auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-accent-border);
+    border-radius: 3px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 12px 40px var(--color-shadow);
+  }
+  #footnote-dialog[open] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  #footnote-dialog::backdrop { background: var(--color-dialog-backdrop); }
+  .post-content.footnote-dialog-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    font-size: var(--text-ui);
+  }
+  .footnote-dialog-body:focus { outline: none; }
+  .footnote-dialog-body > :global(:first-child) { margin-block-start: 0; }
+  .footnote-dialog-body > :global(:last-child) { margin-block-end: 0; }
+  .footnote-dialog-footer { margin: 0; border-top: 1px solid var(--color-border); }
+  .footnote-dialog-footer button {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.625rem 1rem;
+    border: 0;
+    background: var(--color-surface-muted);
+    color: var(--color-link);
+    font: inherit;
+    font-size: var(--text-ui);
+    cursor: pointer;
+  }
+  .footnote-dialog-footer button:hover { background: var(--color-hover); }
+  .footnote-dialog-footer button:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -4px;
+  }
+
   .post-attachments {
     margin-block: 1.5rem 1rem;
     border-bottom: 1px solid var(--color-border);
@@ -543,12 +657,12 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
-  .post-content :global(.footnotes > details > ol) {
+  .post-content :global(.footnotes > details > :is(ol, ul)) {
     font-size: var(--text-ui);
     list-style: none;
     padding-inline-start: 0;
   }
-  .post-content :global(.footnotes > details > ol > li) {
+  .post-content :global(.footnotes > details > :is(ol, ul) > li) {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
     column-gap: 0.6em;
@@ -559,6 +673,8 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    min-width: 3ch;
+    color: var(--color-link);
     font-variant-numeric: tabular-nums;
   }
   .post-content :global(.footnote-content > :first-child) {

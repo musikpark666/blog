@@ -11,7 +11,7 @@ import rehypePostLinks from './src/lib/rehype-post-links.mjs';
 import sharedFontCss, { pretendardJp } from './src/lib/shared-font-css.mjs';
 import remarkGreentext, { rehypeGreentextLines } from './src/lib/remark-greentext.mjs';
 import rehypeCallouts from './src/lib/rehype-callouts.mjs';
-import rehypeFootnotes from './src/lib/rehype-footnotes.ts';
+import rehypeFootnotes, { remarkFootnotes } from './src/lib/rehype-footnotes.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -36,6 +36,7 @@ export default defineConfig({
           pageResolver: (name) => [name.trim().replace(/\\$/, '')],
           hrefTemplate: (slug) => `/posts/${encodeURIComponent(slug)}/`,
         }],
+        remarkFootnotes,
       ],
       rehypePlugins: [
         rehypeCallouts,
