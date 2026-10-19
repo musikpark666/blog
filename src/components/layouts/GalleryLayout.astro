@@ -1,9 +1,9 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import GalleryHeader from '../components/GalleryHeader.astro';
-import GalleryPostList from '../components/GalleryPostList.astro';
+import GalleryHeader from '../GalleryHeader.astro';
+import GalleryPostList from '../GalleryPostList.astro';
 import { Image } from 'astro:assets';
-import { getGalleryHref, getGalleryKind, getGalleryPostHref, getPostListPageHref, type GalleryPageProps } from '../lib/gallery';
+import { getGalleryHref, getGalleryKind, getGalleryPostHref, getPostListPageHref, type GalleryPageProps } from '../../lib/gallery';
 interface Props extends GalleryPageProps {}
 const { gallery, pagePosts, randomPosts, postCount, currentPage, totalPages, compactPage } = Astro.props;
 const compactPageHref = compactPage.currentPage !== currentPage

@@ -1,13 +1,13 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import GalleryHeader from '../components/GalleryHeader.astro';
-import GalleryPostList from '../components/GalleryPostList.astro';
-import TableOfContents from '../components/TableOfContents.astro';
-import { collectPostImages } from '../lib/post-images';
+import GalleryHeader from '../GalleryHeader.astro';
+import GalleryPostList from '../GalleryPostList.astro';
+import TableOfContents from '../TableOfContents.astro';
+import { collectPostImages } from '../../lib/post-images';
 
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import { getGalleryContextKey, getGalleryHref, getGalleryKind, getPostListPageHref, type GalleryPostContext } from '../lib/gallery';
+import { getGalleryContextKey, getGalleryHref, getGalleryKind, getPostListPageHref, type GalleryPostContext } from '../../lib/gallery';
 
 interface Props {
   post: CollectionEntry<'post'>;
@@ -843,6 +843,7 @@ const imageDownloads = [...new Map((await Promise.all(collectedImages))
     font-weight: 700;
   }
   .post-content :global(mark) {
+    font-weight: 700;
     background: linear-gradient(transparent 60%, var(--color-highlight) 60%);
   }
 </style>
