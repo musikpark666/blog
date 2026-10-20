@@ -76,6 +76,10 @@ const preserveOriginal = typeof image === 'string'
 <script>
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
+    const target = event.target;
+    document.querySelectorAll<HTMLDetailsElement>('.post-image-source[open]').forEach((panel) => {
+      if (!panel.contains(target)) panel.open = false;
+    });
     const button = event.target.closest<HTMLButtonElement>('.post-image-spoiler');
     if (!button) return;
     const figure = button.closest<HTMLElement>('.post-image')!;

@@ -33,8 +33,10 @@ interface Props {
 
 const { post, galleryContexts } = Astro.props;
 const { Content, headings } = await render(post);
+
+import Img from '../../components/post/Img.astro';
 ---
 
 <PostLayout post={post} galleryContexts={galleryContexts} headings={headings}>
-  <Content />
+  <Content components={{ Img }} />
 </PostLayout>

@@ -1,53 +1,39 @@
-# my-blog
+# musik.gallery
 
-This is  my personal blog. 
+Source code for [musik.gallery](https://musik.gallery), a static blog built with Astro. Articles are written in Markdown and MDX, and gallery metadata is stored in YAML.
 
-## TODO lists
+## Getting started
 
->after implement posting
+The development server URL is printed on startup. The default port is `4321`.
 
-1. 
-2. Header.astro: **search** implementation
-3. Header.astro: **menu, night mode** implementation (++**Theme**)
-4. Footer.astro: **btns** implementation
-5. Footer.astro: `.footer-top` wide view
-6. Sidebar.astro: implement several **widgets**
-8. GalleryHeader.astro: **relatedSite**, serveral **actions** implementation
-9. GalleryPostList.astro: several btn scripting
-10. additional `astro.config.mjs` settings
+| Command | Description |
+| --- | --- |
+| `npm run astro -- dev status` | Check the background development server status |
+| `npm run astro -- dev logs` | View development server logs |
+| `npm run astro -- dev stop` | Stop the development server |
+| `npm run build` | Build the static site into `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run deploy` | Build and deploy to the server (requires `.env.deploy`) |
 
->issue?
+## Project structure
 
-1. Header logo image flicking
-2. Page navigation latency (Dev Server error?)
+```text
+src/
+├── components/         # Shared UI and page layouts in layouts/
+├── content/
+│   ├── post/           # Markdown and MDX articles
+│   ├── gallery/        # Regular galleries
+│   ├── minor-gallery/  # Minor galleries
+│   ├── minor-gallery-groups.yaml  # Groups for the minor gallery directory
+│   └── quotes.yaml    # Quotes
+├── content.config.ts  # Content schemas
+├── pages/             # Pages and routes
+├── lib/               # Shared logic
+├── styles/            # Shared styles and theme colors
+└── assets/            # Images and other build assets
+public/                # Static files served as-is
+```
 
->will be soon
+An article's `categories` and `mcategories` reference regular and minor gallery IDs, respectively. Minor gallery IDs are filenames without extensions, using lowercase English words separated by hyphens.
 
-1. add commentation
-5. focus-visible styling
-6. heading level organize ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements#avoid_using_multiple_h1_elements_on_one_page), [W3C](https://www.w3.org/WAI/tutorials/page-structure/headings/))
-7. Views (view count) & Comment
-8. GalleryPostList.astro: **sorting** by alphaberic/viewed/comments...
-9. aria-labeling
-10. testing additional fonts 
-11. more styling code block
-n. refer to other sites (blog, news, ...)
-
->someday
-
-1. improve deploy script (don't copy all)
-2. mini gallery - fediverse microblog integrate
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run deploy`          | Build and deployment to server                   |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+`src/content/`, `src/assets/`, and environment files are excluded from Git and must be provided separately.
